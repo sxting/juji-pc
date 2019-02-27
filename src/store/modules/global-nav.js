@@ -5,22 +5,15 @@ const mock = [
     {
         "id": "1044886626813353984",
         "parentId": "0",
-        "name": "dashboard",
+        "name": "商品管理",
         "path": '/dashboard',
         "icon": 'dashboard',
         "leaf": false,
         "children": [{
             "id": "1044886629921333248",
             "parentId": "1044886626813353984",
-            "name": "analysis",
+            "name": "商品列表",
             "path": '/dashboard/analysis',
-            "leaf": true,
-            "children": []
-        },{
-            "id": "1044886629921333248",
-            "parentId": "1044886626813353984",
-            "name": "workplace",
-            "path": '/dashboard/workplace',
             "leaf": true,
             "children": []
         }]
@@ -28,41 +21,20 @@ const mock = [
     {
     "id": "1044886626813353984",
     "parentId": "0",
-    "name": "system",
+    "name": "结算列表",
     "path": '/system',
     "icon": 'setting',
     "leaf": false,
     "children": [{
         "id": "1044886629921333248",
         "parentId": "1044886626813353984",
-        "name": "setting",
-        "path": "/system/setting",
-        "leaf": false,
-        "children": [{
-            "id": "1044886630026190848",
-            "parentId": "1044886629921333248",
-            "name": "menu",
-            "path": "/system/setting/menu",
-            "leaf": true,
-            "children": []
-        }, {
-            "id": "1044886630122659840",
-            "parentId": "1044886629921333248",
-            "name": "module",
-            "path": "/system/setting/module",
-            "leaf": true,
-            "children": []
-        }]
-    },{
-        "id": "1044886629921333248",
-        "parentId": "1044886626813353984",
-        "name": "role",
+        "name": "商家结算列表",
         "path": "/system/role",
         "leaf": true,
     },{
         "id": "1044886629921333248",
         "parentId": "1044886626813353984",
-        "name": "admin",
+        "name": "订单列表",
         "path": "/system/admin",
         "leaf": true,
     }]
@@ -72,9 +44,9 @@ function formatter(data, parentPath = '', parentName) {
     return data.map(item => {
         let locale = 'menu';
         if (parentName && item.name) {
-            locale = `${parentName}.${item.name}`;
+            locale = `${item.name}`;
         } else if (item.name) {
-            locale = `menu.${item.name}`;
+            locale = `${item.name}`;
         } else if (parentName) {
             locale = parentName;
         }
