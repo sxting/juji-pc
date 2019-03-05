@@ -1,154 +1,72 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import store from '../store'
-
-import UserLayout from '@/layouts/UserLayout'
-import BasicLayout from '@/layouts/BasicLayout'
-import BlankLayout from '@/layouts/BlankLayout'
+import RouteView from '@/layouts/RouteView'
+import MenuView from '@/layouts/MenuView'
+import Login from '@/pages/login/Login'
+import ProductList from '@/pages/product/productList'
+import AddProduct from '@/pages/product/addProduct'
+import BaobiaoList from '@/pages/jiesuan/baobiao'
+import OrderList from '@/pages/jiesuan/order'
 
 Vue.use(Router)
 
-const router = new Router({
+export default new Router({
   routes: [
-    // user
     {
-      path: '/user',
-      component: UserLayout,
-      children: [
-        { path: '/user', redirect: '/user/login' },
-        { path: '/user/login', component: () => import('@/views/User/Login') },
-        { path: '/user/register', component: () => import('@/views/User/Register') },
-      ],
+      path: '/login',
+      name: '登录页',
+      component: Login,
+      invisible: true
     },
-    // app
     {
       path: '/',
-      component: BasicLayout,
+      name: '首页',
+      component: MenuView,
+      redirect: '/login',
+      icon: 'none',
+      invisible: true,
       children: [
-        // dashboard
-        { path: '/', redirect: '/dashboard/analysis' },
         {
-          path: '/dashboard',
-          name: 'dashboard',
-          component: BlankLayout,
-          children: [
-            { path: '/dashboard/analysis', name: 'analysis', component: () => import('@/views/Dashboard/Analysis') },
-            // { path: '/dashboard/monitor', name: 'monitor', component: () => import('@/views/Dashboard/Analysis') },
-            { path: '/dashboard/workplace', name: 'workplace', component: () => import('@/views/Dashboard/Workplace') },
-          ]
-        },
-        // {
-        //   path: '/form',
-        //   name: 'form',
-        //   icon: 'form',
-        //   component: BlankLayout,
-        //   children: [
-        //     { path: '/form/basic-form', name: 'basicform', component: () => import('@/views/Dashboard/Analysis') },
-        //     {
-        //       path: '/form/step-form',
-        //       name: 'stepform',
-        //       component: BlankLayout,
-        //       hideChildrenInMenu: true,
-        //       children: [
-        //         {
-        //           path: '/form/step-form/info',
-        //           name: 'info',
-        //           component: () => import('@/views/Dashboard/Analysis'),
-        //         },
-        //       ]
-        //     },
-        //     { path: '/form/advanced-form', name: 'advancedform', component: () => import('@/views/Dashboard/Analysis') },
-        //   ]
-        // },
-        // {
-        //   path: '/list',
-        //   icon: 'table',
-        //   name: 'list',
-        //   component: BlankLayout,
-        //   children: [
-        //     {
-        //       path: '/list/search',
-        //       name: 'searchlist',
-        //       component: BlankLayout,
-        //       children: [
-        //         {
-        //           path: '/list/search/articles',
-        //           name: 'articles',
-        //         },
-        //         {
-        //           path: '/list/search/projects',
-        //           name: 'projects',
-        //         },
-        //         {
-        //           path: '/list/search/applications',
-        //           name: 'applications',
-        //         },
-        //       ]
-        //     }
-        //   ]
-        // },
-        // {
-        //   path: '/profile',
-        //   icon: 'profile',
-        //   name: 'profile',
-        // },
-        {
-          path: '/system',
-          name: 'system',
-          component: BlankLayout,
+          path: '/product',
+          name: '商品管理',
+          component: RouteView,
+          icon: 'dashboard',
           children: [
             {
-              path: '/system/setting',
-              name: 'setting',
-              component: BlankLayout,
-              children: [
-                {
-                  path: '/system/setting/menu',
-                  name: 'menu',
-                  component: () => import('@/views/System/Menu')
-                },
-                {
-                  path: '/system/setting/module',
-                  name: 'module',
-                  component: () => import('@/views/System/Role')
-                },
-                {
-                  path: '/system/setting/config',
-                  name: 'config',
-                  component: () => import('@/views/System/Role')
-                },
-                {
-                  path: '/system/setting/dict',
-                  name: 'dict',
-                  component: () => import('@/views/System/Role')
-                },
-                {
-                  path: '/system/setting/area',
-                  name: 'area',
-                  component: () => import('@/views/System/Role')
-                },
-              ]
+              path: '/product/productList',
+              name: '商品列表',
+              component: ProductList,
+              icon: 'none'
             },
             {
-              path: '/system/role',
-              name: 'role',
-              component: () => import('@/views/System/Role')
-            },
-            {
-              path: '/system/admin',
-              name: 'admin',
-              component: () => import('@/views/System/Role')
+              path: '/product/addProduct',
+              name: '新增商品',
+              component: AddProduct,
+              icon: 'none'
             }
           ]
         },
+        {
+          path: '/jiesuan',
+          name: '结算报表',
+          component: RouteView,
+          icon: 'dashboard',
+          children: [
+            {
+              path: '/jiesuan/baobiao',
+              name: '商家结算报表',
+              component: BaobiaoList,
+              icon: 'none'
+            },
+            {
+              path: '/jiesuan/order',
+              name: '订单列表',
+              component: OrderList,
+              icon: 'none'
+            }
+          ]
+        }
       ]
-    },
-
+    }
   ]
 })
-
-router.afterEach(() => {
-  store.commit('global/UpdateBasicLayoutSpinning', false);
-});
-
-export default router

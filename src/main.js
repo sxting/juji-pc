@@ -1,34 +1,32 @@
+// The Vue build version to load with the `import` command
+// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
+import router from './router/lazy'
+import 'ant-design-vue/dist/antd.css'
+import Antd from 'ant-design-vue'
+import Viser from 'viser-vue'
+import axios from 'axios'
+import '@/mock'
 import store from './store'
-import router from './router'
-import Vuei18n from 'vue-i18n'
-import { sync } from 'vuex-router-sync'
-import zh_CN from "./locales/zh_CN";
-import en_US from "./locales/en_US";
-import defaultSettings from './defaultSettings'
+import PouchDB from 'pouchdb'
 
+Vue.prototype.$axios = axios
 Vue.config.productionTip = false
+Vue.use(Viser)
+Vue.use(Antd)
 
-Vue.use(Vuei18n)
-
-const messages = {
-  "zh_CN": zh_CN,
-  "en_US": en_US,
-}
-const i18n = new Vuei18n({
-  locale: 'zh_CN',  // 语言标识
-  messages
-})
-
-sync(store, router)
-
-//加载默认设置
-store.commit('global/UpdateDefaultSettings', defaultSettings)
-
+/* eslint-disable no-new */
 new Vue({
+  el: '#app',
   router,
   store,
-  i18n,
-  render: h => h(App)
-}).$mount('#app')
+  components: { App },
+  template: '<App/>',
+  mounted () {
+    var db = new PouchDB('admindb')
+    db.get('currUser').then(doc => {
+      this.$store.commit('account/setuser', doc.user)
+    })
+  }
+})
