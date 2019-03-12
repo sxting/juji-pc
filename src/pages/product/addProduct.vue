@@ -52,18 +52,27 @@
           </div>
         </a-form-item>
         <a-form-item label="图文详情" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
-          <div class="clearfix">
-            <a-upload listType="picture-card" :fileList="fileList3" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @preview="handlePreview" @change="handleChange3($event)">
-              <div v-if="fileList3.length < 5">
-                <a-icon type="plus" />
-                <div class="ant-upload-text">上传图片</div>
-              </div>
-            </a-upload>
-            <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
-              <img alt="example" style="width: 100%" :src="previewImage" />
-            </a-modal>
+          <div v-for="(list, j) in picXQ" :key="j" style="margin-top:20px;">
+            <div class="clearfix">
+              <a-upload listType="picture-card" :fileList="list.fileList" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @preview="handlePreview" @change="handleChange3($event,j)">
+                <div v-if="list.fileList.length < 5">
+                  <a-icon type="plus" />
+                  <div class="ant-upload-text">上传图片</div>
+                </div>
+              </a-upload>
+              <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
+                <img alt="example" style="width: 100%" :src="previewImage" />
+              </a-modal>
+            </div>
+            <a-textarea rows="4" :value="list.picIds" @change="XQgetnoteDetaildata(j,$event.target.value)" placeholder="请输入图文详情的介绍文字，展示在图片下方" />
+            <div>
+              <p class="double_btn">
+                <span class="descriptions_addAll_btn" @click="XQaddGroupBuynote()">增加一组</span>
+                <span class="descriptions_minusAll_btn" @click="XQpluseGroupbuyNote(j)">删除此组</span>
+              </p>
+            </div>
           </div>
-          <a-textarea rows="4" v-model="picIds" placeholder="请输入图文详情的介绍文字，展示在图片下方" />
+
         </a-form-item>
         <a-form-item label="购买须知" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div class="marketing_means">
@@ -168,6 +177,7 @@ export default {
       productType: "PRODUCT",
       previewImage: "",
       buyerNotes: [{ title: "", details: [{ item: "" }] }], //购买须知
+      picXQ: [{fileList:[],picIds:''}], //图片详情
       fileList1: [],
       fileList2: [],
       fileList3: [],
@@ -194,7 +204,7 @@ export default {
   },
   created() {},
   mounted() {
-    this.getData()
+    this.getData();
   },
   watch: {
     $route(to, from) {
@@ -203,8 +213,8 @@ export default {
     }
   },
   methods: {
-    getData(){
-      this.providerId =  this.$route.query.providerId;
+    getData() {
+      this.providerId = this.$route.query.providerId;
       this.merchantListFun(this.providerId);
     },
     checkStord() {
@@ -218,7 +228,7 @@ export default {
       if (this.buyerNotes[index].details.length >= 5) {
         this.$error({
           title: "温馨提示",
-          content: "手下留情啊,不能再删除了!!"
+          content: "最多添加五组!!"
         });
       } else {
         this.buyerNotes[index].details.push({ item: "" });
@@ -239,7 +249,7 @@ export default {
       if (this.buyerNotes.length >= 5) {
         this.$error({
           title: "温馨提示",
-          content: "手下留情啊,不能再删除了!!"
+          content: "最多添加五组!!"
         });
       } else {
         this.buyerNotes.push({
@@ -248,8 +258,46 @@ export default {
         });
       }
     },
+    pluseGroupbuyNote(index) {
+      if (this.buyerNotes.length <= 1) {
+        this.$error({
+          title: "温馨提示",
+          content: "手下留情啊,不能再删除了!!"
+        });
+        return;
+      } else {
+        this.buyerNotes.splice(index, 1);
+      }
+    },
+    XQaddGroupBuynote() {
+      if (this.buyerNotes.length >= 5) {
+        this.$error({
+          title: "温馨提示",
+          content: "最多添加五组!!"
+        });
+      } else {
+        this.picXQ.push(
+         {fileList:[],picIds:''}
+        );
+      }
+    },
+    XQpluseGroupbuyNote(index) {
+      if (this.picXQ.length <= 1) {
+        this.$error({
+          title: "温馨提示",
+          content: "手下留情啊,不能再删除了!!"
+        });
+        return;
+      } else {
+        this.picXQ.splice(index, 1);
+      }
+    },
+    XQgetnoteDetaildata(index, event) {
+      this.picXQ[index].picIds = event;
+    },
     submit(e) {
       // e.preventDefault();
+      console.log(this.picXQ)
       let data;
       this.form.validateFields((err, values) => {
         console.log(values);
@@ -299,17 +347,6 @@ export default {
       //   }
       // });
     },
-    pluseGroupbuyNote(index) {
-      if (this.buyerNotes.length <= 1) {
-        this.$error({
-          title: "温馨提示",
-          content: "手下留情啊,不能再删除了!!"
-        });
-        return;
-      } else {
-        this.buyerNotes.splice(index, 1);
-      }
-    },
     getnoteTitledata(index, event) {
       this.buyerNotes[index].title = event;
     },
@@ -340,8 +377,8 @@ export default {
     handleChange2({ fileList }) {
       this.fileList2 = fileList;
     },
-    handleChange3({ fileList }) {
-      this.fileList3 = fileList;
+    handleChange3({ fileList },ind) {
+      this.picXQ[ind].fileList = fileList;
     },
     handleCancel(e) {
       this.visible = false;
