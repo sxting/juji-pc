@@ -5,9 +5,9 @@
         <a-form-item
           label="仓库名"
           fieldDecoratorId="repository.name"
-          :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入仓库名称', whitespace: true}]}"
+          :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入商品名称', whitespace: true}]}"
         >
-          <a-input placeholder="请输入仓库名称" />
+          <a-input placeholder="请输入商品名称" />
         </a-form-item>
       </a-col>
       <a-col :xl="{span: 6, offset: 2}" :lg="{span: 8}" :md="{span: 12}" :sm="24">

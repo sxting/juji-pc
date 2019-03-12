@@ -32,7 +32,7 @@ export default new Router({
             {
               path: '/product/productList',
               name: '商品列表',
-              component: () => import('@/pages/proDuct/productList'),
+              component: () => import('@/pages/product/productList'),
               icon: 'none'
             },
             {

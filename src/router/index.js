@@ -39,7 +39,7 @@ export default new Router({
               icon: 'none'
             },
             {
-              path: '/product/addProduct',
+              path: '/product/addProduct:providerId',
               name: '新增商品',
               component: AddProduct,
               icon: 'none'

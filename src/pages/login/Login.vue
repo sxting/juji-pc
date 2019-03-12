@@ -99,22 +99,9 @@ export default {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
-          this.logging = true
-          this.$axios.post('/login', {
-            name: this.form.getFieldValue('name'),
-            password: this.form.getFieldValue('password')
-          }).then((res) => {
-            this.logging = false
-            const result = res.data
-            if (result.code >= 0) {
-              const user = result.data.user
+
               this.$router.push('/product/productList')
-              this.$store.commit('account/setuser', user)
-              this.$message.success(result.message, 3)
-            } else {
-              this.error = result.message
-            }
-          })
+
         }
       })
     }
