@@ -27,8 +27,8 @@
         </a-form-item>
         <a-form-item label="商品首图" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <div class="clearfix">
-            <a-upload listType="picture-card" :fileList="fileList1" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @preview="handlePreview" @change="handleChange1($event)">
-              <div v-if="fileList1.length < 5">
+            <a-upload listType="picture-card" :fileList="fileList1" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun"  @change="handleChange1($event)">
+              <div v-if="fileList1.length < 1">
                 <a-icon type="plus" />
                 <div class="ant-upload-text">上传图片</div>
               </div>
@@ -40,29 +40,23 @@
         </a-form-item>
         <a-form-item label="商品图片" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div class="clearfix">
-            <a-upload listType="picture-card" :fileList="fileList2" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @preview="handlePreview" @change="handleChange2($event)">
+            <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}"  :fileList="fileList2" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @preview="handlePreview" @change="handleChange2($event)">
               <div v-if="fileList2.length < 5">
                 <a-icon type="plus" />
                 <div class="ant-upload-text">上传图片</div>
               </div>
             </a-upload>
-            <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
-              <img alt="example" style="width: 100%" :src="previewImage" />
-            </a-modal>
           </div>
         </a-form-item>
         <a-form-item label="图文详情" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div v-for="(list, j) in picXQ" :key="j" style="margin-top:20px;">
             <div class="clearfix">
-              <a-upload listType="picture-card" :fileList="list.fileList" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @preview="handlePreview" @change="handleChange3($event,j)">
+              <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :fileList="list.fileList" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @preview="handlePreview" @change="handleChange3($event,j)">
                 <div v-if="list.fileList.length < 5">
                   <a-icon type="plus" />
                   <div class="ant-upload-text">上传图片</div>
                 </div>
               </a-upload>
-              <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
-                <img alt="example" style="width: 100%" :src="previewImage" />
-              </a-modal>
             </div>
             <a-textarea rows="4" :value="list.picIds" @change="XQgetnoteDetaildata(j,$event.target.value)" placeholder="请输入图文详情的介绍文字，展示在图片下方" />
             <div>
@@ -104,10 +98,12 @@
             </div>
           </div>
         </a-form-item>
-        <a-form-item label="库存" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.stock" :fieldDecoratorOptions="{rules: [{ required: true, message: '使用库存', whitespace: true}]}" :required="true">
+        <a-form-item label="库存" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.stock" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入使用库存', whitespace: true}]}" :required="true">
+          <div>
           <a-input-number :min="1" :max="99999" />
+          </div>
         </a-form-item>
-        <a-form-item label="使用有效期" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.cutOffDays" :fieldDecoratorOptions="{rules: [{ required: true, message: '使用有效期', whitespace: true}]}" :required="true">
+        <a-form-item label="使用有效期" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.cutOffDays" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入使用有效期', whitespace: true}]}" :required="true">
           <div>
             自购买之日起
             <a-input-number :min="1" :step="1" :max="30" /> 天内有效
@@ -134,8 +130,8 @@
           </div>
         </a-form-item>
         <a-form-item label="所属商家" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-select v-model="mechantId" @change="mechantChange">
-            <a-select-option v-for="item in merchantList" :key="item.id">{{item.name}}</a-select-option>
+          <a-select  @change="mechantChange">
+            <a-select-option v-for="(item,index) in merchantList" :key="index">{{item.name}}</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label="适用门店" :labelCol="{span: 7}" :wrapperCol="{span: 10}" v-if="mechantId" :required="true">
@@ -191,7 +187,7 @@ export default {
       ModalText: "Content of the modal",
       visible: false,
       confirmLoading: false,
-      mechantId: "",
+      mechantId: {},
       merchantList: [],
       storeIdListTrue: [],
       storeIdList: [],
@@ -296,36 +292,49 @@ export default {
       this.picXQ[index].picIds = event;
     },
     submit(e) {
-      // e.preventDefault();
-      console.log(this.picXQ)
-      let data;
+      e.preventDefault();
+      let data,picXQArr=[],note = [],storeIdArr = [];
+       this.picXQ.forEach(function(i){
+        let pic = [];
+        i.fileList.forEach(function(m){
+            pic.push(m.response)
+        })
+        picXQArr.push(
+          {title:"", content:[i.picIds],picIds:pic}
+        )
+      })
+      this.buyerNotes.forEach(function(i){
+          note.push({
+            title : i.title,
+            content : [i.details[0].item]
+          })
+      })
+      this.storeIdList.forEach(function(i){
+          storeIdArr.push({
+            storeId : i,
+          })
+      })
       this.form.validateFields((err, values) => {
-        console.log(values);
         if (!err) {
           console.log("Received values of form: ", values);
         }
         data = {
           cutOffDays: values.repository.cutOffDays, //核销截止日期
-          description:
-            '[{"title":"", "content":["测试商品" ,"修改此处内容"],"picIds":["26wJ-TXukQqS"]}]',
+          description:picXQArr,
           idx: values.repository.idx,
           limitMaxNum: this.limitMaxNum,
           limitPerDayNum: this.limitPerDayNum,
           limitPerOrderNum: this.limitPerOrderNum,
-          merchantId: this.mechantId,
-          merchantName: "test",
-          note: '[{"title":"购买须知", "content":["30天核销" ,"活动促销"]}]',
+          merchantId: this.merchantId,
+          merchantName: this.merchantName,
+          note: note,
           originalPrice: values.repository.originalPrice,
-          picId: "26wJ-TXukQqS",
-          picIds: "26wJ-TXukQqS",
+          picId: this.fileList1[0].response,
+          picIds: "",
           point: 1,
-          price: values.repository.price,
-          productName: "TEST 商品",
-          productStores: [
-            {
-              storeId: "111548833959189117"
-            }
-          ],
+          price: values.repository.price *100,
+          productName: values.repository.productName,
+          productStores: storeIdArr,
           providerId: this.providerId,
           providerName: values.repository.providerName,
           putAway: 1,
@@ -334,18 +343,21 @@ export default {
           type: this.productType
         };
       });
-
-      // this.$axios({
-      //   url: "/endpoint/produt/add.json",
-      //   method: "post",
-      //   processData: false,
-      //   data: data
-      // }).then(res => {
-      //   if (res) {
-      //     console.log(res);
-      //   } else {
-      //   }
-      // });
+      this.$axios({
+        url: "/endpoint/produt/add.json",
+        method: "post",
+        processData: false,
+        data: data
+      }).then(res => {
+        if (res.success) {
+          console.log(res);
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
     },
     getnoteTitledata(index, event) {
       this.buyerNotes[index].title = event;
@@ -410,13 +422,18 @@ export default {
         url: "http://juji-dev.juniuo.com/upload/image.json",
         method: "post",
         processData: false,
-        params: formData
+        data: formData,
+        type:"formData"
       }).then(res => {
-        if (res) {
+        if (res.errorCode === '0') {
           e.onProgress(res, e.file);
           e.onSuccess(res["data"], e.file, res);
         } else {
-          e.onError(res.data.errorInfo, e.file);
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo+'请稍后重新上传'
+          });
+          e.onError(res.errorInfo, e.file);
         }
       });
     },
@@ -424,8 +441,11 @@ export default {
       this.allShopsNumber = 0;
       this.storeIdListTrue = [];
       this.storeIdList = [];
+      this.merchantId = this.merchantList[event].id;
+      this.merchantName = this.merchantList[event].name;
+      
       let data = {
-        merchantId: event
+        merchantId: this.merchantList[event].id
       };
       this.$axios({
         url: "/endpoint/juji/merchant/store/list.json",
