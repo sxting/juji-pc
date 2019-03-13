@@ -320,14 +320,14 @@ export default {
         }
         data = {
           cutOffDays: values.repository.cutOffDays, //核销截止日期
-          description:picXQArr,
+          description:JSON.stringify(picXQArr),
           idx: values.repository.idx,
           limitMaxNum: this.limitMaxNum,
           limitPerDayNum: this.limitPerDayNum,
           limitPerOrderNum: this.limitPerOrderNum,
           merchantId: this.merchantId,
           merchantName: this.merchantName,
-          note: note,
+          note: JSON.stringify(note),
           originalPrice: values.repository.originalPrice,
           picId: this.fileList1[0].response,
           picIds: "",
