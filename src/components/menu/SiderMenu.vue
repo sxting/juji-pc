@@ -91,7 +91,7 @@ export default {
         font-family: "Myriad Pro","Helvetica Neue",Arial,Helvetica,sans-serif;
         font-weight: 600;
         display: inline-block;
-        height: 32px;
+        height: 26px;
         line-height: 32px;
         vertical-align: middle;
       }

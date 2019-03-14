@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card :body-style="{padding: '24px 32px'}" :bordered="false">
-      <a-form @submit="submit" :autoFormCreate="(form) => this.form = form">
+      <a-form @submit="submit" :autoFormCreate="(form) => {this.form = form;}">
         <a-form-item label="商品类型" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="productType" :style="{ marginBottom: '8px' }">
             <a-radio-button value="PRODUCT">普通商品</a-radio-button>
@@ -19,15 +19,25 @@
         <a-form-item label="商品名称" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.productName" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入仓库名称', whitespace: true}]}" :required="true">
           <a-input placeholder="请输入商品名称，限1-40字" />
         </a-form-item>
-        <a-form-item label="原价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.originalPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价', whitespace: true}]}" :required="true">
+        <a-form-item label="原价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.originalPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
           <a-input placeholder="请输入商品原价" />
         </a-form-item>
-        <a-form-item label="售价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.price" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入售价', whitespace: true}]}" :required="true">
-          <a-input placeholder="请输入商品售价" />
+        <a-form-item label="售价" :labelCol="{span: 7}" v-if="productType === 'PRODUCT'" :wrapperCol="{span: 10}" :required="true">
+          <a-input :value="price" @change="priceChange($event)" placeholder="请输入商品售价" />
+        </a-form-item>
+        <a-form-item label="售价" :labelCol="{span: 7}" v-if="productType === 'POINT'" :wrapperCol="{span: 10}" :required="true">
+          <a-radio-group v-model="jifen">
+            <a-radio :value="'桔子兑换'">桔子兑换</a-radio>
+            <a-radio :value="'桔子+钱'">桔子+钱</a-radio>
+          </a-radio-group>
+          <div>
+            <a-input-number :min="1" :value="point" @change="pointChange($event)" :max="99999" style="width:200px;margin-right:10px;" placeholder="请输入桔子数量" />
+            <a-input-number :min="1" :value="price" @change="priceChange($event)" v-if="jifen === '桔子+钱'" style="width:200px" :max="99999" placeholder="请输入钱数" />
+          </div>
         </a-form-item>
         <a-form-item label="商品首图" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <div class="clearfix">
-            <a-upload listType="picture-card" :fileList="fileList1" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun"  @change="handleChange1($event)">
+            <a-upload listType="picture-card" :fileList="fileList1" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @change="handleChange1($event)">
               <div v-if="fileList1.length < 1">
                 <a-icon type="plus" />
                 <div class="ant-upload-text">上传图片</div>
@@ -40,7 +50,7 @@
         </a-form-item>
         <a-form-item label="商品图片" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div class="clearfix">
-            <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}"  :fileList="fileList2" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @preview="handlePreview" @change="handleChange2($event)">
+            <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :fileList="fileList2" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @preview="handlePreview" @change="handleChange2($event)">
               <div v-if="fileList2.length < 5">
                 <a-icon type="plus" />
                 <div class="ant-upload-text">上传图片</div>
@@ -98,16 +108,11 @@
             </div>
           </div>
         </a-form-item>
-        <a-form-item label="库存" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.stock" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入使用库存', whitespace: true}]}" :required="true">
-          <div>
+        <a-form-item label="库存" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.stock" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入使用库存'}]}" :required="true">
           <a-input-number :min="1" :max="99999" />
-          </div>
         </a-form-item>
-        <a-form-item label="使用有效期" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.cutOffDays" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入使用有效期', whitespace: true}]}" :required="true">
-          <div>
-            自购买之日起
-            <a-input-number :min="1" :step="1" :max="30" /> 天内有效
-          </div>
+        <a-form-item label="使用有效期" :labelCol="{span: 7}" help="自购买之日起开始计算时间" :wrapperCol="{span: 10}" fieldDecoratorId="repository.cutOffDays" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入使用有效期'}]}" :required="true">
+          <a-input-number :min="1" :step="1" :max="30" />
         </a-form-item>
         <a-form-item label="购买限制" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div>
@@ -123,19 +128,16 @@
             <a-input-number :min="0" :step="1" :max="999" v-model="limitPerOrderNum" /> 个
           </div>
         </a-form-item>
-        <a-form-item label="展示顺序" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.idx" :required="false">
-          <div>
-            第
-            <a-input-number :min="0" :step="1" :max="99999" /> 位
-          </div>
+        <a-form-item label="展示顺序" :labelCol="{span: 7}" help="第几位" :wrapperCol="{span: 10}" fieldDecoratorId="repository.idx" :required="false">
+            <a-input-number :min="0" :step="1" :max="99999" />
         </a-form-item>
-        <a-form-item label="所属商家" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-select  @change="mechantChange">
-            <a-select-option v-for="(item,index) in merchantList" :key="index">{{item.name}}</a-select-option>
+        <!-- @change="mechantChange"  fieldDecoratorId="repository.mechantId"   :value="item.id"-->
+        <a-form-item label="所属商家" :labelCol="{span: 7}" fieldDecoratorId="repository.merchantId" :fieldDecoratorOptions="{rules: [{ required: true, message: '请选择商家'}]}" :wrapperCol="{span: 10}" :required="true">
+          <a-select @change="mechantChange($event)">
+            <a-select-option v-for="(item,index) in merchantList" :key="index" :value="item.id">{{item.name}}</a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="适用门店" :labelCol="{span: 7}" :wrapperCol="{span: 10}" v-if="mechantId" :required="true">
-
+        <a-form-item label="适用门店" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           已选择 {{allShopsNumber}} 家门店
           <span class="buttons" @click="checkStord">选择门店</span>
         </a-form-item>
@@ -173,7 +175,7 @@ export default {
       productType: "PRODUCT",
       previewImage: "",
       buyerNotes: [{ title: "", details: [{ item: "" }] }], //购买须知
-      picXQ: [{fileList:[],picIds:''}], //图片详情
+      picXQ: [{ fileList: [], picIds: "" }], //图片详情
       fileList1: [],
       fileList2: [],
       fileList3: [],
@@ -187,7 +189,7 @@ export default {
       ModalText: "Content of the modal",
       visible: false,
       confirmLoading: false,
-      mechantId: {},
+      merchantId: "",
       merchantList: [],
       storeIdListTrue: [],
       storeIdList: [],
@@ -195,13 +197,17 @@ export default {
       limitPerDayNum: "", // 限制每天购买数量 ,
       limitPerOrderNum: "", //限制每单购买数量 ,
       providerId: "",
-      picIds: ""
+      picIds: "",
+      jifen: "桔子兑换",
+      point: "",
+      price: "",
+      productId: sessionStorage.getItem('PROCIDERID')||""
     };
   },
-  created() {},
-  mounted() {
+  created() {
     this.getData();
   },
+  mounted() {},
   watch: {
     $route(to, from) {
       // 刷新参数放到这里里面去触发就可以刷新相同界面了
@@ -209,8 +215,15 @@ export default {
     }
   },
   methods: {
+    pointChange(e) {
+      this.point = e;
+    },
+    priceChange(e) {
+      this.price = e;
+    },
     getData() {
-      this.providerId = this.$route.query.providerId;
+      this.providerId = sessionStorage.getItem('PROCIDERID')||this.$route.query.providerId;
+      this.productId = this.$route.query.productId;
       this.merchantListFun(this.providerId);
     },
     checkStord() {
@@ -272,9 +285,7 @@ export default {
           content: "最多添加五组!!"
         });
       } else {
-        this.picXQ.push(
-         {fileList:[],picIds:''}
-        );
+        this.picXQ.push({ fileList: [], picIds: "" });
       }
     },
     XQpluseGroupbuyNote(index) {
@@ -293,56 +304,101 @@ export default {
     },
     submit(e) {
       e.preventDefault();
-      let data,picXQArr=[],note = [],storeIdArr = [];
-       this.picXQ.forEach(function(i){
+      let data,
+        picXQArr = [],
+        note = [],
+        storeIdArr = [];
+      this.picXQ.forEach(function(i) {
         let pic = [];
-        i.fileList.forEach(function(m){
-            pic.push(m.response)
-        })
-        picXQArr.push(
-          {title:"", content:[i.picIds],picIds:pic}
-        )
-      })
-      this.buyerNotes.forEach(function(i){
-          note.push({
-            title : i.title,
-            content : [i.details[0].item]
-          })
-      })
-      this.storeIdList.forEach(function(i){
-          storeIdArr.push({
-            storeId : i,
-          })
-      })
-      this.form.validateFields((err, values) => {
-        if (!err) {
-          console.log("Received values of form: ", values);
-        }
-        data = {
-          cutOffDays: values.repository.cutOffDays, //核销截止日期
-          description:JSON.stringify(picXQArr),
-          idx: values.repository.idx,
-          limitMaxNum: this.limitMaxNum,
-          limitPerDayNum: this.limitPerDayNum,
-          limitPerOrderNum: this.limitPerOrderNum,
-          merchantId: this.merchantId,
-          merchantName: this.merchantName,
-          note: JSON.stringify(note),
-          originalPrice: values.repository.originalPrice,
-          picId: this.fileList1[0].response,
-          picIds: "",
-          point: 1,
-          price: values.repository.price *100,
-          productName: values.repository.productName,
-          productStores: storeIdArr,
-          providerId: this.providerId,
-          providerName: values.repository.providerName,
-          putAway: 1,
-          stock: values.repository.stock,
-          tag: this.biaoqian,
-          type: this.productType
-        };
+        i.fileList.forEach(function(m) {
+          pic.push(m.response);
+        });
+        picXQArr.push({ title: "", content: [i.picIds], picIds: pic });
       });
+      this.buyerNotes.forEach(function(i) {
+        note.push({
+          title: i.title,
+          content: [i.details[0].item]
+        });
+      });
+      this.storeIdList.forEach(function(i) {
+        storeIdArr.push({
+          storeId: i
+        });
+      });
+      this.form.validateFields((err, values) => {
+        if (err) {
+          console.log(this.fileList1);
+        } else {
+          if (this.fileList1.length < 1) {
+            this.$error({
+              title: "温馨提示",
+              content: "请上传商品首图"
+            });
+          } else if (!values.repository.merchantId) {
+            this.$error({
+              title: "温馨提示",
+              content: "请选择所属商家"
+            });
+          } else if (storeIdArr.length < 1) {
+            this.$error({
+              title: "温馨提示",
+              content: "请选择试用门店"
+            });
+          } else if (
+            (this.productType === "POINT" &&
+              this.jifen === "桔子兑换" &&
+              !this.point) ||
+            (this.productType === "POINT" &&
+              this.jifen === "桔子+钱" &&
+              (!this.point || !this.price))
+          ) {
+            this.$error({
+              title: "温馨提示",
+              content: "请输入售价"
+            });
+          } else {
+            data = {
+              cutOffDays: values.repository.cutOffDays, //核销截止日期
+              description: JSON.stringify(picXQArr),
+              idx: values.repository.idx,
+              limitMaxNum: this.limitMaxNum,
+              limitPerDayNum: this.limitPerDayNum,
+              limitPerOrderNum: this.limitPerOrderNum,
+              merchantId: values.repository.merchantId,
+              merchantName: this.merchantName,
+              note: JSON.stringify(note),
+              originalPrice: values.repository.originalPrice * 100,
+              picId: this.fileList1[0].response
+                ? this.fileList1[0].response
+                : this.fileList1[0].name,
+              picIds: "",
+              point: this.productType === "POINT" ? this.point : "",
+              price:
+                this.productType === "POINT"
+                  ? this.price * 100
+                  : values.repository.price * 100,
+              productName: values.repository.productName,
+              productStores: storeIdArr,
+              providerId: this.providerId,
+              providerName: values.repository.providerName,
+              putAway: 1,
+              stock: values.repository.stock,
+              tag: this.biaoqian,
+              type: this.productType,
+              productId: this.productId
+            };
+            console.log(this.fileList1);
+            if (this.productId) {
+              this.checkdataFun(data);
+            } else {
+              this.updataFun(data);
+            }
+          }
+        }
+      });
+    },
+    updataFun(data) {
       this.$axios({
         url: "/endpoint/produt/add.json",
         method: "post",
@@ -350,7 +406,28 @@ export default {
         data: data
       }).then(res => {
         if (res.success) {
-          console.log(res);
+          this.$router.push({
+            path: "/product/productList"
+          });
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    checkdataFun(data) {
+      this.$axios({
+        url: "/endpont/product/update.json",
+        method: "post",
+        processData: false,
+        data: data
+      }).then(res => {
+        if (res.success) {
+          this.$router.push({
+            path: "/product/productList"
+          });
         } else {
           this.$error({
             title: "温馨提示",
@@ -384,12 +461,13 @@ export default {
       this.previewVisible = true;
     },
     handleChange1({ fileList }) {
+      console.log(fileList);
       this.fileList1 = fileList;
     },
     handleChange2({ fileList }) {
       this.fileList2 = fileList;
     },
-    handleChange3({ fileList },ind) {
+    handleChange3({ fileList }, ind) {
       this.picXQ[ind].fileList = fileList;
     },
     handleCancel(e) {
@@ -407,6 +485,9 @@ export default {
       }).then(res => {
         if (res.success) {
           this.merchantList = res.data;
+          if (this.productId) {
+            this.productInfo();
+          }
         } else {
           this.$error({
             title: "温馨提示",
@@ -423,29 +504,31 @@ export default {
         method: "post",
         processData: false,
         data: formData,
-        type:"formData"
+        type: "formData"
       }).then(res => {
-        if (res.errorCode === '0') {
+        if (res.errorCode === "0") {
           e.onProgress(res, e.file);
           e.onSuccess(res["data"], e.file, res);
         } else {
           this.$error({
             title: "温馨提示",
-            content: res.errorInfo+'请稍后重新上传'
+            content: res.errorInfo + "请稍后重新上传"
           });
           e.onError(res.errorInfo, e.file);
         }
       });
     },
-    mechantChange(event) {
+    mechantChange(event, storeIdArr) {
+      let that = this;
       this.allShopsNumber = 0;
       this.storeIdListTrue = [];
       this.storeIdList = [];
-      this.merchantId = this.merchantList[event].id;
-      this.merchantName = this.merchantList[event].name;
-      
+      this.merchantId = this.event;
+      this.merchantList.forEach(function(i) {
+        if (i.merchantId === event) that.merchantName = i.name;
+      });
       let data = {
-        merchantId: this.merchantList[event].id
+        merchantId: event
       };
       this.$axios({
         url: "/endpoint/juji/merchant/store/list.json",
@@ -455,6 +538,100 @@ export default {
       }).then(res => {
         if (res.success) {
           this.cityStoreList = res.data;
+          this.storeIdList = storeIdArr;
+          this.allShopsNumber = this.storeIdList.length;
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    picUrl(id) {
+      return (
+        "https://upic.juniuo.com/file/picture/" + id + "/resize_85_85/mode_fill"
+      );
+    },
+    productInfo() {
+      let that = this;
+      this.$axios({
+        url: "/endpoint/product/info.json",
+        method: "get",
+        processData: false,
+        params: { productId: this.productId }
+      }).then(res => {
+        if (res.success) {
+          this.productType = res.data.type;
+          this.biaoqian = res.data.tag;
+          this.price =  res.data.price / 100;
+          this.point =  res.data.point ;
+          
+          this.limitMaxNum =
+            res.data.limitMaxNum > 0 ? res.data.limitMaxNum : "";
+          this.limitPerDayNum = res.data.limitPerDayNum
+            ? res.data.limitPerDayNum
+            : "";
+          this.limitPerOrderNum = res.data.limitPerOrderNum
+            ? res.data.limitPerOrderNum
+            : "";
+          // merchantId:res.data.merchantId
+          this.merchantId = res.data.merchantId;
+          this.$nextTick(() => {
+            this.form.setFieldsValue({
+              repository: {
+                cutOffDays: res.data.cutOffDays,
+                idx: res.data.idx,
+                originalPrice: res.data.originalPrice / 100,
+                
+                productName: res.data.productName,
+                stock: res.data.stock,
+                merchantId: res.data.merchantId
+              }
+            });
+          });
+          let storeIdArr = [];
+          res.data.productStores.forEach(function(i) {
+            storeIdArr.push(i.storeId);
+          });
+          console.log();
+          this.mechantChange(this.merchantId, storeIdArr);
+          this.fileList1 = [
+            {
+              uid: "-1",
+              name: res.data.picId,
+              status: "done",
+              url: this.picUrl(res.data.picId)
+            }
+          ];
+          this.buyerNotes = [];
+          this.picXQ = [];
+          let noteArr = JSON.parse(res.data.note);
+          let picXQArr = JSON.parse(res.data.description);
+          if (noteArr && noteArr.length > 0) {
+            noteArr.forEach(function(i) {
+              let content = [];
+              i.content.forEach(function(n) {
+                content.push({ item: n });
+              });
+              that.buyerNotes.push({ title: i.title, details: content });
+            });
+          }
+          if (picXQArr && picXQArr.length > 0) {
+            picXQArr.forEach(function(i) {
+              let fileList = [];
+              i.picIds.forEach(function(n, m) {
+                fileList.push({
+                  uid: m + "1",
+                  name: n,
+                  status: "done",
+                  url: that.picUrl(n)
+                });
+              });
+              that.picXQ.push({ fileList: fileList, picIds: i.content[0] });
+            });
+          }
+          console.log(that.picXQ);
         } else {
           this.$error({
             title: "温馨提示",

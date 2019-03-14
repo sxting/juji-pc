@@ -6,10 +6,10 @@
           <img alt="logo" class="logo" src="static/img/vue-antd-logo.png" />
           <span class="title">{{systemName}}</span>
         </div>
-        <div class="desc">Ant Design 是西湖区最具影响力的 Web 设计规范</div>
+        <div class="desc"></div>
       </div>
       <div class="login">
-        <a-form @submit="onSubmit" :autoFormCreate="(form) => this.form = form">
+        <!-- <a-form @submit="onSubmit" :autoFormCreate="(form) => this.form = form">
           <a-tabs size="large" :tabBarStyle="{textAlign: 'center'}" style="padding: 0 2px;">
             <a-tab-pane tab="账户密码登录" key="1">
               <a-alert type="error" :closable="true" v-show="error" :message="error" showIcon style="margin-bottom: 24px;" />
@@ -54,9 +54,9 @@
             <a-checkbox :checked="true" >自动登录</a-checkbox>
             <a style="float: right">忘记密码</a>
           </div>
-          <a-form-item>
-            <a-button :loading="logging" style="width: 100%;margin-top: 24px" size="large" htmlType="submit" type="primary">登录</a-button>
-          </a-form-item>
+          <a-form-item> -->
+            <a-button  style="width: 100%;margin-top: 24px" size="large" htmlType="submit" @click="onSubmit" type="primary">微信扫码登陆</a-button>
+          <!-- </a-form-item>
           <div>
             其他登录方式
             <a-icon class="icon" type="alipay-circle" />
@@ -64,10 +64,9 @@
             <a-icon class="icon" type="weibo-circle" />
             <router-link style="float: right" to="/dashboard/workplace" >注册账户</router-link>
           </div>
-        </a-form>
+        </a-form> -->
       </div>
     </div>
-    <global-footer :link-list="linkList" :copyright="copyright" />
   </div>
 </template>
 
@@ -83,6 +82,12 @@ export default {
       error: ''
     }
   },
+  created() {
+    let token = this.$route.query.token;
+    sessionStorage.setItem('App-Token',token)
+    this.$router.push('/login')
+    this.arCallback();
+  },
   computed: {
     systemName () {
       return this.$store.state.setting.systemName
@@ -96,14 +101,46 @@ export default {
   },
   methods: {
     onSubmit (e) {
-      e.preventDefault()
-      this.form.validateFields((err, values) => {
-        if (!err) {
-
-              this.$router.push('/product/productList')
-
+      this.$axios({
+        url: "/user/qr/login.do",
+        method: "get",
+        processData: false,
+      }).then(res => {
+        if (res.success) {
+          window.location.href = res.data;
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
         }
-      })
+      });
+        //
+      //  this.$router.push('/product/productList')
+    },
+    arCallback(){
+      this.$axios({
+        url: "/endpoint/provider/user.json",
+        method: "get",
+        processData: false,
+      }).then(res => {
+        if (res.success) {
+          if(!res.data.isProvider){
+            this.$error({
+              title: "温馨提示",
+              content: '您没有权限'
+            });
+          }else{
+            sessionStorage.setItem('PROCIDERID',res.data.providerId)
+            this.$router.push('/product/productList')
+          }
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
     }
   }
 }
