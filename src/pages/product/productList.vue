@@ -183,10 +183,6 @@ export default {
     toggleAdvanced() {
       this.advanced = !this.advanced;
     },
-    onchange(selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
-      this.selectedRows = selectedRows;
-    },
     remove() {
       this.dataSource = this.dataSource.filter(
         item => this.selectedRowKeys.indexOf(item.key) < 0

@@ -419,7 +419,7 @@ export default {
     },
     checkdataFun(data) {
       this.$axios({
-        url: "/endpont/product/update.json",
+        url: "/endpoint/product/update.json",
         method: "post",
         processData: false,
         data: data

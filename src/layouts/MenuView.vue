@@ -15,10 +15,10 @@
       </a-tab-pane>
     </a-tabs> -->
     <transition name="page-toggle">
-      <keep-alive v-if="multipage">
+      <!-- <keep-alive v-if="multipage">
         <router-view />
-      </keep-alive>
-      <router-view v-else />
+      </keep-alive> -->
+      <router-view/>
     </transition>
   </global-layout>
 </template>
@@ -31,8 +31,6 @@ export default {
   components: {Contextmenu, GlobalLayout},
   data () {
     return {
-      pageList: [],
-      linkList: [],
       activePage: '',
       menuVisible: false,
       menuItemList: [
@@ -48,29 +46,18 @@ export default {
     }
   },
   created () {
-    this.pageList.push(this.$route)
-    this.linkList.push(this.$route.fullPath)
     this.activePage = this.$route.fullPath
   },
   watch: {
     '$route': function (newRoute, oldRoute) {
       this.activePage = newRoute.fullPath
-      if (!this.multipage) {
-        this.linkList = [newRoute.fullPath]
-        this.pageList = [newRoute]
-      } else if (this.linkList.indexOf(newRoute.fullPath) < 0) {
-        this.linkList.push(newRoute.fullPath)
-        this.pageList.push(newRoute)
-      }
+      
     },
     'activePage': function (key) {
       this.$router.push(key)
     },
     'multipage': function (newVal, oldVal) {
-      if (!newVal) {
-        this.linkList = [this.$route.fullPath]
-        this.pageList = [this.$route]
-      }
+      
     }
   },
   methods: {
@@ -79,17 +66,6 @@ export default {
     },
     editPage (key, action) {
       this[action](key)
-    },
-    remove (key) {
-      if (this.pageList.length === 1) {
-        this.$message.warning('这是最后一页，不能再关闭了啦')
-        return
-      }
-      this.pageList = this.pageList.filter(item => item.fullPath !== key)
-      let index = this.linkList.indexOf(key)
-      this.linkList = this.linkList.filter(item => item !== key)
-      index = index >= this.linkList.length ? this.linkList.length - 1 : index
-      this.activePage = this.linkList[index]
     },
     onContextmenu (e) {
       const pagekey = this.getPageKey(e.target)
@@ -131,28 +107,7 @@ export default {
           break
       }
     },
-    closeOthers (pageKey) {
-      let index = this.linkList.indexOf(pageKey)
-      this.linkList = this.linkList.slice(index, index + 1)
-      this.pageList = this.pageList.slice(index, index + 1)
-      this.activePage = this.linkList[0]
-    },
-    closeLeft (pageKey) {
-      let index = this.linkList.indexOf(pageKey)
-      this.linkList = this.linkList.slice(index)
-      this.pageList = this.pageList.slice(index)
-      if (this.linkList.indexOf(this.activePage) < 0) {
-        this.activePage = this.linkList[0]
-      }
-    },
-    closeRight (pageKey) {
-      let index = this.linkList.indexOf(pageKey)
-      this.linkList = this.linkList.slice(0, index + 1)
-      this.pageList = this.pageList.slice(0, index + 1)
-      if (this.linkList.indexOf(this.activePage < 0)) {
-        this.activePage = this.linkList[this.linkList.length - 1]
-      }
-    }
+
   }
 }
 </script>

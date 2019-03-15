@@ -2,9 +2,12 @@
   <a-dropdown style="display: inline-block; height: 100%; vertical-align: initial" >
     <span style="cursor: pointer">
       <a-avatar class="avatar" size="small" shape="circle" :src="currUser.avatar"/>
-      <span>{{currUser.name}}</span>
+       <router-link to="/login">
+          <span>点击退出</span>
+      </router-link>
+      
     </span>
-    <a-menu style="width: 150px" slot="overlay">
+    <!-- <a-menu style="width: 150px" slot="overlay"> -->
       <!-- <a-menu-item>
         <a-icon type="user" />
         <span>个人中心</span>
@@ -14,13 +17,13 @@
         <span>设置</span>
       </a-menu-item>
       <a-menu-divider /> -->
-      <a-menu-item>
+      <!-- <a-menu-item>
         <router-link to="/login">
           <a-icon type="poweroff" />
           <span>退出登录</span>
         </router-link>
-      </a-menu-item>
-    </a-menu>
+      </a-menu-item> -->
+    <!-- </a-menu> -->
   </a-dropdown>
 </template>
 

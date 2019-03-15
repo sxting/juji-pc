@@ -4,10 +4,10 @@
       <img :src="extraImage"/>
     </div>
     <transition name="page-toggle">
-      <keep-alive v-if="multipage">
+      <!-- <keep-alive v-if="multipage">
         <router-view ref="page" />
-      </keep-alive>
-      <router-view ref="page" v-else />
+      </keep-alive> -->
+      <router-view ref="page"/>
     </transition>
   </page-layout>
 </template>

@@ -6,17 +6,13 @@
                     <a-row>
                         <a-col :md="8" :sm="24">
                             <a-form-item label="选择日期" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                                <a-select placeholder="请选择">
-                                    <a-select-option value="1">关闭</a-select-option>
-                                    <a-select-option value="2">运行中</a-select-option>
-                                </a-select>
+                                <a-range-picker  @change="onChange"/>
                             </a-form-item>
                         </a-col>
-                        <a-col :md="8" :sm="24">
+                        <a-col :md="8" :sm="24" v-if="merchantId">
                             <a-form-item label="所属商家" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                                <a-select placeholder="请选择">
-                                    <a-select-option value="1">关闭</a-select-option>
-                                    <a-select-option value="2">运行中</a-select-option>
+                                <a-select placeholder="请选择" :defaultValue="merchantId" @change="merchantChange">
+                                  <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                                 </a-select>
                             </a-form-item>
                         </a-col>
@@ -27,11 +23,14 @@
         </div>
      <div>
 
-            <a-table :columns="columns" :dataSource="data2">
+            <a-table :columns="columns" :dataSource="data2" :pagination="false">
                 <span slot="action" slot-scope="text, record">
                     <a href="javascript:;">查看详情</a>
                 </span>
             </a-table>
+            <div style="margin-top:20px;">
+              <a-pagination style="float:right" @change="paginationChange" :current="pageNo" :pageSize="10" :total="countTotal" />
+            </div>
         </div>
     </a-card>
 </template>
@@ -70,16 +69,7 @@ const columns = [
     scopedSlots: { customRender: "action" }
   }
 ];
-const data2 = [{
-  key: '1',
-  name: 'John Brown',
-  age: 32,
-  address: 'New York No',
-  address1: 'New York No',
-  address2: 'New York No',
-  address3: 'New York No',
-  
-}];
+
 const dataSource = [];
 
 for (let i = 0; i < 100; i++) {
@@ -103,16 +93,36 @@ export default {
       dataSource: dataSource,
       selectedRowKeys: [],
       selectedRows: [],
-      data2:data2
+      data2:[],
+      dateStart:'',
+      dateEnd:'',
+      pageNo:1,
+      providerId : "",
+      merchantList : [],
+      merchantId:'',
+      countTotal :1
     };
+  },
+  created() {
+    this.providerId = sessionStorage.getItem('PROCIDERID')||this.$route.query.providerId || "1215431996629494";
+    this.merchantListFun(this.providerId);
   },
   methods: {
     toggleAdvanced() {
       this.advanced = !this.advanced;
     },
-    onchange(selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
-      this.selectedRows = selectedRows;
+    paginationChange(e){
+      this.pageNo = e;
+      this.productList();
+    },
+    onChange(dates, dateStrings) {
+      this.dateStart = dateStrings[0];
+      this.dateEnd = dateStrings[1];
+      this.productList()
+    },
+    merchantChange(e){
+      this.merchantId = e;
+      this.productList()
     },
     remove() {
       this.dataSource = this.dataSource.filter(
@@ -129,6 +139,70 @@ export default {
       if (e.key === "delete") {
         this.remove();
       }
+    },
+    formatDateTime(date, type) {
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+      return (
+        year +
+        '-' +
+        (month.toString().length > 1 ? month : '0' + month) +
+        '-' +
+        (day.toString().length > 1 ? day : '0' + day) +
+        (type === 'start' ? ' 00:00:00' : ' 23:59:59')
+      );
+    },
+    merchantListFun(providerId) {
+      let data = {
+        providerId: providerId
+      };
+      this.$axios({
+        url: "/endpoint/juji/provider/merchant/list.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          this.merchantList = res.data;
+          this.merchantId = this.merchantList[0].id;
+          this.productList();
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    productList() {
+      let data = {
+        pageNo: this.pageNo,
+        pageSize: 10,
+        providerId: this.providerId,
+        merchantId:this.merchantId ,
+        dateStart:this.dateStart,
+        dateEnd:this.dateEnd,
+      };
+      if(!data.dateStart) delete data.dateStart
+      if(!data.dateEnd) delete data.dateEnd
+      
+      this.$axios({
+        url: "/endpoint/settle/list.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          this.data2 = res.data.list;
+          this.countTotal = res.data.countTotal;
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
     }
   }
 };

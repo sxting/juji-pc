@@ -6,17 +6,13 @@
           <a-row>
             <a-col :md="8" :sm="24">
               <a-form-item label="选择日期" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择">
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="2">运行中</a-select-option>
-                </a-select>
+                <a-range-picker  @change="onChange"/>
               </a-form-item>
             </a-col>
-            <a-col :md="8" :sm="24">
+            <a-col :md="8" :sm="24"  v-if="merchantId">
               <a-form-item label="所属商家" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择">
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="2">运行中</a-select-option>
+                <a-select placeholder="请选择" :defaultValue="merchantId" @change="merchantChange">
+                  <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -37,14 +33,14 @@
             </a-col>
           </a-row>
         </div>
-        <span style="float: right; margin-top: 3px;">
+        <!-- <span style="float: right; margin-top: 3px;">
           <a-button type="primary">查询</a-button>
           <a-button style="margin-left: 8px">重置</a-button>
           <a @click="toggleAdvanced" style="margin-left: 8px">
             {{advanced ? '收起' : '展开'}}
             <a-icon :type="advanced ? 'up' : 'down'" />
           </a>
-        </span>
+        </span> -->
       </a-form>
     </div>
     <div>
@@ -90,17 +86,6 @@ const columns = [
     scopedSlots: { customRender: "action" }
   }
 ];
-const data2 = [
-  {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No",
-    address1: "New York No",
-    address2: "New York No",
-    address3: "New York No"
-  }
-];
 const dataSource = [];
 
 for (let i = 0; i < 100; i++) {
@@ -124,16 +109,23 @@ export default {
       dataSource: dataSource,
       selectedRowKeys: [],
       selectedRows: [],
-      data2: data2
+      data2: [],
+      merchantList:[],
+      merchantId:''
     };
+  },
+  created() {
+    this.providerId = sessionStorage.getItem('PROCIDERID')||this.$route.query.providerId || "1215431996629494";
+    this.merchantListFun(this.providerId);
   },
   methods: {
     toggleAdvanced() {
       this.advanced = !this.advanced;
     },
-    onchange(selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys;
-      this.selectedRows = selectedRows;
+    onChange(dates, dateStrings) {
+      this.dateStart = dateStrings[0];
+      this.dateEnd = dateStrings[1];
+      this.orderList()
     },
     remove() {
       this.dataSource = this.dataSource.filter(
@@ -150,7 +142,66 @@ export default {
       if (e.key === "delete") {
         this.remove();
       }
-    }
+    },
+    merchantChange(e){
+      this.merchantId = e;
+      this.orderList()
+    },
+    orderList() {
+      let data = {
+        pageNo: this.pageNo,
+        pageSize: 10,
+        providerId: this.providerId,
+        merchantId:this.merchantId ,
+        dateStart:this.dateStart,
+        dateEnd:this.dateEnd,
+        status:'ALL',
+        productName:''
+      };
+      if(!data.dateStart) delete data.dateStart
+      if(!data.dateEnd) delete data.dateEnd
+      if(!data.productName) delete data.productName
+      
+      
+      this.$axios({
+        url: "/endpoint/order/page.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          this.data2 = res.data.list;
+          this.countTotal = res.data.countTotal;
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    merchantListFun(providerId) {
+      let data = {
+        providerId: providerId
+      };
+      this.$axios({
+        url: "/endpoint/juji/provider/merchant/list.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          this.merchantList = res.data;
+          this.merchantId = this.merchantList[0].id;
+          // this.productList();
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
   }
 };
 </script>

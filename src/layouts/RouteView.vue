@@ -1,19 +1,24 @@
 <template>
+<a-locale-provider :locale="zh_CN">
   <page-layout :desc="desc" :title="title" :linkList="linkList">
 
     <transition name="page-toggle">
-      <keep-alive v-if="multipage">
+      <!-- <keep-alive v-if="multipage">
         <router-view />
-      </keep-alive>
-      <router-view v-else />
+      </keep-alive> -->
+      <router-view />
     </transition>
   </page-layout>
-
+</a-locale-provider>
 </template>
 
 <script>
 import PageHeader from '../components/page/PageHeader'
 import PageLayout from './PageLayout'
+import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+moment.locale('zh-cn');
 export default {
   name: "RouteView",
   components: {PageLayout, PageHeader},
@@ -22,7 +27,8 @@ export default {
       title: '',
       desc: '',
       linkList: [],
-      extraImage: ''
+      extraImage: '',
+      zh_CN,
     }
   },
   computed: {
