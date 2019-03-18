@@ -23,7 +23,7 @@
           <a-input placeholder="请输入商品原价" />
         </a-form-item>
         <a-form-item label="售价" :labelCol="{span: 7}" v-if="productType === 'PRODUCT'" :wrapperCol="{span: 10}" :required="true">
-          <a-input :value="price" @change="priceChange($event)" placeholder="请输入商品售价" />
+          <a-input-number style="width:100%" :value="price" @change="priceChange" placeholder="请输入商品售价" />
         </a-form-item>
         <a-form-item label="售价" :labelCol="{span: 7}" v-if="productType === 'POINT'" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="jifen">
@@ -32,7 +32,7 @@
           </a-radio-group>
           <div>
             <a-input-number :min="1" :value="point" @change="pointChange($event)" :max="99999" style="width:200px;margin-right:10px;" placeholder="请输入桔子数量" />
-            <a-input-number :min="1" :value="price" @change="priceChange($event)" v-if="jifen === '桔子+钱'" style="width:200px" :max="99999" placeholder="请输入钱数" />
+            <a-input-number :min="1" :value="price" @change="priceChange" v-if="jifen === '桔子+钱'" style="width:200px" :max="99999" placeholder="请输入钱数" />
           </div>
         </a-form-item>
         <a-form-item label="商品首图" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
@@ -219,7 +219,8 @@ export default {
       this.point = e;
     },
     priceChange(e) {
-      this.price = e;
+      console.log(e)
+      if(e) this.price = e;
     },
     getData() {
       this.providerId = sessionStorage.getItem('PROCIDERID')||this.$route.query.providerId;
