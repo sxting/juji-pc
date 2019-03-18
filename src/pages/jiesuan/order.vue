@@ -193,7 +193,7 @@ export default {
         if (res.success) {
           this.merchantList = res.data;
           this.merchantId = this.merchantList[0].id;
-          // this.productList();
+          this.orderList();
         } else {
           this.$error({
             title: "温馨提示",

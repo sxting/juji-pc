@@ -84,9 +84,11 @@ export default {
   },
   created() {
     let token = this.$route.query.token;
-    sessionStorage.setItem('App-Token',token)
-    this.$router.push('/login')
-    this.arCallback();
+    if(token){
+      sessionStorage.setItem('App-Token',token)
+      this.$router.push('/login')
+      this.arCallback();
+    }
   },
   computed: {
     systemName () {
