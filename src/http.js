@@ -10,7 +10,6 @@ axios.interceptors.request.use(
     let token = sessionStorage.getItem('App-Token')
     if (token) {
       config.headers['token'] = token
-      config.headers['clientType'] = 'mer'
     }
     return config
   },
