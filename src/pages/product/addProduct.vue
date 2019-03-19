@@ -372,7 +372,7 @@ export default {
               merchantId: values.repository.merchantId,
               merchantName: this.merchantName,
               note: JSON.stringify(note),
-              costPrice:values.repository.costPrice,
+              costPrice:values.repository.costPrice* 100,
               originalPrice: values.repository.originalPrice * 100,
               picId: this.fileList1[0].response
                 ? this.fileList1[0].response
@@ -505,7 +505,7 @@ export default {
       const formData = new FormData();
       formData.append("multipartFile", e.file, e.file.name);
       this.$axios({
-        url: "http://juji.juniuo.com//upload/image.json",
+        url: "https://juji.juniuo.com//upload/image.json",
         method: "post",
         processData: false,
         data: formData,
