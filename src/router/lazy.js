@@ -36,6 +36,12 @@ export default new Router({
               icon: 'none'
             },
             {
+              path: '/product/fenxiao',
+              name: '商品分销',
+              component: () => import('@/pages/product/fenxiao'),
+              icon: 'none'
+            },
+            {
               path: '/product/addProduct',
               name: '新增商品',
               component: () => import('@/pages/product/addProduct'),

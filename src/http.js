@@ -2,7 +2,7 @@ import axios from 'axios'
 import router from './router'
 
 // axios 配置
-axios.defaults.baseURL = process.env.BASE_API_ADDR
+axios.defaults.baseURL = process.env.BASE_API_ADDR_TEST
 
 // http request 拦截器
 axios.interceptors.request.use(

@@ -7,6 +7,7 @@ import ProductList from '@/pages/product/productList'
 import AddProduct from '@/pages/product/addProduct'
 import BaobiaoList from '@/pages/jiesuan/baobiao'
 import OrderList from '@/pages/jiesuan/order'
+import Fenxiao from '@/pages/product/fenxiao'
 
 Vue.use(Router)
 
@@ -36,6 +37,12 @@ export default new Router({
               path: '/product/productList',
               name: '商品列表',
               component: ProductList,
+              icon: 'none'
+            },
+            {
+              path: '/product/fenxiao',
+              name: '商品列表',
+              component: Fenxiao,
               icon: 'none'
             },
             {

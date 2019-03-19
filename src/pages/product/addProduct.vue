@@ -505,7 +505,7 @@ export default {
       const formData = new FormData();
       formData.append("multipartFile", e.file, e.file.name);
       this.$axios({
-        url: "http://juji-dev.juniuo.com/upload/image.json",
+        url: "http://juji.juniuo.com//upload/image.json",
         method: "post",
         processData: false,
         data: formData,
