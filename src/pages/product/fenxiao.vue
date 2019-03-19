@@ -1,6 +1,10 @@
 <template>
     <a-card>
-        <div :class="advanced ? 'search' : null" v-if="false">
+        <div :class="advanced ? 'search' : null" v-if="true">
+            <a-tabs>
+                <a-tab-pane tab="待分销商品" key="1">待分销商品</a-tab-pane>
+                <a-tab-pane tab="待分销商品" key="2">分销中商品</a-tab-pane>
+            </a-tabs>
             <a-form layout="horizontal" @submit="submit" :autoFormCreate="(form) => this.form = form">
                 <div :class="advanced ? null: 'fold'">
                     <a-row>
@@ -37,17 +41,46 @@
             </div>
         </div>
 
-        <div v-if="true">
+        <div v-if="false">
             <div :class="advanced ? null: 'fold'">
                 <a-form layout="horizontal" @submit="submit" :autoFormCreate="(form) => this.form = form">
-                    <a-form-item label="所属运营商" :labelCol="{span: 7}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 10}">
-                        <a-select placeholder="请选择">
-                            <a-select-option value="">全部商家</a-select-option>
-                            <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
-                        </a-select>
-                    </a-form-item>
-                    <a-form-item label="商品名称" :labelCol="{span: 7}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 10}">
-                        <a-input style="width: 100%" placeholder="请输入" />
+                    <a-card title="商品信息" style="margin-top:20px">
+                        <a-form-item label="商品名称" :labelCol="{span: 7}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 10}">
+                            剪发总监设计
+                        </a-form-item>
+                        <a-form-item label="原价" :labelCol="{span: 7}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 10}">
+                            11
+                        </a-form-item>
+                        <a-form-item label="售价" :labelCol="{span: 7}" fieldDecoratorId="repository.productName2" :wrapperCol="{span: 10}">
+                            22
+                        </a-form-item>
+                        <a-form-item label="底价" :labelCol="{span: 7}" fieldDecoratorId="repository.productName3" :wrapperCol="{span: 10}">
+                            33
+                        </a-form-item>
+                    </a-card>
+                    <a-card title="分佣设置" style="margin-top:20px">
+                        <a-form-item label="购物返利分佣比例" :labelCol="{span: 7}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 10}">
+                            <a-input-number/>19.00元
+                        </a-form-item>
+                        <a-form-item label="管理佣金分佣比例" :labelCol="{span: 7}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 10}">
+                            <a-input-number/>19.00元
+                        </a-form-item>
+                    </a-card>
+                    <a-card title="推广素材" style="margin-top:20px">
+                        <a-form-item label="推广文案" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+                            <a-textarea type="text" maxlength="100" class="desc_textarea" placeholder=""></a-textarea>
+                        </a-form-item>
+                        <a-form-item label="推广图片" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+                            <a-upload listType="picture-card" :fileList="fileList" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @change="handleChange1($event)">
+                                <div v-if="fileList.length < 1">
+                                    <a-icon type="plus" />
+                                    <div class="ant-upload-text">上传图片</div>
+                                </div>
+                            </a-upload>
+                        </a-form-item>
+                    </a-card>
+                    <a-form-item :wrapperCol="{span: 10, offset: 7}">
+                        <a-button htmlType="submit">提交</a-button>
                     </a-form-item>
                 </a-form>
 
@@ -122,7 +155,8 @@ export default {
       pageSize: 10,
       providerId: "1215431996629494",
       countTotal: 0,
-      merchantList: []
+      merchantList: [],
+      fileList: []
     };
   },
   created() {
