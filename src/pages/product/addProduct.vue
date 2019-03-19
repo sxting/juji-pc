@@ -19,6 +19,9 @@
         <a-form-item label="商品名称" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.productName" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入仓库名称', whitespace: true}]}" :required="true">
           <a-input placeholder="请输入商品名称，限1-40字" />
         </a-form-item>
+        <a-form-item label="底价" :labelCol="{span: 7}" :wrapperCol="{span: 10}"  fieldDecoratorId="repository.costPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
+          <a-input placeholder="请输入商品底价" :disabled="productId?true:false"/>
+        </a-form-item>
         <a-form-item label="原价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.originalPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
           <a-input placeholder="请输入商品原价" />
         </a-form-item>
@@ -369,6 +372,7 @@ export default {
               merchantId: values.repository.merchantId,
               merchantName: this.merchantName,
               note: JSON.stringify(note),
+              costPrice:values.repository.costPrice,
               originalPrice: values.repository.originalPrice * 100,
               picId: this.fileList1[0].response
                 ? this.fileList1[0].response
@@ -584,7 +588,7 @@ export default {
                 cutOffDays: res.data.cutOffDays,
                 idx: res.data.idx,
                 originalPrice: res.data.originalPrice / 100,
-                
+                costPrice:res.data.costPrice / 100,
                 productName: res.data.productName,
                 stock: res.data.stock,
                 merchantId: res.data.merchantId
