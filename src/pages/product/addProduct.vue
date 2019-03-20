@@ -92,10 +92,10 @@
                       <div class="details_list_box">
                         <div class="form_parent" style="position:relative;" v-for="(detail, noteIndex) in list.details" :key="noteIndex">
                           <a-textarea type="text" maxlength="100" class="desc_textarea" :value="detail.item" @change="getnoteDetaildata(j,noteIndex,$event.target.value)" placeholder="请输入内容，最多输入100个字，更多内容点“添加更多”"></a-textarea>
-                          <!-- <span>
+                          <span>
                             <span class="descriptions_add_btn descriptions_btns" @click="addLineNoteDetail(j)">添加更多</span>
                             <span class="descriptions_minus_btn descriptions_btns" @click="deleteNoteDetail(j,noteIndex)">删除</span>
-                          </span> -->
+                          </span>
                         </div>
                       </div>
                       <div>
@@ -140,7 +140,7 @@
             <a-select-option v-for="(item,index) in merchantList" :key="index" :value="item.id">{{item.name}}</a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="适用门店" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="适用门店" :labelCol="{span: 7}" v-if="cityStoreList.length>0" :wrapperCol="{span: 10}" :required="true">
           已选择 {{allShopsNumber}} 家门店
           <span class="buttons" @click="checkStord">选择门店</span>
         </a-form-item>
@@ -153,7 +153,15 @@
 
     </a-card>
     <a-modal title="选择门店" :visible="visible" @ok="handleOk" :confirmLoading="confirmLoading" @cancel="handleCancel">
-      <a-checkbox-group v-model="storeIdList" @change="onChange">
+      <div :style="{ borderBottom: '1px solid #E9E9E9' }">
+      <a-checkbox
+        @change="onCheckAllChange"
+        :checked="checkAll"
+      >
+        全选
+      </a-checkbox>
+    </div>
+      <a-checkbox-group v-model="storeIdList" @change="onChange" :defaultChecked = "true">
         <a-row>
           <a-col v-for="(item,index) in cityStoreList" :key="index">
             <a-checkbox :value="item.id">{{item.name}}</a-checkbox>
@@ -177,6 +185,8 @@ export default {
       previewVisible: false,
       productType: "PRODUCT",
       previewImage: "",
+      checkAll: true,
+      // plainOptions,
       buyerNotes: [{ title: "", details: [{ item: "" }] }], //购买须知
       picXQ: [{ fileList: [], picIds: "" }], //图片详情
       fileList1: [],
@@ -204,6 +214,7 @@ export default {
       jifen: "桔子兑换",
       point: "",
       price: "",
+      checkedList:[],
       productId: sessionStorage.getItem('PROCIDERID')||""
     };
   },
@@ -221,6 +232,14 @@ export default {
     pointChange(e) {
       this.point = e;
     },
+    onCheckAllChange (e) {
+      let arr = []
+      this.cityStoreList.forEach(function(i){
+        arr.push(i.id)
+      })
+      this.checkAll = e.target.checked;
+      this.storeIdList = e.target.checked ? arr : []
+    },
     priceChange(e) {
       console.log(e)
       if(e) this.price = e;
@@ -235,6 +254,7 @@ export default {
     },
     onChange(event) {
       console.log(event);
+      this.checkAll = event.length ===  this.cityStoreList.length
       this.storeIdList = event;
     },
     addLineNoteDetail(index) {
@@ -320,9 +340,13 @@ export default {
         picXQArr.push({ title: "", content: [i.picIds], picIds: pic });
       });
       this.buyerNotes.forEach(function(i) {
+        let arr = [];
+        i.details.forEach(function(n){
+          arr.push(n.item)
+        })
         note.push({
           title: i.title,
-          content: [i.details[0].item]
+          content: [arr]
         });
       });
       this.storeIdList.forEach(function(i) {
@@ -526,6 +550,8 @@ export default {
       this.storeIdListTrue = [];
       this.storeIdList = [];
       this.merchantId = this.event;
+      console.log(event)
+      
       this.merchantList.forEach(function(i) {
         if (i.merchantId === event) that.merchantName = i.name;
       });
@@ -540,7 +566,12 @@ export default {
       }).then(res => {
         if (res.success) {
           this.cityStoreList = res.data;
-          this.storeIdList = storeIdArr;
+          let arr = []
+          this.cityStoreList.forEach(function(i){
+            arr.push(i.id)
+          })
+          if(storeIdArr) this.storeIdList = storeIdArr;
+          else this.storeIdList =arr;
           this.allShopsNumber = this.storeIdList.length;
         } else {
           this.$error({
@@ -642,7 +673,14 @@ export default {
         }
       });
     },
-    beforeUpload() {}
+    beforeUpload(file) {
+      const isLt2M = file.size / 1024 / 1024 < 1;
+      console.log(file.size / 1024 / 1024)
+
+      if (!isLt2M) {
+        this.$message.error('上传图片大小必须小于10MB!')
+      }
+    }
   }
 };
 </script>
