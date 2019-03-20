@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card :body-style="{padding: '24px 32px'}" :bordered="false">
-      <a-form @submit="submit" :autoFormCreate="(form) => {this.form = form;}">
+      <a-form  :autoFormCreate="(form) => {this.form = form;}">
         <a-form-item label="商品类型" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="productType" :style="{ marginBottom: '8px' }">
             <a-radio-button value="PRODUCT">普通商品</a-radio-button>
@@ -146,7 +146,7 @@
         </a-form-item>
 
         <a-form-item :wrapperCol="{span: 10, offset: 7}">
-          <a-button htmlType="submit">提交</a-button>
+          <a-button htmlType="submit" @click="submit">提交</a-button>
         </a-form-item>
       </a-form>
       <!--门店v-if="showStoreSelect"-->
@@ -424,7 +424,6 @@ export default {
               type: this.productType,
               productId: this.productId
             };
-            console.log(this.fileList1);
             if (this.productId) {
               this.checkdataFun(data);
             } else {
@@ -497,7 +496,6 @@ export default {
       this.previewVisible = true;
     },
     handleChange1({ fileList }) {
-      console.log(fileList);
       this.fileList1 = fileList;
     },
     handleChange2({ fileList }) {
@@ -560,7 +558,6 @@ export default {
       this.storeIdListTrue = [];
       this.storeIdList = [];
       this.merchantId = this.event;
-      console.log(event)
       
       this.merchantList.forEach(function(i) {
         if (i.merchantId === event) that.merchantName = i.name;
@@ -609,7 +606,7 @@ export default {
           this.biaoqian = res.data.tag;
           this.price =  res.data.price / 100;
           this.point =  res.data.point ;
-          
+          this.jifen =res.data.type === 'PRODUCT'?"桔子兑换" : "桔子+钱";
           this.limitMaxNum =
             res.data.limitMaxNum > 0 ? res.data.limitMaxNum : "";
           this.limitPerDayNum = res.data.limitPerDayNum
@@ -637,7 +634,6 @@ export default {
           res.data.productStores.forEach(function(i) {
             storeIdArr.push(i.storeId);
           });
-          console.log();
           this.mechantChange(this.merchantId, storeIdArr);
           this.fileList1 = [
             {
@@ -660,7 +656,6 @@ export default {
               that.buyerNotes.push({ title: i.title, details: content });
             });
           }
-          console.log(that.buyerNotes)
           if (picXQArr && picXQArr.length > 0) {
             picXQArr.forEach(function(i) {
               let fileList = [];
@@ -688,7 +683,6 @@ export default {
             });
             this.fileList2 = fileList;
           }
-          console.log(that.picXQ);
         } else {
           this.$error({
             title: "温馨提示",
@@ -698,9 +692,7 @@ export default {
       });
     },
     beforeUpload(file) {
-      const isLt2M = file.size / 1024 / 1024 < 1;
-      console.log(file.size / 1024 / 1024)
-
+      const isLt2M = file.size / 1024 / 1024 < 10;
       if (!isLt2M) {
         this.$message.error('上传图片大小必须小于10MB!')
       }

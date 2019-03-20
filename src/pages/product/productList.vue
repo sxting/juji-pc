@@ -15,7 +15,7 @@
 
     </div>
     <div :class="advanced ? 'search' : null">
-      <a-form layout="horizontal" @submit="submit" :autoFormCreate="(form) => this.form = form">
+      <a-form layout="horizontal" :autoFormCreate="(form) => this.form = form">
         <div :class="advanced ? null: 'fold'">
           <a-row>
             <a-col :md="8" :sm="24">
@@ -56,8 +56,7 @@
           </a-row>
         </div>
         <span style="float: right; margin-top: 3px;">
-          <a-button htmlType="submit">查询</a-button>
-          <a-button style="margin-left: 8px">重置</a-button>
+          <a-button htmlType="submit" @click="submit">查询</a-button>
           <a @click="toggleAdvanced" style="margin-left: 8px">
             {{advanced ? '收起' : '展开'}}
             <a-icon :type="advanced ? 'up' : 'down'" />
