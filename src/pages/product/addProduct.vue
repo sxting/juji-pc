@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card :body-style="{padding: '24px 32px'}" :bordered="false">
-      <a-form  :autoFormCreate="(form) => {this.form = form;}">
+      <a-form :autoFormCreate="(form) => {this.form = form;}">
         <a-form-item label="商品类型" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="productType" :style="{ marginBottom: '8px' }">
             <a-radio-button value="PRODUCT">普通商品</a-radio-button>
@@ -19,8 +19,8 @@
         <a-form-item label="商品名称" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.productName" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入仓库名称', whitespace: true}]}" :required="true">
           <a-input placeholder="请输入商品名称，限1-40字" />
         </a-form-item>
-        <a-form-item label="底价" :labelCol="{span: 7}" :wrapperCol="{span: 10}"  fieldDecoratorId="repository.costPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
-          <a-input placeholder="请输入商品底价" :disabled="productId?true:false"/>
+        <a-form-item label="底价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.costPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
+          <a-input placeholder="请输入商品底价" :disabled="productId?true:false" />
         </a-form-item>
         <a-form-item label="原价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.originalPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
           <a-input placeholder="请输入商品原价" />
@@ -53,7 +53,7 @@
         </a-form-item>
         <a-form-item label="商品图片" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div class="clearfix">
-            <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :fileList="fileList2" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun"  @change="handleChange2($event)">
+            <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :fileList="fileList2" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @change="handleChange2($event)">
               <div v-if="fileList2.length < 5">
                 <a-icon type="plus" />
                 <div class="ant-upload-text">上传图片</div>
@@ -64,7 +64,7 @@
         <a-form-item label="图文详情" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div v-for="(list, j) in picXQ" :key="j" style="margin-top:20px;">
             <div class="clearfix">
-              <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :fileList="list.fileList" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun"  @change="handleChange3($event,j)">
+              <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :fileList="list.fileList" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @change="handleChange3($event,j)">
                 <div v-if="list.fileList.length < 5">
                   <a-icon type="plus" />
                   <div class="ant-upload-text">上传图片</div>
@@ -132,7 +132,7 @@
           </div>
         </a-form-item>
         <a-form-item label="展示顺序" :labelCol="{span: 7}" help="第几位" :wrapperCol="{span: 10}" fieldDecoratorId="repository.idx" :required="false">
-            <a-input-number :min="0" :step="1" :max="99999" />
+          <a-input-number :min="0" :step="1" :max="99999" />
         </a-form-item>
         <!-- @change="mechantChange"  fieldDecoratorId="repository.mechantId"   :value="item.id"-->
         <a-form-item label="所属商家" :labelCol="{span: 7}" fieldDecoratorId="repository.merchantId" :fieldDecoratorOptions="{rules: [{ required: true, message: '请选择商家'}]}" :wrapperCol="{span: 10}" :required="true">
@@ -154,14 +154,11 @@
     </a-card>
     <a-modal title="选择门店" :visible="visible" @ok="handleOk" :confirmLoading="confirmLoading" @cancel="handleCancel">
       <div :style="{ borderBottom: '1px solid #E9E9E9' }">
-      <a-checkbox
-        @change="onCheckAllChange"
-        :checked="checkAll"
-      >
-        全选
-      </a-checkbox>
-    </div>
-      <a-checkbox-group v-model="storeIdList" @change="onChange" :defaultChecked = "true">
+        <a-checkbox @change="onCheckAllChange" :checked="checkAll">
+          全选
+        </a-checkbox>
+      </div>
+      <a-checkbox-group v-model="storeIdList" @change="onChange" :defaultChecked="true">
         <a-row>
           <a-col v-for="(item,index) in cityStoreList" :key="index">
             <a-checkbox :value="item.id">{{item.name}}</a-checkbox>
@@ -214,8 +211,8 @@ export default {
       jifen: "桔子兑换",
       point: "",
       price: "",
-      checkedList:[],
-      productId: sessionStorage.getItem('PROCIDERID')||""
+      checkedList: [],
+      productId: sessionStorage.getItem("PROCIDERID") || ""
     };
   },
   created() {
@@ -232,20 +229,21 @@ export default {
     pointChange(e) {
       this.point = e;
     },
-    onCheckAllChange (e) {
-      let arr = []
-      this.cityStoreList.forEach(function(i){
-        arr.push(i.id)
-      })
+    onCheckAllChange(e) {
+      let arr = [];
+      this.cityStoreList.forEach(function(i) {
+        arr.push(i.id);
+      });
       this.checkAll = e.target.checked;
-      this.storeIdList = e.target.checked ? arr : []
+      this.storeIdList = e.target.checked ? arr : [];
     },
     priceChange(e) {
-      console.log(e)
-      if(e) this.price = e;
+      console.log(e);
+      if (e) this.price = e;
     },
     getData() {
-      this.providerId = sessionStorage.getItem('PROCIDERID')||this.$route.query.providerId;
+      this.providerId =
+        sessionStorage.getItem("PROCIDERID") || this.$route.query.providerId;
       this.productId = this.$route.query.productId;
       this.merchantListFun(this.providerId);
     },
@@ -254,7 +252,7 @@ export default {
     },
     onChange(event) {
       console.log(event);
-      this.checkAll = event.length ===  this.cityStoreList.length
+      this.checkAll = event.length === this.cityStoreList.length;
       this.storeIdList = event;
     },
     addLineNoteDetail(index) {
@@ -323,8 +321,9 @@ export default {
         this.picXQ.splice(index, 1);
       }
     },
-     rtrim(str){ //删除右边的空格
-      return str.replace(/(\s*$)/g,",");
+    rtrim(str) {
+      //删除右边的空格
+      return str.replace(/(\s*$)/g, ",");
     },
     XQgetnoteDetaildata(index, event) {
       this.picXQ[index].picIds = event;
@@ -335,19 +334,19 @@ export default {
         picXQArr = [],
         note = [],
         storeIdArr = [];
-        console.log(this.picXQ);
+      console.log(this.picXQ);
       this.picXQ.forEach(function(i) {
         let pic = [];
         i.fileList.forEach(function(m) {
-          pic.push(m.response?m.response:m.name);
+          pic.push(m.response ? m.response : m.name);
         });
         picXQArr.push({ title: "", content: [i.picIds], picIds: pic });
       });
       this.buyerNotes.forEach(function(i) {
         let arr = [];
-        i.details.forEach(function(n){
-          arr.push(n.item)
-        })
+        i.details.forEach(function(n) {
+          arr.push(n.item);
+        });
         note.push({
           title: i.title,
           content: [arr]
@@ -358,12 +357,12 @@ export default {
           storeId: i
         });
       });
-      let picIds = '';
-      if(this.fileList2&&this.fileList2.length>0){
-          this.fileList2.forEach(function(m) {
-            picIds+=((m.response?m.response:m.name)+',');
-          });
-          picIds= picIds.slice(0,picIds.length-1)
+      let picIds = "";
+      if (this.fileList2 && this.fileList2.length > 0) {
+        this.fileList2.forEach(function(m) {
+          picIds += (m.response ? m.response : m.name) + ",";
+        });
+        picIds = picIds.slice(0, picIds.length - 1);
       }
       this.form.validateFields((err, values) => {
         if (err) {
@@ -406,14 +405,14 @@ export default {
               merchantId: values.repository.merchantId,
               merchantName: this.merchantName,
               note: JSON.stringify(note),
-              costPrice:values.repository.costPrice* 100,
+              costPrice: values.repository.costPrice * 100,
               originalPrice: values.repository.originalPrice * 100,
               picId: this.fileList1[0].response
                 ? this.fileList1[0].response
                 : this.fileList1[0].name,
               picIds: picIds,
               point: this.productType === "POINT" ? this.point : "",
-              price:this.price * 100,
+              price: this.price * 100,
               productName: values.repository.productName,
               productStores: storeIdArr,
               providerId: this.providerId,
@@ -558,7 +557,7 @@ export default {
       this.storeIdListTrue = [];
       this.storeIdList = [];
       this.merchantId = this.event;
-      
+
       this.merchantList.forEach(function(i) {
         if (i.merchantId === event) that.merchantName = i.name;
       });
@@ -573,12 +572,12 @@ export default {
       }).then(res => {
         if (res.success) {
           this.cityStoreList = res.data;
-          let arr = []
-          this.cityStoreList.forEach(function(i){
-            arr.push(i.id)
-          })
-          if(storeIdArr) this.storeIdList = storeIdArr;
-          else this.storeIdList =arr;
+          let arr = [];
+          this.cityStoreList.forEach(function(i) {
+            arr.push(i.id);
+          });
+          if (storeIdArr) this.storeIdList = storeIdArr;
+          else this.storeIdList = arr;
           this.allShopsNumber = this.storeIdList.length;
         } else {
           this.$error({
@@ -604,9 +603,9 @@ export default {
         if (res.success) {
           this.productType = res.data.type;
           this.biaoqian = res.data.tag;
-          this.price =  res.data.price / 100;
-          this.point =  res.data.point ;
-          this.jifen =res.data.type === 'PRODUCT'?"桔子兑换" : "桔子+钱";
+          this.price = res.data.price / 100;
+          this.point = res.data.point;
+          this.jifen = res.data.type === "PRODUCT" ? "桔子兑换" : "桔子+钱";
           this.limitMaxNum =
             res.data.limitMaxNum > 0 ? res.data.limitMaxNum : "";
           this.limitPerDayNum = res.data.limitPerDayNum
@@ -623,7 +622,7 @@ export default {
                 cutOffDays: res.data.cutOffDays,
                 idx: res.data.idx,
                 originalPrice: res.data.originalPrice / 100,
-                costPrice:res.data.costPrice / 100,
+                costPrice: res.data.costPrice / 100,
                 productName: res.data.productName,
                 stock: res.data.stock,
                 merchantId: res.data.merchantId
@@ -650,10 +649,12 @@ export default {
           if (noteArr && noteArr.length > 0) {
             noteArr.forEach(function(i) {
               let content = [];
-              i.content[0].forEach(function(n) {
-                content.push({ item: n });
-              });
-              that.buyerNotes.push({ title: i.title, details: content });
+              if (i.content && i.content[0]) {
+                i.content[0].forEach(function(n) {
+                  content.push({ item: n });
+                });
+                that.buyerNotes.push({ title: i.title, details: content });
+              }
             });
           }
           if (picXQArr && picXQArr.length > 0) {
@@ -670,15 +671,15 @@ export default {
               that.picXQ.push({ fileList: fileList, picIds: i.content[0] });
             });
           }
-          let fileList2 = res.data.picIds?res.data.picIds.split(','):'';
-          if (fileList2&& fileList2.length > 0) {
+          let fileList2 = res.data.picIds ? res.data.picIds.split(",") : "";
+          if (fileList2 && fileList2.length > 0) {
             let fileList = [];
-            fileList2.forEach(function(n,m) {
-                fileList.push({
-                  uid: m + "1",
-                  name: n,
-                  status: "done",
-                  url: that.picUrl(n)
+            fileList2.forEach(function(n, m) {
+              fileList.push({
+                uid: m + "1",
+                name: n,
+                status: "done",
+                url: that.picUrl(n)
               });
             });
             this.fileList2 = fileList;
@@ -694,7 +695,7 @@ export default {
     beforeUpload(file) {
       const isLt2M = file.size / 1024 / 1024 < 10;
       if (!isLt2M) {
-        this.$message.error('上传图片大小必须小于10MB!')
+        this.$message.error("上传图片大小必须小于10MB!");
       }
     }
   }
