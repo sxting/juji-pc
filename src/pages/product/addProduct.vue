@@ -323,6 +323,9 @@ export default {
         this.picXQ.splice(index, 1);
       }
     },
+     rtrim(str){ //删除右边的空格
+      return str.replace(/(\s*$)/g,",");
+    },
     XQgetnoteDetaildata(index, event) {
       this.picXQ[index].picIds = event;
     },
@@ -332,10 +335,11 @@ export default {
         picXQArr = [],
         note = [],
         storeIdArr = [];
+        console.log(this.picXQ);
       this.picXQ.forEach(function(i) {
         let pic = [];
         i.fileList.forEach(function(m) {
-          pic.push(m.response);
+          pic.push(m.response?m.response:m.name);
         });
         picXQArr.push({ title: "", content: [i.picIds], picIds: pic });
       });
@@ -354,9 +358,15 @@ export default {
           storeId: i
         });
       });
+      let picIds = '';
+      if(this.fileList2&&this.fileList2.length>0){
+          this.fileList2.forEach(function(m) {
+            picIds+=((m.response?m.response:m.name)+',');
+          });
+          picIds= picIds.slice(0,picIds.length-1)
+      }
       this.form.validateFields((err, values) => {
         if (err) {
-          console.log(this.fileList1);
         } else {
           if (this.fileList1.length < 1) {
             this.$error({
@@ -401,7 +411,7 @@ export default {
               picId: this.fileList1[0].response
                 ? this.fileList1[0].response
                 : this.fileList1[0].name,
-              picIds: "",
+              picIds: picIds,
               point: this.productType === "POINT" ? this.point : "",
               price:this.price * 100,
               productName: values.repository.productName,
@@ -663,6 +673,19 @@ export default {
               });
               that.picXQ.push({ fileList: fileList, picIds: i.content[0] });
             });
+          }
+          let fileList2 = res.data.picIds?res.data.picIds.split(','):'';
+          if (fileList2&& fileList2.length > 0) {
+            let fileList = [];
+            fileList2.forEach(function(n,m) {
+                fileList.push({
+                  uid: m + "1",
+                  name: n,
+                  status: "done",
+                  url: that.picUrl(n)
+              });
+            });
+            this.fileList2 = fileList;
           }
           console.log(that.picXQ);
         } else {
