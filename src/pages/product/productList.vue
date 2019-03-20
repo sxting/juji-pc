@@ -1,12 +1,26 @@
 <template>
   <a-card>
-    <div  :class="advanced ? 'search' : null">
+    <div class="operator">
+      <a-row>
+        <a-col :md="16" :sm="24">
+          <a-button @click="addNew" type="primary">新增商品</a-button>
+        </a-col>
+        <a-col :md="8" :sm="24">
+          <a-tabs @change="tabFun">
+            <a-tab-pane tab="售卖中" key="1"></a-tab-pane>
+            <a-tab-pane tab="已下架" key="0"></a-tab-pane>
+          </a-tabs>
+        </a-col>
+      </a-row>
+
+    </div>
+    <div :class="advanced ? 'search' : null">
       <a-form layout="horizontal" @submit="submit" :autoFormCreate="(form) => this.form = form">
         <div :class="advanced ? null: 'fold'">
           <a-row>
             <a-col :md="8" :sm="24">
               <a-form-item label="商品类型" fieldDecoratorId="repository.productType" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择" >
+                <a-select placeholder="请选择">
                   <a-select-option value="">全部类型</a-select-option>
                   <a-select-option value="PRODUCT">普通商品</a-select-option>
                   <a-select-option value="POINT">积分商品</a-select-option>
@@ -14,8 +28,8 @@
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="所属商家" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId"  :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择" >
+              <a-form-item label="所属商家" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 18, offset: 1}">
+                <a-select placeholder="请选择">
                   <a-select-option value="">全部商家</a-select-option>
                   <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                 </a-select>
@@ -52,14 +66,12 @@
       </a-form>
     </div>
     <div>
-      <div class="operator">
-        <a-button @click="addNew" type="primary">新增商品</a-button>
-      </div>
+
       <a-table :columns="columns" :dataSource="data2" :pagination="false">
         <span slot="action" slot-scope="text, record">
           <a @click="bianji(record)">编辑</a>
-          <a-divider type="vertical" />
-          <a @click="xiajia(record)" class="ant-dropdown-link">
+          <a-divider v-if="putAway !== '0'" type="vertical" />
+          <a v-if="putAway !== '0'" @click="xiajia(record)" class="ant-dropdown-link">
             下架
           </a>
         </span>
@@ -104,9 +116,7 @@ const columns = [
     scopedSlots: { customRender: "action" }
   }
 ];
-const data2 = [
-
-];
+const data2 = [];
 const dataSource = [];
 
 for (let i = 0; i < 100; i++) {
@@ -134,44 +144,59 @@ export default {
       pageNo: 1,
       pageSize: 10,
       providerId: "1215431996629494",
-      countTotal:0,
-      merchantList:[]
+      countTotal: 0,
+      merchantList: [],
+      putAway:1
     };
   },
   created() {
-    this.providerId = sessionStorage.getItem('PROCIDERID')||this.$route.query.providerId || "1215431996629494";
-    this.merchantListFun(sessionStorage.getItem('PROCIDERID')||this.providerId || "1215431996629494")
+    this.providerId =
+      sessionStorage.getItem("PROCIDERID") ||
+      this.$route.query.providerId ||
+      "1215431996629494";
+    this.merchantListFun(
+      sessionStorage.getItem("PROCIDERID") ||
+        this.providerId ||
+        "1215431996629494"
+    );
     this.productList();
   },
-  mounted() {
-    
-  },
+  mounted() {},
   methods: {
-    submit(){
-      this.form.validateFields((err, values) => {
-        console.log(values)
-        this.productList(values.repository.merchantId,values.repository.productType,values.repository.productName,values.repository.biaoqian);
-        
-      })
+    tabFun(e){
+      this.putAway = e;
+      this.productList();
     },
-    bianji(e){
-      this.$router.push({
-        path: "/product/addProduct",
-        query: { providerId: "1215431996629494",productId:e.productId }
+    submit() {
+      this.form.validateFields((err, values) => {
+        console.log(values);
+        this.productList(
+          values.repository.merchantId,
+          values.repository.productType,
+          values.repository.productName,
+          values.repository.biaoqian
+        );
       });
     },
-    xiajia(e){
+    bianji(e) {
+      this.$router.push({
+        path: "/product/addProduct",
+        query: { providerId: "1215431996629494", productId: e.productId }
+      });
+    },
+    xiajia(e) {
       this.$axios({
         url: "/endpoint/product/offline.json",
         method: "post",
         processData: false,
-        data: {productId:e.productId}
+        params: { productId: e.productId }
+        // data: {productId:e.productId}
       }).then(res => {
         if (res.success) {
           this.$success({
-            content: '下架成功'
+            content: "下架成功"
           });
-          this.productList()
+          this.productList();
         } else {
           this.$error({
             title: "温馨提示",
@@ -226,16 +251,16 @@ export default {
         }
       });
     },
-    productList(merchantId,type,name,tag) {
+    productList(merchantId, type, name, tag) {
       let data = {
         pageNo: this.pageNo,
         pageSize: 10,
         providerId: this.providerId,
-        merchantId:merchantId || '',
-        type:type ||'',
-        tag:tag || '',
-        name	:name||'',
-        putAway:1
+        merchantId: merchantId || "",
+        type: type || "",
+        tag: tag || "",
+        name: name || "",
+        putAway: this.putAway
       };
       this.$axios({
         url: "/endpoint/product/page.json",
@@ -246,10 +271,10 @@ export default {
         if (res.success) {
           this.data2 = res.data.list;
           this.countTotal = res.data.countTotal;
-          this.data2.forEach(function(i){
-            i.price = i.price/100;
-            i.typeName = i.type === 'PRODUCT'?'普通商品':'积分商品';
-          })
+          this.data2.forEach(function(i) {
+            i.price = i.price / 100;
+            i.typeName = i.type === "PRODUCT" ? "普通商品" : "积分商品";
+          });
         } else {
           this.$error({
             title: "温馨提示",
