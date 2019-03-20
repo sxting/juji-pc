@@ -53,7 +53,7 @@
         </a-form-item>
         <a-form-item label="商品图片" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div class="clearfix">
-            <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :fileList="fileList2" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @preview="handlePreview" @change="handleChange2($event)">
+            <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :fileList="fileList2" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun"  @change="handleChange2($event)">
               <div v-if="fileList2.length < 5">
                 <a-icon type="plus" />
                 <div class="ant-upload-text">上传图片</div>
@@ -64,7 +64,7 @@
         <a-form-item label="图文详情" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div v-for="(list, j) in picXQ" :key="j" style="margin-top:20px;">
             <div class="clearfix">
-              <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :fileList="list.fileList" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @preview="handlePreview" @change="handleChange3($event,j)">
+              <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :fileList="list.fileList" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun"  @change="handleChange3($event,j)">
                 <div v-if="list.fileList.length < 5">
                   <a-icon type="plus" />
                   <div class="ant-upload-text">上传图片</div>
@@ -654,12 +654,13 @@ export default {
           if (noteArr && noteArr.length > 0) {
             noteArr.forEach(function(i) {
               let content = [];
-              i.content.forEach(function(n) {
+              i.content[0].forEach(function(n) {
                 content.push({ item: n });
               });
               that.buyerNotes.push({ title: i.title, details: content });
             });
           }
+          console.log(that.buyerNotes)
           if (picXQArr && picXQArr.length > 0) {
             picXQArr.forEach(function(i) {
               let fileList = [];
