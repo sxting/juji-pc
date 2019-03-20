@@ -379,10 +379,7 @@ export default {
                 : this.fileList1[0].name,
               picIds: "",
               point: this.productType === "POINT" ? this.point : "",
-              price:
-                this.productType === "POINT"
-                  ? this.price * 100
-                  : values.repository.price * 100,
+              price:this.price * 100,
               productName: values.repository.productName,
               productStores: storeIdArr,
               providerId: this.providerId,
