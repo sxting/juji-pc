@@ -16,7 +16,7 @@
             <a-radio :value="'其他'">其他</a-radio>
           </a-radio-group>
         </a-form-item>
-        <a-form-item label="商品名称" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.productName" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入仓库名称', whitespace: true}]}" :required="true">
+        <a-form-item label="商品名称" :labelCol="{span: 7}" maxlength="40" :wrapperCol="{span: 10}" fieldDecoratorId="repository.productName" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入商品名称', whitespace: true}]}" :required="true">
           <a-input placeholder="请输入商品名称，限1-40字" />
         </a-form-item>
         <a-form-item label="底价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.costPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
@@ -91,7 +91,7 @@
                       <a-input type="text" maxlength="40" class="juniu_input" :value="list.title" @change="getnoteTitledata(j,$event.target.value)" placeholder="请输入标题，最多输入40个字" />
                       <div class="details_list_box">
                         <div class="form_parent" style="position:relative;" v-for="(detail, noteIndex) in list.details" :key="noteIndex">
-                          <a-textarea type="text" maxlength="100" class="desc_textarea" :value="detail.item" @change="getnoteDetaildata(j,noteIndex,$event.target.value)" placeholder="请输入内容，最多输入100个字，更多内容点“添加更多”"></a-textarea>
+                          <a-textarea type="text" maxlength="1000" class="desc_textarea" :value="detail.item" @change="getnoteDetaildata(j,noteIndex,$event.target.value)" placeholder="请输入内容，最多输入1000个字，更多内容点“添加更多”"></a-textarea>
                           <span>
                             <span class="descriptions_add_btn descriptions_btns" @click="addLineNoteDetail(j)">添加更多</span>
                             <span class="descriptions_minus_btn descriptions_btns" @click="deleteNoteDetail(j,noteIndex)">删除</span>
@@ -135,9 +135,9 @@
           <a-input-number :min="0" :step="1" :max="99999" />
         </a-form-item>
         <!-- @change="mechantChange"  fieldDecoratorId="repository.mechantId"   :value="item.id"-->
-        <a-form-item label="所属商家" :labelCol="{span: 7}" fieldDecoratorId="repository.merchantId" :fieldDecoratorOptions="{rules: [{ required: true, message: '请选择商家'}]}" :wrapperCol="{span: 10}" :required="true">
-          <a-select @change="mechantChange($event)">
-            <a-select-option v-for="(item,index) in merchantList" :key="index" :value="item.id">{{item.name}}</a-select-option>
+        <a-form-item label="所属商家" :labelCol="{span: 7}"   fieldDecoratorId="repository.merchantId" :fieldDecoratorOptions="{rules: [{ required: true, message: '请选择商家'}]}" :wrapperCol="{span: 10}" :required="true">
+          <a-select  :value="selectedItems" @change="mechantChange($event)">
+            <a-select-option v-for="(item,index) in filteredOptions" :key="index" :value="item.id">{{item.name}}</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label="适用门店" :labelCol="{span: 7}" v-if="cityStoreList.length>0" :wrapperCol="{span: 10}" :required="true">
@@ -212,6 +212,7 @@ export default {
       point: "",
       price: "",
       checkedList: [],
+      selectedItems:[],
       productId: sessionStorage.getItem("PROCIDERID") || ""
     };
   },
@@ -225,7 +226,13 @@ export default {
       this.getData();
     }
   },
+  computed: {
+    filteredOptions() {
+      return this.merchantList.filter(o => !this.selectedItems.includes(o));
+    }
+  },
   methods: {
+
     pointChange(e) {
       this.point = e;
     },
@@ -301,7 +308,7 @@ export default {
       }
     },
     XQaddGroupBuynote() {
-      if (this.buyerNotes.length >= 5) {
+      if (this.picXQ.length >= 5) {
         this.$error({
           title: "温馨提示",
           content: "最多添加五组!!"
@@ -326,7 +333,14 @@ export default {
       return str.replace(/(\s*$)/g, ",");
     },
     XQgetnoteDetaildata(index, event) {
-      this.picXQ[index].picIds = event;
+      if (event.length > 1000) {
+        this.$error({
+          title: "温馨提示",
+          content: "不能输入超过1000个字"
+        });
+      } else {
+        this.picXQ[index].picIds = event;
+      }
     },
     submit(e) {
       e.preventDefault();
@@ -349,7 +363,7 @@ export default {
         });
         note.push({
           title: i.title,
-          content: [arr]
+          content: arr
         });
       });
       this.storeIdList.forEach(function(i) {
@@ -405,14 +419,17 @@ export default {
               merchantId: values.repository.merchantId,
               merchantName: this.merchantName,
               note: JSON.stringify(note),
-              costPrice: values.repository.costPrice * 100,
-              originalPrice: values.repository.originalPrice * 100,
+              costPrice: this.accurate_mul(values.repository.costPrice, 100),
+              originalPrice: this.accurate_mul(
+                values.repository.originalPrice,
+                100
+              ),
               picId: this.fileList1[0].response
                 ? this.fileList1[0].response
                 : this.fileList1[0].name,
               picIds: picIds,
               point: this.productType === "POINT" ? this.point : "",
-              price: this.price * 100,
+              price: this.accurate_mul(this.price, 100),
               productName: values.repository.productName,
               productStores: storeIdArr,
               providerId: this.providerId,
@@ -557,7 +574,7 @@ export default {
       this.storeIdListTrue = [];
       this.storeIdList = [];
       this.merchantId = this.event;
-
+        this.selectedItems = event
       this.merchantList.forEach(function(i) {
         if (i.merchantId === event) that.merchantName = i.name;
       });
@@ -603,7 +620,7 @@ export default {
         if (res.success) {
           this.productType = res.data.type;
           this.biaoqian = res.data.tag;
-          this.price = res.data.price / 100;
+          this.price = this.accurate_div(res.data.price, 100);
           this.point = res.data.point;
           this.jifen = res.data.type === "PRODUCT" ? "桔子兑换" : "桔子+钱";
           this.limitMaxNum =
@@ -621,8 +638,8 @@ export default {
               repository: {
                 cutOffDays: res.data.cutOffDays,
                 idx: res.data.idx,
-                originalPrice: res.data.originalPrice / 100,
-                costPrice: res.data.costPrice / 100,
+                originalPrice: this.accurate_div(res.data.originalPrice, 100),
+                costPrice: this.accurate_div(res.data.costPrice, 100),
                 productName: res.data.productName,
                 stock: res.data.stock,
                 merchantId: res.data.merchantId
@@ -649,14 +666,14 @@ export default {
           if (noteArr && noteArr.length > 0) {
             noteArr.forEach(function(i) {
               let content = [];
-              if (i.content && i.content[0]) {
-                i.content[0].forEach(function(n) {
+              if (i.content) {
+                i.content.forEach(function(n) {
                   content.push({ item: n });
                 });
                 that.buyerNotes.push({ title: i.title, details: content });
               }
             });
-          }else{
+          } else {
             that.buyerNote = [{ title: "", details: [{ item: "" }] }];
           }
           if (picXQArr && picXQArr.length > 0) {
@@ -672,8 +689,8 @@ export default {
               });
               that.picXQ.push({ fileList: fileList, picIds: i.content[0] });
             });
-          }else{
-            that.picXQ = [{ fileList: [], picIds: "" }]
+          } else {
+            that.picXQ = [{ fileList: [], picIds: "" }];
           }
           let fileList2 = res.data.picIds ? res.data.picIds.split(",") : "";
           if (fileList2 && fileList2.length > 0) {
