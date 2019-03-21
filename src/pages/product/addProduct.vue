@@ -656,6 +656,8 @@ export default {
                 that.buyerNotes.push({ title: i.title, details: content });
               }
             });
+          }else{
+            that.buyerNote = [{ title: "", details: [{ item: "" }] }];
           }
           if (picXQArr && picXQArr.length > 0) {
             picXQArr.forEach(function(i) {
@@ -670,6 +672,8 @@ export default {
               });
               that.picXQ.push({ fileList: fileList, picIds: i.content[0] });
             });
+          }else{
+            that.picXQ = [{ fileList: [], picIds: "" }]
           }
           let fileList2 = res.data.picIds ? res.data.picIds.split(",") : "";
           if (fileList2 && fileList2.length > 0) {

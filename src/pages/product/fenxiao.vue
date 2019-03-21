@@ -2,8 +2,8 @@
     <a-card>
         <div :class="advanced ? 'search' : null" v-if="true">
             <a-tabs>
-                <a-tab-pane tab="待分销商品" key="1">待分销商品</a-tab-pane>
-                <a-tab-pane tab="待分销商品" key="2">分销中商品</a-tab-pane>
+                <a-tab-pane tab="待分销商品" key="1"></a-tab-pane>
+                <a-tab-pane tab="待分销商品" key="2"></a-tab-pane>
             </a-tabs>
             <a-form layout="horizontal" @submit="submit" :autoFormCreate="(form) => this.form = form">
                 <div :class="advanced ? null: 'fold'">
@@ -24,10 +24,6 @@
                     </a-row>
 
                 </div>
-                <span style="float: right; margin-top: 3px;">
-                    <a-button htmlType="submit">查询</a-button>
-                    <a-button style="margin-left: 8px">重置</a-button>
-                </span>
             </a-form>
             <div>
                 <a-table :columns="columns" :dataSource="data2" :pagination="false">
