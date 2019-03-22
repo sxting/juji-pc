@@ -35,7 +35,7 @@
           </a-radio-group>
           <div>
             <a-input-number :min="1" :value="point" @change="pointChange($event)" :max="99999" style="width:200px;margin-right:10px;" placeholder="请输入桔子数量" />
-            <a-input-number :min="1" :value="price" @change="priceChange" v-if="jifen === '桔子+钱'" style="width:200px" :max="99999" placeholder="请输入钱数" />
+            <a-input-number :min="1" @change="priceChange" v-if="jifen === '桔子+钱'" :value="price"  style="width:200px" :max="99999" placeholder="请输入钱数" />
           </div>
         </a-form-item>
         <a-form-item label="商品首图" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
@@ -136,7 +136,7 @@
         </a-form-item>
         <!-- @change="mechantChange"  fieldDecoratorId="repository.mechantId"   :value="item.id"-->
         <a-form-item label="所属商家" :labelCol="{span: 7}"   fieldDecoratorId="repository.merchantId" :fieldDecoratorOptions="{rules: [{ required: true, message: '请选择商家'}]}" :wrapperCol="{span: 10}" :required="true">
-          <a-select  :value="selectedItems" @change="mechantChange($event)">
+          <a-select  :value="selectedItems" @change="mechantChange($event,false)">
             <a-select-option v-for="(item,index) in filteredOptions" :key="index" :value="item.id">{{item.name}}</a-select-option>
           </a-select>
         </a-form-item>
@@ -568,7 +568,7 @@ export default {
         }
       });
     },
-    mechantChange(event, storeIdArr) {
+     mechantChange(event, storeIdArr) {
       let that = this;
       this.allShopsNumber = 0;
       this.storeIdListTrue = [];
@@ -620,7 +620,8 @@ export default {
         if (res.success) {
           this.productType = res.data.type;
           this.biaoqian = res.data.tag;
-          this.price = this.accurate_div(res.data.price, 100);
+          this.price = Number(this.accurate_div(res.data.price, 100));
+          console.log(this.price)
           this.point = res.data.point;
           this.jifen = res.data.type === "PRODUCT" ? "桔子兑换" : "桔子+钱";
           this.limitMaxNum =
@@ -638,8 +639,8 @@ export default {
               repository: {
                 cutOffDays: res.data.cutOffDays,
                 idx: res.data.idx,
-                originalPrice: this.accurate_div(res.data.originalPrice, 100),
-                costPrice: this.accurate_div(res.data.costPrice, 100),
+                originalPrice: Number(this.accurate_div(res.data.originalPrice, 100)),
+                costPrice: Number(this.accurate_div(res.data.costPrice, 100)),
                 productName: res.data.productName,
                 stock: res.data.stock,
                 merchantId: res.data.merchantId
@@ -692,7 +693,7 @@ export default {
           } else {
             that.picXQ = [{ fileList: [], picIds: "" }];
           }
-          let fileList2 = res.data.picIds ? res.data.picIds.split(",") : "";
+          let fileList2 = res.data.picIds ? res.data.picIds.split(",") : [];
           if (fileList2 && fileList2.length > 0) {
             let fileList = [];
             fileList2.forEach(function(n, m) {
@@ -704,6 +705,8 @@ export default {
               });
             });
             this.fileList2 = fileList;
+          }else{
+            this.fileList2 = []
           }
         } else {
           this.$error({

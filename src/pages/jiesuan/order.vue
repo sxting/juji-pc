@@ -56,29 +56,29 @@
 import StandardTable from "../../components/table/StandardTable";
 const columns = [
   {
-    title: "商品类型",
+    title: "订单编号",
 
-    dataIndex: "name"
+    dataIndex: "orderId"
+  },
+  {
+    title: "下单时间",
+    dataIndex: "dateCreated"
+  },
+  {
+    title: "订单状态",
+    dataIndex: "status"
   },
   {
     title: "商品名称",
-    dataIndex: "age"
+    dataIndex: "body"
   },
   {
-    title: "所需桔子",
-    dataIndex: "address"
+    title: "商家名称",
+    dataIndex: "merchantName"
   },
   {
-    title: "售价",
-    dataIndex: "address1"
-  },
-  {
-    title: "当前库存",
-    dataIndex: "address2"
-  },
-  {
-    title: "所属商家",
-    dataIndex: "address3"
+    title: "订单金额",
+    dataIndex: "paidAmount"
   },
   {
     title: "操作",
@@ -162,7 +162,7 @@ export default {
       if(!data.dateEnd) delete data.dateEnd
       if(!data.productName) delete data.productName
       
-      
+      let that = this;
       this.$axios({
         url: "/endpoint/order/page.json",
         method: "get",
@@ -171,6 +171,10 @@ export default {
       }).then(res => {
         if (res.success) {
           this.data2 = res.data.list;
+          this.data2.forEach(function(i) {
+            // i.typeName = i.type === "POINT" ? "积分商品" : "普通商品";
+            i.paidAmount = that.accurate_div(i.paidAmount, 100);
+          });
           this.countTotal = res.data.countTotal;
         } else {
           this.$error({
