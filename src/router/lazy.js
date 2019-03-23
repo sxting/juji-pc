@@ -43,7 +43,7 @@ export default new Router({
             },
             {
               path: '/product/addProduct',
-              name: '新增商品',
+              name: '商品',
               component: () => import('@/pages/product/addProduct'),
               icon: 'none',
               invisible: true

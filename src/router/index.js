@@ -47,7 +47,7 @@ export default new Router({
             },
             {
               path: '/product/addProduct:providerId',
-              name: '新增商品',
+              name: '商品',
               component: AddProduct,
               icon: 'none'
             }

@@ -1,6 +1,6 @@
 <template>
   <a-card>
-    <div v-if="changeBoo">
+    <div v-if="!changeBoo">
       <div :class="advanced ? 'search' : null">
         <a-form layout="horizontal">
           <div :class="advanced ? null: 'fold'">
@@ -25,7 +25,7 @@
       <div>
         <a-table :columns="columns" :dataSource="data2" :pagination="false">
           <span slot="action" slot-scope="text, record">
-            <a href="javascript:;">查看详情</a>
+            <a  @click="xiangqingList(record)">查看详情</a>
           </span>
         </a-table>
         <div style="margin-top:20px;">
@@ -33,7 +33,7 @@
         </div>
       </div>
     </div>
-    <div v-if="!changeBoo">
+    <div v-if="changeBoo">
       <div :class="advanced ? 'search' : null">
         <a-form layout="horizontal">
           <div :class="advanced ? null: 'fold'">
@@ -62,19 +62,15 @@
               </a-col>
             </a-row>
             <span style="float: right; margin-top: 3px;">
-              <a-button htmlType="submit" @click="submit">查询</a-button>
-              <a @click="toggleAdvanced" style="margin-left: 8px">
-                {{advanced ? '收起' : '展开'}}
-                <a-icon :type="advanced ? 'up' : 'down'" />
-              </a>
+              <a-button htmlType="submit" >查询</a-button>
             </span>
           </div>
         </a-form>
       </div>
       <div>
-        <a-table :columns="columns" :dataSource="data2" :pagination="false">
+        <a-table :columns="columns" :dataSource="data3" :pagination="false">
           <span slot="action" slot-scope="text, record">
-            <a @click="xiangqingList(record)">查看详情</a>
+            <a >查看详情</a>
           </span>
         </a-table>
         <div style="margin-top:20px;">
@@ -115,7 +111,34 @@ const columns = [
     scopedSlots: { customRender: "action" }
   }
 ];
+const columns2 = [
+  {
+    title: "核销时间",
 
+    dataIndex: "use_time"
+  },
+  {
+    title: "核销门店",
+    dataIndex: "use_store_name"
+  },
+  {
+    title: "核销数量",
+    dataIndex: "num"
+  },
+  {
+    title: "核销金额",
+    dataIndex: "amount"
+  },
+  {
+    title: "核销码",
+    dataIndex: "voucher_code"
+  },
+  {
+    title: "操作",
+    key: "action",
+    scopedSlots: { customRender: "action" }
+  }
+];
 const dataSource = [];
 
 for (let i = 0; i < 100; i++) {
@@ -140,6 +163,7 @@ export default {
       selectedRowKeys: [],
       selectedRows: [],
       data2: [],
+      data3:[],
       dateStart: "",
       dateEnd: "",
       pageNo: 1,
@@ -148,7 +172,8 @@ export default {
       merchantId: "",
       countTotal: 1,
       voucherCode: "",
-      changeBoo: false
+      changeBoo: false,
+      storeId:'ALL'
     };
   },
   created() {
@@ -290,6 +315,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.changeBoo = true;
+          this.data3 = res.data.list;
         } else {
           this.$error({
             title: "温馨提示",

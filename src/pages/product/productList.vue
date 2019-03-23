@@ -167,6 +167,7 @@ export default {
       this.productList();
     },
     submit() {
+      this.pageNo = 1;
       this.form.validateFields((err, values) => {
         console.log(values);
         this.productList(
@@ -228,7 +229,14 @@ export default {
     },
     onChange(e) {
       this.pageNo = e;
-      this.productList();
+      this.form.validateFields((err, values) => {
+        this.productList(
+          values.repository.merchantId,
+          values.repository.productType,
+          values.repository.productName,
+          values.repository.biaoqian
+        );
+      });
     },
     merchantListFun(providerId) {
       let data = {

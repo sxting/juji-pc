@@ -16,26 +16,26 @@
             <a-radio :value="'其他'">其他</a-radio>
           </a-radio-group>
         </a-form-item>
-        <a-form-item label="商品名称" :labelCol="{span: 7}" maxlength="40" :wrapperCol="{span: 10}" fieldDecoratorId="repository.productName" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入商品名称', whitespace: true}]}" :required="true">
+        <a-form-item label="商品名称" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" fieldDecoratorId="repository.productName" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入商品名称', whitespace: true}]}" :required="true">
           <a-input placeholder="请输入商品名称，限1-40字" />
         </a-form-item>
         <a-form-item label="底价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.costPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
-          <a-input placeholder="请输入商品底价" :disabled="productId?true:false" />
+          <a-input-number style="width:100%" :min="0.01" :max="99999.99" placeholder="请输入商品底价" :disabled="productId?true:false" />
         </a-form-item>
-        <a-form-item label="原价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.originalPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
-          <a-input placeholder="请输入商品原价" />
+        <a-form-item label="原价" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" fieldDecoratorId="repository.originalPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
+          <a-input-number style="width:100%" :min="0.01" :max="99999.99" placeholder="请输入商品原价" />
         </a-form-item>
         <a-form-item label="售价" :labelCol="{span: 7}" v-if="productType === 'PRODUCT'" :wrapperCol="{span: 10}" :required="true">
-          <a-input-number style="width:100%" :value="price" @change="priceChange" placeholder="请输入商品售价" />
+          <a-input-number style="width:100%" :min="0" :max="99999.99" :value="price" @change="priceChange" placeholder="请输入商品售价" />
         </a-form-item>
         <a-form-item label="售价" :labelCol="{span: 7}" v-if="productType === 'POINT'" :wrapperCol="{span: 10}" :required="true">
-          <a-radio-group v-model="jifen">
+          <a-radio-group v-model="jifen"  @change="jifenFun">
             <a-radio :value="'桔子兑换'">桔子兑换</a-radio>
             <a-radio :value="'桔子+钱'">桔子+钱</a-radio>
           </a-radio-group>
           <div>
-            <a-input-number :min="1" :value="point" @change="pointChange($event)" :max="99999" style="width:200px;margin-right:10px;" placeholder="请输入桔子数量" />
-            <a-input-number :min="1" @change="priceChange" v-if="jifen === '桔子+钱'" :value="price"  style="width:200px" :max="99999" placeholder="请输入钱数" />
+            <a-input-number :min="0" :value="point" @change="pointChange($event)" :max="99999" style="width:200px;margin-right:10px;" placeholder="请输入桔子数量" />
+            <a-input-number :min="0" @change="priceChange($event)" :max="99999.99" v-if="jifen === '桔子+钱'" :value="price"  style="width:200px"  placeholder="请输入钱数" />
           </div>
         </a-form-item>
         <a-form-item label="商品首图" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
@@ -120,7 +120,7 @@
         <a-form-item label="购买限制" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div>
             每单最多购买
-            <a-input-number :min="0" :step="1" :max="999" v-model="limitMaxNum" /> 个
+            <a-input-number :min="0" :step="1" :max="999" v-model="limitPerOrderNum" /> 个
           </div>
           <div>
             每日最多购买
@@ -128,7 +128,7 @@
           </div>
           <div>
             每人最多购买
-            <a-input-number :min="0" :step="1" :max="999" v-model="limitPerOrderNum" /> 个
+            <a-input-number :min="0" :step="1" :max="999" v-model="limitMaxNum" /> 个
           </div>
         </a-form-item>
         <a-form-item label="展示顺序" :labelCol="{span: 7}" help="第几位" :wrapperCol="{span: 10}" fieldDecoratorId="repository.idx" :required="false">
@@ -232,7 +232,9 @@ export default {
     }
   },
   methods: {
-
+    jifenFun(){
+      this.price = 0;
+    },
     pointChange(e) {
       this.point = e;
     },
@@ -245,8 +247,7 @@ export default {
       this.storeIdList = e.target.checked ? arr : [];
     },
     priceChange(e) {
-      console.log(e);
-      if (e) this.price = e;
+       this.price = e;
     },
     getData() {
       this.providerId =
@@ -429,7 +430,7 @@ export default {
                 : this.fileList1[0].name,
               picIds: picIds,
               point: this.productType === "POINT" ? this.point : "",
-              price: this.accurate_mul(this.price, 100),
+              price: this.price?this.accurate_mul(this.price, 100):0,
               productName: values.repository.productName,
               productStores: storeIdArr,
               providerId: this.providerId,
@@ -623,7 +624,7 @@ export default {
           this.price = Number(this.accurate_div(res.data.price, 100));
           console.log(this.price)
           this.point = res.data.point;
-          this.jifen = res.data.type === "PRODUCT" ? "桔子兑换" : "桔子+钱";
+          this.jifen = res.data.type === "PRODUCT" ? res.data.price? "桔子+钱": "桔子兑换" :"桔子兑换";
           this.limitMaxNum =
             res.data.limitMaxNum > 0 ? res.data.limitMaxNum : "";
           this.limitPerDayNum = res.data.limitPerDayNum
