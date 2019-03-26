@@ -260,7 +260,7 @@ export default {
     },
     productList(merchantId, type, name, tag) {
       let data = {
-        pageNo: this.pageNo,
+        pageNo: this.pageNo || 1,
         pageSize: 10,
         providerId: this.providerId,
         merchantId: merchantId || "",

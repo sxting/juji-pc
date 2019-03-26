@@ -123,7 +123,7 @@ export default {
     arCallback(){
       this.$axios({
         url: "/endpoint/provider/user.json",
-        method: "get",
+        method: "GET",
         processData: false,
       }).then(res => {
         if (res.success) {

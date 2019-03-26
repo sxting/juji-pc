@@ -181,10 +181,7 @@ export default {
       });
     },
     bianji(e) {
-      this.$router.push({
-        path: "/product/addProduct",
-        query: { providerId: "1215431996629494", productId: e.productId }
-      });
+      
     },
     xiajia(e) {
       this.$axios({

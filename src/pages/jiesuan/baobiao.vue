@@ -25,7 +25,7 @@
       <div>
         <a-table :columns="columns" :dataSource="data2" :pagination="false">
           <span slot="action" slot-scope="text, record">
-            <a  @click="xiangqingList(record)">查看详情</a>
+            <a @click="xiangqingList(record)">查看详情</a>
           </span>
         </a-table>
         <div style="margin-top:20px;">
@@ -43,34 +43,33 @@
                   <a-range-picker @change="onChange" />
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24" v-if="merchantId">
-                <a-form-item label="商品名称" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-input />
+              
+              <a-col :md="8" :sm="24" >
+                <a-form-item label="核销码"  :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
+                  <a-input v-model="voucherCode"/>
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24" v-if="merchantId">
+              <a-col :md="8" :sm="24">
                 <a-form-item label="核销门店" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择" :defaultValue="merchantId" @change="merchantChange">
-                    <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
+                  <a-select placeholder="请选择"  @change="storeChange">
+                    <a-select-option :key="'ALL'" >全部门店</a-select-option>
+                    <a-select-option v-for="(item) in cityStoreList" :key="item.id">{{item.name}}</a-select-option>
                   </a-select>
-                </a-form-item>
-              </a-col>
-              <a-col :md="8" :sm="24" v-if="merchantId">
-                <a-form-item label="核销码" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-input />
                 </a-form-item>
               </a-col>
             </a-row>
             <span style="float: right; margin-top: 3px;">
-              <a-button htmlType="submit" >查询</a-button>
+              <a-button htmlType="submit" @click="back">返回</a-button>
+              
+              <a-button htmlType="submit" @click="xiangqingFun">查询</a-button>
             </span>
           </div>
         </a-form>
       </div>
       <div>
-        <a-table :columns="columns" :dataSource="data3" :pagination="false">
+        <a-table :columns="columns2" :dataSource="data3" :pagination="false">
           <span slot="action" slot-scope="text, record">
-            <a >查看详情</a>
+            <a @click="orderList(record)">查看详情</a>
           </span>
         </a-table>
         <div style="margin-top:20px;">
@@ -78,6 +77,90 @@
         </div>
       </div>
     </div>
+    <a-modal title="详情" :visible="visible" @ok="handleCancel" @cancel="handleCancel" width="1000px">
+      <div class="orderpage_detail_list">
+        <table>
+          <tr class="ui-grid-row">
+            <td class="">订单号</td>
+            <td class="" style="width:350px;">{{orderInfoOrder.orderId}}</td>
+            <!-- <td class="">退款单号</td>
+            <td class="trans-status" style="width:350px;"></td> -->
+          </tr>
+          <tr>
+            <td class="">下单时间</td>
+            <td class="" style="width:220px;">{{orderInfoOrder.dateCreated}}</td>
+            <!-- <td class="">退款时间</td>
+            <td class="" style="width:220px;"></td> -->
+          </tr>
+          <tr>
+            <td class="">订单状态</td>
+            <td class="" style="width:220px;">{{orderInfoOrder.orderTypeName}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3 class="flex-1 text-lg borderLeft" style="margin-top:20px;">订单信息</h3>
+      <div>
+        <table nz-table class="existingGroups-table">
+          <thead>
+            <tr>
+              <td>商品名称</td>
+              <td>核销状态</td>
+              <td>核销时间</td>
+              <td>核销门店</td>
+              <td>核销码</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in vouchersList" :key="index">
+              <td>{{item.productName}}</td>
+              <td>{{item.voucherStatusName}}</td>
+              <td>{{item.useTime}}</td>
+              <td>{{item.useStoreName}}</td>
+              <td>{{item.voucherCode}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="orderpage_detail_list">
+        <table>
+          <tr class="ui-grid-row">
+            <td class="">订单金额</td>
+            <td class="" style="width:350px;">{{orderInfoOrder.amount}}</td>
+            <td class="">优惠金额</td>
+            <td class="trans-status" style="width:350px;">{{orderInfoOrder.couponAmount/100}}</td>
+          </tr>
+          <tr class="ui-grid-row">
+            <td class="">实付金额</td>
+            <td class="" style="width:350px;">{{orderInfoOrder.paidAmount/100}}</td>
+            <td class="">消耗桔子积分</td>
+            <td class="trans-status" style="width:350px;">{{orderInfoOrder.paidPoint}}</td>
+          </tr>
+        </table>
+      </div>
+      <h3 class="flex-1 text-lg borderLeft">顾客信息</h3>
+      <div class="orderpage_detail_list">
+        <table>
+          <tr class="ui-grid-row">
+            <td class="">微信昵称</td>
+            <td class="" style="width:350px;">{{orderUser.nickName}}</td>
+            <td class="">手机号</td>
+            <td class="trans-status" style="width:350px;">{{orderUser.phone}}</td>
+          </tr>
+        </table>
+      </div>
+      <!-- <h3 class="flex-1 text-lg borderLeft">分销信息</h3> -->
+      <!-- <div class="orderpage_detail_list">
+        <table>
+          <tr class="ui-grid-row">
+            <td class="">分销桔长</td>
+            <td class="" style="width:350px;">1</td>
+            <td class="">上级分销桔长</td>
+            <td class="trans-status" style="width:350px;">1</td>
+          </tr>
+        </table>
+      </div> -->
+    </a-modal>
   </a-card>
 </template>
 
@@ -93,10 +176,10 @@ const columns = [
     title: "商品名称",
     dataIndex: "productName"
   },
-  {
-    title: "商家名称",
-    dataIndex: "providerName"
-  },
+  // {
+  //   title: "商家名称",
+  //   dataIndex: "providerName"
+  // },
   {
     title: "核销数量",
     dataIndex: "num"
@@ -159,11 +242,12 @@ export default {
     return {
       advanced: true,
       columns: columns,
+      columns2: columns2,
       dataSource: dataSource,
       selectedRowKeys: [],
       selectedRows: [],
       data2: [],
-      data3:[],
+      data3: [],
       dateStart: "",
       dateEnd: "",
       pageNo: 1,
@@ -173,7 +257,20 @@ export default {
       countTotal: 1,
       voucherCode: "",
       changeBoo: false,
-      storeId:'ALL'
+      storeId: "ALL",
+      visible: false,
+      cityStoreList:[],
+      orderInfoOrder:{
+        orderId: "",
+        orderType: "",
+        dateCreated: "",
+        amount: "",
+        couponAmount: "",
+        paidAmount: "",
+        paidPoint: ""
+      },
+      vouchersList: [],
+      orderUser: { nickName: "", phone: "" }
     };
   },
   created() {
@@ -190,6 +287,12 @@ export default {
     paginationChange(e) {
       this.pageNo = e;
       this.productList();
+    },
+    handleCancel(){
+      this.visible = false;
+    },
+    back(){
+      this.changeBoo = false;
     },
     onChange(dates, dateStrings) {
       this.dateStart = dateStrings[0];
@@ -216,6 +319,7 @@ export default {
         this.remove();
       }
     },
+    
     formatDateTime(date, type) {
       let year = date.getFullYear();
       let month = date.getMonth() + 1;
@@ -316,6 +420,7 @@ export default {
         if (res.success) {
           this.changeBoo = true;
           this.data3 = res.data.list;
+          this.storeIdList(this.merchantId)
         } else {
           this.$error({
             title: "温馨提示",
@@ -323,6 +428,76 @@ export default {
           });
         }
       });
+    },
+    orderList(e){
+      this.orderFun(e.order_id)
+    },
+    storeChange(e){
+      this.storeId = e;
+      this.xiangqingFun()
+    },
+    storeIdList(event){
+      let data = {
+        merchantId: event
+      };
+      this.$axios({
+        url: "/endpoint/juji/merchant/store/list.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          this.cityStoreList = res.data;
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    orderFun(orderId){
+      let data = {
+       orderId : orderId 
+      }
+      this.$axios({
+        url: "/endpoint/order/info.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          this.orderInfoOrder = res.data.order;
+          if (this.orderInfoOrder.orderType === "CREATED")
+            this.orderInfoOrder.orderTypeName = "待付款";
+          if (this.orderInfoOrder.orderType === "PAID")
+            this.orderInfoOrder.orderTypeName = "待使用";
+          if (this.orderInfoOrder.orderType === "CONSUME")
+            this.orderInfoOrder.orderTypeName = "待评价";
+          if (this.orderInfoOrder.orderType === "FINISH")
+            this.orderInfoOrder.orderTypeName = "已完成";
+          if (this.orderInfoOrder.orderType === "CLOSE")
+            this.orderInfoOrder.orderTypeName = "已关闭";
+          if (this.orderInfoOrder.orderType === "REFUND")
+            this.orderInfoOrder.orderTypeName = "已退款";
+          this.vouchersList = res.data.order.vouchers;
+          this.vouchersList.forEach(function(i) {
+            if (i.voucherStatus === "INIT") i.voucherStatusName = "初始状态";
+            if (i.voucherStatus === "USED") i.voucherStatusName = "已使用";
+            if (i.voucherStatus === "REFUND") i.voucherStatusName = "已退款";
+            if (i.voucherStatus === "OVERDUE") i.voucherStatusName = "已过期";
+          });
+          this.orderUser = res.data.user;
+          console.log(res);
+          this.visible = true;
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+      
     }
   }
 };
@@ -343,5 +518,38 @@ export default {
   .fold {
     width: 100%;
   }
+}
+
+.orderpage_detail_list table {
+    border-spacing: 0;
+    border: solid #D9D9D9;
+    border-width: 1px 0px 0px 1px;
+    padding: 0;
+}
+
+.orderpage_detail_list tr td {
+    line-height: 38px;
+    height: 38px;
+    border: solid #D9D9D9;
+    border-width: 0px 1px 1px 0px;
+    text-align: center;
+    padding: 0;
+}
+
+.orderpage_detail_list tr td:nth-child(2n-1) {
+    color: #999999;
+    background-color: #F4F4F4;
+    width: 150px;
+}
+.existingGroups-table{
+    width: 100%;
+    text-align: center;    
+}
+.existingGroups-table tr{
+    height: 40px;
+    line-height: 40px;
+}
+.existingGroups-table thead tr{
+    background: #f2f2f2;
 }
 </style>
