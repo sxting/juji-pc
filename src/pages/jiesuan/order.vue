@@ -102,7 +102,7 @@
         <table>
           <tr class="ui-grid-row">
             <td class="">订单金额</td>
-            <td class="" style="width:350px;">{{orderInfoOrder.amount}}</td>
+            <td class="" style="width:350px;">{{orderInfoOrder.amount/100}}</td>
             <td class="">优惠金额</td>
             <td class="trans-status" style="width:350px;">{{orderInfoOrder.couponAmount/100}}</td>
           </tr>

@@ -126,7 +126,7 @@
         <table>
           <tr class="ui-grid-row">
             <td class="">订单金额</td>
-            <td class="" style="width:350px;">{{orderInfoOrder.amount}}</td>
+            <td class="" style="width:350px;">{{orderInfoOrder.amount/100}}</td>
             <td class="">优惠金额</td>
             <td class="trans-status" style="width:350px;">{{orderInfoOrder.couponAmount/100}}</td>
           </tr>
@@ -410,7 +410,7 @@ export default {
       if (!data.dateStart) delete data.dateStart;
       if (!data.dateEnd) delete data.dateEnd;
       if (!data.productId) delete data.productId;
-
+      let that = this;
       this.$axios({
         url: "/endpoint/product/settle/list.json",
         method: "get",
@@ -420,6 +420,9 @@ export default {
         if (res.success) {
           this.changeBoo = true;
           this.data3 = res.data.list;
+          this.data3.forEach(function(i){
+            i.amount =that.accurate_div(i.amount,100) 
+          })
           this.storeIdList(this.merchantId)
         } else {
           this.$error({
