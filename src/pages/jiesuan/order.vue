@@ -164,9 +164,22 @@ const columns = [
     title: "商家名称",
     dataIndex: "merchantName"
   },
+  
   {
     title: "订单金额",
     dataIndex: "paidAmount"
+  },
+  {
+    title: "桔子",
+    dataIndex: "point"
+  },
+  {
+    title: "支付金额",
+    dataIndex: "amount"
+  },
+  {
+    title: "实付桔子",
+    dataIndex: "paidPoint"
   },
   {
     title: "操作",
@@ -290,6 +303,8 @@ export default {
             if (i.status === "CLOSE") i.orderTypeName = "已关闭";
             if (i.status === "REFUND") i.orderTypeName = "已退款";
             i.paidAmount = that.accurate_div(i.paidAmount, 100);
+            i.amount = that.accurate_div(i.amount, 100);
+            
           });
           this.countTotal = res.data.countTotal;
         } else {
