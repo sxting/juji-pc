@@ -167,7 +167,7 @@ const columns = [
   
   {
     title: "订单金额",
-    dataIndex: "paidAmount"
+    dataIndex: "amount"
   },
   {
     title: "桔子",
@@ -175,7 +175,7 @@ const columns = [
   },
   {
     title: "支付金额",
-    dataIndex: "amount"
+    dataIndex: "paidAmount"
   },
   {
     title: "实付桔子",
