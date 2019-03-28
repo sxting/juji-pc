@@ -51,13 +51,11 @@ export default {
   watch: {
     '$route': function (newRoute, oldRoute) {
       this.activePage = newRoute.fullPath
-      
     },
     'activePage': function (key) {
       this.$router.push(key)
     },
     'multipage': function (newVal, oldVal) {
-      
     }
   },
   methods: {

@@ -122,19 +122,20 @@ export default {
     },
     arCallback(){
       this.$axios({
-        url: "/endpoint/provider/user.json",
+        url: "/endpoint/ops/staffOpsInfo.json",
         method: "GET",
         processData: false,
       }).then(res => {
         if (res.success) {
-          if(!res.data.isProvider){
-            this.$error({
-              title: "温馨提示",
-              content: '您没有权限'
-            });
-          }else{
-            sessionStorage.setItem('PROCIDERID',res.data.providerId)
+          sessionStorage.setItem('menu',JSON.stringify(res.data.menuList))
+          if(res.data.menuList&&res.data.menuList.length>0){
             this.$router.push('/product/productList')
+            window.location.reload()
+          }else{
+            this.$error({
+            title: "温馨提示",
+            content: '您尚未拥有权限'
+          });
           }
         } else {
           this.$error({

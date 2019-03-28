@@ -29,7 +29,7 @@ export default new Router({
       children: [
         {
           path: '/product',
-          name: '商品管理',
+          name: '商品管理2',
           component: RouteView,
           icon: 'dashboard',
           children: [

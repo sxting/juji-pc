@@ -6,8 +6,7 @@ import MenuView from '@/layouts/MenuView'
 import Login from '@/pages/login/Login'
 
 Vue.use(Router)
-
-export default new Router({
+let routesObj = {
   routes: [
     {
       path: '/login',
@@ -27,19 +26,25 @@ export default new Router({
           path: '/product',
           name: '商品管理',
           component: RouteView,
+          invisible: true,
+          menuId: '20000000',
           icon: 'dashboard',
           children: [
             {
               path: '/product/productList',
               name: '商品列表',
               component: () => import('@/pages/product/productList'),
-              icon: 'none'
+              icon: 'none',
+              menuId: '20100000',
+              invisible: true
             },
             {
               path: '/product/fenxiao',
-              name: '商品分销',
+              name: '分销商品',
+              menuId: '20300000',
               component: () => import('@/pages/product/fenxiao'),
-              icon: 'none'
+              icon: 'none',
+              invisible: true
             },
             {
               path: '/product/addProduct',
@@ -55,22 +60,45 @@ export default new Router({
           name: '结算报表',
           component: PageView,
           icon: 'form',
+          menuId: '30000000',
+          invisible: true,
           children: [
             {
               path: '/jiesuan/baobiao',
-              name: '商家结算报表',
+              name: '结算报表',
+              menuId: '30100000',
               component: () => import('@/pages/jiesuan/baobiao'),
-              icon: 'none'
+              icon: 'none',
+              invisible: true
             },
             {
               path: '/jiesuan/order',
               name: '订单列表',
+              menuId: '30200000',
               component: () => import('@/pages/jiesuan/order'),
-              icon: 'none'
+              icon: 'none',
+              invisible: true
             }
           ]
         }
       ]
     }
   ]
-})
+}
+var aaa = JSON.parse(sessionStorage.getItem('menu'))
+if (aaa && aaa.length > 0) {
+  routesObj.routes[1].children.forEach(i => {
+    console.log(aaa)
+    aaa.forEach(n => {
+      if (n.menuId === i.menuId) i.invisible = false
+      i.children.forEach(m => {
+        n.children.forEach(q => {
+          if (q.menuId === m.menuId) m.invisible = false
+        })
+      })
+    })
+  })
+}
+
+console.log(routesObj)
+export default new Router(routesObj)
