@@ -26,7 +26,7 @@ let routesObj = {
           path: '/product',
           name: '商品管理',
           component: RouteView,
-          invisible: true,
+          invisible: false,
           menuId: '20000000',
           icon: 'dashboard',
           children: [
@@ -69,7 +69,7 @@ let routesObj = {
           component: PageView,
           icon: 'form',
           menuId: '30000000',
-          invisible: true,
+          invisible: false,
           children: [
             {
               path: '/jiesuan/baobiao',
