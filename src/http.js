@@ -21,23 +21,12 @@ axios.interceptors.request.use(
 // http response 拦截器
 axios.interceptors.response.use(
   response => {
-    // return response.data
-    // let result = response.data
-    // if (result.errorCode === 'TOKEN_NOT_EXIST') {
-    //   router.push({
-    //     path: '/'
-    //   })
-    //   window.location.reload()
-    // } else {
-    // }
     let result = response.data
-    if (result.errorCode === 'invalid_token') {
-      router.replace({
-        path: '/bindAccount',
-        query: {
-          redirect: router.currentRoute.fullPath
-        }
+    if (result.errorCode === 'TOKEN_NOT_EXIST') {
+      router.push({
+        path: '/'
       })
+      window.location.reload()
     } else {
       return response.data
     }

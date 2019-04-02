@@ -36,7 +36,7 @@ let routesObj = {
               component: () => import('@/pages/product/productList'),
               icon: 'none',
               menuId: '20100000',
-              invisible: true
+              invisible: false
             },
             {
               path: '/product/fenxiao',
@@ -44,7 +44,7 @@ let routesObj = {
               menuId: '20300000',
               component: () => import('@/pages/product/fenxiao'),
               icon: 'none',
-              invisible: true
+              invisible: false
             },
             {
               path: '/product/Reviewed',
@@ -52,7 +52,7 @@ let routesObj = {
               menuId: '20200000',
               component: () => import('@/pages/product/reviewed'),
               icon: 'none',
-              invisible: true
+              invisible: false
             },
             {
               path: '/product/addProduct',
@@ -77,7 +77,7 @@ let routesObj = {
               menuId: '30100000',
               component: () => import('@/pages/jiesuan/baobiao'),
               icon: 'none',
-              invisible: true
+              invisible: false
             },
             {
               path: '/jiesuan/order',
@@ -85,7 +85,7 @@ let routesObj = {
               menuId: '30200000',
               component: () => import('@/pages/jiesuan/order'),
               icon: 'none',
-              invisible: true
+              invisible: false
             },
             {
               path: '/jiesuan/verification',
@@ -127,20 +127,20 @@ let routesObj = {
     }
   ]
 }
-var aaa = JSON.parse(sessionStorage.getItem('menu'))
-if (aaa && aaa.length > 0) {
-  routesObj.routes[1].children.forEach(i => {
-    console.log(aaa)
-    aaa.forEach(n => {
-      if (n.menuId === i.menuId) i.invisible = false
-      i.children.forEach(m => {
-        n.children.forEach(q => {
-          if (q.menuId === m.menuId) m.invisible = false
-        })
-      })
-    })
-  })
-}
+// var aaa = JSON.parse(sessionStorage.getItem('menu'))
+// if (aaa && aaa.length > 0) {
+//   routesObj.routes[1].children.forEach(i => {
+//     console.log(aaa)
+//     aaa.forEach(n => {
+//       if (n.menuId === i.menuId) i.invisible = false
+//       i.children.forEach(m => {
+//         n.children.forEach(q => {
+//           if (q.menuId === m.menuId) m.invisible = false
+//         })
+//       })
+//     })
+//   })
+// }
 
 console.log(routesObj)
 export default new Router(routesObj)

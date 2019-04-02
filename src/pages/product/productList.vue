@@ -181,7 +181,7 @@ export default {
       providerId: "1215431996629494",
       countTotal: 0,
       merchantList: [],
-      putAway:1
+      putAway: 1
     };
   },
   created() {
@@ -198,9 +198,9 @@ export default {
   },
   mounted() {},
   methods: {
-    tabFun(e){
+    tabFun(e) {
       this.putAway = e;
-      if(this.putAway === '2') this.columns = columns2;
+      if (this.putAway === "2") this.columns = columns2;
       else this.columns = columns;
       this.productList();
     },
@@ -296,7 +296,7 @@ export default {
         }
       });
     },
-    
+
     productList(merchantId, type, name, tag) {
       let data = {
         pageNo: this.pageNo || 1,
@@ -318,10 +318,13 @@ export default {
           this.data2 = res.data.list;
           this.countTotal = res.data.countTotal;
           this.data2.forEach(function(i) {
-            if(i.auditStatusMap.auditStatus === 'PASS') i.auditStatusMap.auditStatusName = '通过';
-            if(i.auditStatusMap.auditStatus === 'INIT') i.auditStatusMap.auditStatusName = '待审核';
-            if(i.auditStatusMap.auditStatus === 'REJECT') i.auditStatusMap.auditStatusName = '拒绝';
-            
+            if (i.auditStatusMap.auditStatus === "PASS")
+              i.auditStatusMap.auditStatusName = "通过";
+            if (i.auditStatusMap.auditStatus === "INIT")
+              i.auditStatusMap.auditStatusName = "待审核";
+            if (i.auditStatusMap.auditStatus === "REJECT")
+              i.auditStatusMap.auditStatusName = "拒绝";
+
             i.price = i.price / 100;
             i.typeName = i.type === "PRODUCT" ? "普通商品" : "积分商品";
           });
