@@ -86,6 +86,14 @@ let routesObj = {
               component: () => import('@/pages/jiesuan/order'),
               icon: 'none',
               invisible: true
+            },
+            {
+              path: '/jiesuan/verification',
+              name: '核销记录',
+              menuId: '30300000',
+              component: () => import('@/pages/jiesuan/verification'),
+              icon: 'none',
+              invisible: true
             }
           ]
         },

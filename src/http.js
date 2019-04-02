@@ -21,15 +21,15 @@ axios.interceptors.request.use(
 // http response 拦截器
 axios.interceptors.response.use(
   response => {
-    let result = response.data
-    if (result.errorCode === 'TOKEN_NOT_EXIST') {
-      router.push({
-        path: '/'
-      })
-      window.location.reload()
-    } else {
-      return response.data
-    }
+    return response.data
+    // let result = response.data
+    // if (result.errorCode === 'TOKEN_NOT_EXIST') {
+    //   router.push({
+    //     path: '/'
+    //   })
+    //   window.location.reload()
+    // } else {
+    // }
   },
   error => {
     if (error.response) {
