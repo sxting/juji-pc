@@ -110,11 +110,11 @@ const columns = [
   },
   {
     title: "购物返利",
-    dataIndex: "MANAGERAmount"
+    dataIndex: "SALESAmount"
   },
   {
     title: "管理佣金",
-    dataIndex: "PLATFORMAmount"
+    dataIndex: "MANAGERAmount"
   },
   {
     title: "操作",
@@ -228,6 +228,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.showBoolean = true;
+          this.effective = 0
           this.productList();
         } else {
           this.$error({
@@ -307,7 +308,6 @@ export default {
         params: data
       }).then(res => {
         if (res.success) {
-          console.log(res);
           this.detail = res.data;
           this.detail.estimateSettlements.forEach(function(i) {
             if (i.settlementType === "MERCHANT") i.boolean = true;
@@ -328,6 +328,22 @@ export default {
             if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
             if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
           });
+          this.descriptions = res.data.descriptions;
+          let fileList2 = res.data.picIds ;
+          if (fileList2 && fileList2.length > 0) {
+            let fileList = [];
+            fileList2.forEach(function(n, m) {
+              fileList.push({
+                uid: m + "1",
+                name: n,
+                status: "done",
+                url: that.picUrl(n)
+              });
+            });
+            this.fileList = fileList;
+          }else{
+            this.fileList = []
+          }
         } else {
           this.$error({
             title: "温馨提示",
@@ -335,6 +351,11 @@ export default {
           });
         }
       });
+    },
+    picUrl(id) {
+      return (
+        "https://upic.juniuo.com/file/picture/" + id + "/resize_85_85/mode_fill"
+      );
     },
     productList() {
       let data = {
