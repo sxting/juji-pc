@@ -128,6 +128,8 @@ export default {
       }).then(res => {
         if (res.success) {
           sessionStorage.setItem('menu',JSON.stringify(res.data.menuList))
+          sessionStorage.setItem('LoginDate',JSON.stringify(res.data))
+          console.log(res)
           if(res.data.menuList&&res.data.menuList.length>0){
             this.$router.push('/product/productList')
             window.location.reload()

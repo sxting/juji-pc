@@ -1,88 +1,88 @@
 <template>
-    <a-card>
-        <div :class="advanced ? 'search' : null" v-if="true">
-            <a-tabs>
-                <a-tab-pane tab="待分销商品" key="1"></a-tab-pane>
-                <a-tab-pane tab="待分销商品" key="2"></a-tab-pane>
-            </a-tabs>
-            <a-form layout="horizontal" @submit="submit" :autoFormCreate="(form) => this.form = form">
-                <div :class="advanced ? null: 'fold'">
-                    <a-row>
-                        <a-col :md="8" :sm="24">
-                            <a-form-item label="所属运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 18, offset: 1}">
-                                <a-select placeholder="请选择">
-                                    <a-select-option value="">全部商家</a-select-option>
-                                    <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
-                                </a-select>
-                            </a-form-item>
-                        </a-col>
-                        <a-col :md="8" :sm="24">
-                            <a-form-item label="商品名称" :labelCol="{span: 5}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 18, offset: 1}">
-                                <a-input style="width: 100%" placeholder="请输入" />
-                            </a-form-item>
-                        </a-col>
-                    </a-row>
+  <a-card>
+    <div v-if="showBoolean">
+      <a-tabs @change="tabFun">
+        <a-tab-pane tab="待分销商品" key="0"></a-tab-pane>
+        <a-tab-pane tab="分销商品" key="1"></a-tab-pane>
+      </a-tabs>
+      <a-form layout="horizontal">
+        <div>
+          <a-row>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="所属运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 18, offset: 1}">
+                <a-select placeholder="请选择">
+                  <a-select-option value="">全部商家</a-select-option>
+                  <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="商品名称" :labelCol="{span: 5}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 18, offset: 1}">
+                <a-input style="width: 100%" placeholder="请输入" />
+              </a-form-item>
+            </a-col>
+          </a-row>
 
-                </div>
-            </a-form>
-            <div>
-                <a-table :columns="columns" :dataSource="data2" :pagination="false">
-                    <span slot="action" slot-scope="text, record">
-                        <a @click="bianji(record)">分销推广</a>
-                    </span>
-                </a-table>
-                <div style="margin-top:20px;">
-                    <a-pagination style="float:right" @change="onChange" :current="pageNo" :pageSize="10" :total="countTotal" />
-                </div>
-            </div>
         </div>
-
-        <div v-if="false">
-            <div :class="advanced ? null: 'fold'">
-                <a-form layout="horizontal" @submit="submit" :autoFormCreate="(form) => this.form = form">
-                    <a-card title="商品信息" style="margin-top:20px">
-                        <a-form-item label="商品名称" :labelCol="{span: 7}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 10}">
-                            剪发总监设计
-                        </a-form-item>
-                        <a-form-item label="原价" :labelCol="{span: 7}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 10}">
-                            11
-                        </a-form-item>
-                        <a-form-item label="售价" :labelCol="{span: 7}" fieldDecoratorId="repository.productName2" :wrapperCol="{span: 10}">
-                            22
-                        </a-form-item>
-                        <a-form-item label="底价" :labelCol="{span: 7}" fieldDecoratorId="repository.productName3" :wrapperCol="{span: 10}">
-                            33
-                        </a-form-item>
-                    </a-card>
-                    <a-card title="分佣设置" style="margin-top:20px">
-                        <a-form-item label="购物返利分佣比例" :labelCol="{span: 7}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 10}">
-                            <a-input-number/>19.00元
-                        </a-form-item>
-                        <a-form-item label="管理佣金分佣比例" :labelCol="{span: 7}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 10}">
-                            <a-input-number/>19.00元
-                        </a-form-item>
-                    </a-card>
-                    <a-card title="推广素材" style="margin-top:20px">
-                        <a-form-item label="推广文案" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
-                            <a-textarea type="text" maxlength="100" class="desc_textarea" placeholder=""></a-textarea>
-                        </a-form-item>
-                        <a-form-item label="推广图片" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
-                            <a-upload listType="picture-card" :fileList="fileList" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @change="handleChange1($event)">
-                                <div v-if="fileList.length < 1">
-                                    <a-icon type="plus" />
-                                    <div class="ant-upload-text">上传图片</div>
-                                </div>
-                            </a-upload>
-                        </a-form-item>
-                    </a-card>
-                    <a-form-item :wrapperCol="{span: 10, offset: 7}">
-                        <a-button htmlType="submit">提交</a-button>
-                    </a-form-item>
-                </a-form>
-
-            </div>
+      </a-form>
+      <div>
+        <a-table :columns="columns" :dataSource="data2" :pagination="false">
+          <span slot="action" slot-scope="text, record">
+            <a @click="bianji(record)">分销推广</a>
+          </span>
+        </a-table>
+        <div style="margin-top:20px;">
+          <a-pagination style="float:right" @change="onChange" :current="pageNo" :pageSize="10" :total="countTotal" />
         </div>
-    </a-card>
+      </div>
+    </div>
+
+    <div v-if="!showBoolean">
+      <div>
+        <a-form layout="horizontal" @submit="submit" :autoFormCreate="(form) => this.form = form">
+          <a-card title="商品信息" style="margin-top:20px">
+            <a-form-item label="商品名称" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+              {{detail.productName}}
+            </a-form-item>
+            <a-form-item label="原价" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+              {{detail.originalPrice/100}}
+            </a-form-item>
+            <a-form-item label="售价" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+              {{detail.price/100}}
+            </a-form-item>
+            <a-form-item label="底价" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+              {{detail.costPrice/100}}
+            </a-form-item>
+          </a-card>
+          <a-card title="分佣设置" style="margin-top:20px">
+            <a-form-item v-for="(item) in detail.estimateSettlements" :key="item.settlementType" v-if="!item.boolean" :label="item.name" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+              <span v-if="item.settlementType ==='DISTRIBUTOR_SALES_REBATE'||item.settlementType ==='DISTRIBUTOR_MANAGER_REBATE'">
+                <a-input-number :value="item.rate" :min="item.settlementType==='DISTRIBUTOR_SALES_REBATE'?5:1" :max="100" style="margin-right:20px;" @change="fenyongFun(item,$event)" />% {{item.estimateAmount/100}}元</span>
+              <span v-else>
+                <span style="margin-right:20px;">{{item.rate}}%</span> {{item.estimateAmount/100}}元</span>
+            </a-form-item>
+          </a-card>
+          <a-card title="推广素材" style="margin-top:20px">
+            <a-form-item label="推广文案" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+              <a-textarea type="text" maxlength="100" v-model="descriptions" @change="descriptionsFun($event.target.value)" class="desc_textarea" placeholder=""></a-textarea>
+            </a-form-item>
+            <a-form-item label="推广图片" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+              <a-upload listType="picture-card" :fileList="fileList" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @change="handleChange1($event)">
+                <div v-if="fileList.length < 6">
+                  <a-icon type="plus" />
+                  <div class="ant-upload-text">上传图片</div>
+                </div>
+              </a-upload>
+            </a-form-item>
+          </a-card>
+          <a-form-item :wrapperCol="{span: 10, offset: 7}">
+            <a-button @click="submit">提交</a-button>
+          </a-form-item>
+        </a-form>
+
+      </div>
+    </div>
+  </a-card>
 </template>
 
 <script>
@@ -90,36 +90,38 @@ import StandardTable from "../../components/table/StandardTable";
 const columns = [
   {
     title: "上架时间",
-    dataIndex: "typeName"
+    dataIndex: "date"
   },
   {
     title: "所属运营商",
-    dataIndex: "productName"
+    dataIndex: "providerName"
   },
   {
     title: "商品名称",
-    dataIndex: "point"
+    dataIndex: "productName"
   },
   {
     title: "库存",
-    dataIndex: "price"
-  },
-  {
-    title: "售价",
     dataIndex: "stock"
   },
   {
+    title: "售价",
+    dataIndex: "price"
+  },
+  {
     title: "购物返利",
-    dataIndex: "merchantName"
+    dataIndex: "MANAGERAmount"
   },
   {
     title: "管理佣金",
-    dataIndex: "merchantName1"
+    dataIndex: "PLATFORMAmount"
   },
   {
     title: "操作",
     key: "action",
-    scopedSlots: { customRender: "action" }
+    scopedSlots: {
+      customRender: "action"
+    }
   }
 ];
 const data2 = [];
@@ -138,10 +140,11 @@ for (let i = 0; i < 100; i++) {
 
 export default {
   name: "Fenxiao",
-  components: { StandardTable },
+  components: {
+    StandardTable
+  },
   data() {
     return {
-      advanced: true,
       columns: columns,
       dataSource: dataSource,
       selectedRowKeys: [],
@@ -149,51 +152,82 @@ export default {
       data2: data2,
       pageNo: 1,
       pageSize: 10,
-      providerId: "1215431996629494",
+      providerId: "",
       countTotal: 0,
       merchantList: [],
-      fileList: []
+      fileList: [],
+      productId: "",
+      effective: 0,
+      providerList: [],
+      showBoolean: true,
+      detail: {
+        productName: ""
+      },
+      descriptions: "",
+      salesRateStr: "",
+      manageRateStr: "",
+      effective:0
     };
   },
   created() {
-    this.providerId =
-      sessionStorage.getItem("PROCIDERID") ||
-      this.$route.query.providerId ||
-      "1215431996629494";
-    this.merchantListFun(
-      sessionStorage.getItem("PROCIDERID") ||
-        this.providerId ||
-        "1215431996629494"
-    );
+    this.providerId = sessionStorage.getItem("PROCIDERID");
+    this.providerList = JSON.parse(
+      sessionStorage.getItem("LoginDate")
+    ).providerList;
     this.productList();
   },
   mounted() {},
   methods: {
-    submit() {
-      this.form.validateFields((err, values) => {
-        console.log(values);
-        this.productList(
-          values.repository.merchantId,
-          values.repository.productType,
-          values.repository.productName,
-          values.repository.biaoqian
+    descriptionsFun(e) {
+      this.descriptions = e;
+    },
+    fenyongFun(item, e) {
+      if (e) {
+        item.rate = e;
+        if (item.settlementType === "DISTRIBUTOR_SALES_REBATE")
+          this.salesRateStr = e;
+        if (item.settlementType === "DISTRIBUTOR_MANAGER_REBATE")
+          this.manageRateStr = e;
+        item.estimateAmount = this.accurate_mul(
+          this.accurate_div(this.detail.price, 100),
+          this.accurate_div(item.rate, 100)
         );
-      });
+        item.estimateAmount = this.accurate_mul(item.estimateAmount, 100);
+      }
     },
-    bianji(e) {
-      
+    handleChange1({ fileList }) {
+      this.fileList = fileList;
     },
-    xiajia(e) {
+    tabFun(e){
+      this.effective =e;
+      this.productList();
+    },
+    submit() {
+      let picIds = "";
+      if (this.fileList && this.fileList.length > 0) {
+        this.fileList.forEach(function(m) {
+          picIds += (m.response ? m.response : m.name) + ",";
+        });
+        picIds = picIds.slice(0, picIds.length - 1);
+      }
+      let data = {
+        productId: this.productId,
+        salesRateStr: this.salesRateStr || 5,
+        manageRateStr: this.manageRateStr || 1,
+        descriptions: this.descriptions,
+        picIds: picIds
+      };
+      let url = '/endpoint/distributor/product/create.json'
+      let url2 = '/endpoint/distributor/product/modify.json'
+      console.log(this.effective)
       this.$axios({
-        url: "/endpoint/product/offline.json",
-        method: "post",
+        url: this.effective ===0?url:url2,
+        method: "get",
         processData: false,
-        data: { productId: e.productId }
+        params: data
       }).then(res => {
         if (res.success) {
-          this.$success({
-            content: "下架成功"
-          });
+          this.showBoolean = true;
           this.productList();
         } else {
           this.$error({
@@ -203,8 +237,16 @@ export default {
         }
       });
     },
-    toggleAdvanced() {
-      this.advanced = !this.advanced;
+    bianji(e) {
+      this.showBoolean = false;
+      this.productId = e.productId;
+      this.productDetail(e.productId);
+    },
+    beforeUpload(file) {
+      const isLt2M = file.size / 1024 / 1024 < 10;
+      if (!isLt2M) {
+        this.$message.error("上传图片大小必须小于10MB!");
+      }
     },
     remove() {
       this.dataSource = this.dataSource.filter(
@@ -217,7 +259,9 @@ export default {
     addNew() {
       this.$router.push({
         path: "/product/addProduct",
-        query: { providerId: "1215431996629494" }
+        query: {
+          providerId: "1215431996629494"
+        }
       });
     },
     handleMenuClick(e) {
@@ -225,22 +269,65 @@ export default {
         this.remove();
       }
     },
+    nzCustomRequestFun(e) {
+      const formData = new FormData();
+      formData.append("multipartFile", e.file, e.file.name);
+      this.$axios({
+        url: "https://juji.juniuo.com//upload/image.json",
+        method: "post",
+        processData: false,
+        data: formData,
+        type: "formData"
+      }).then(res => {
+        if (res.errorCode === "0") {
+          e.onProgress(res, e.file);
+          e.onSuccess(res["data"], e.file, res);
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo + "请稍后重新上传"
+          });
+          e.onError(res.errorInfo, e.file);
+        }
+      });
+    },
     onChange(e) {
       this.pageNo = e;
       this.productList();
     },
-    merchantListFun(providerId) {
+    productDetail(productId) {
       let data = {
-        providerId: providerId
+        productId: productId
       };
+      let that = this;
       this.$axios({
-        url: "/endpoint/juji/provider/merchant/list.json",
+        url: "/endpoint/distributor/product/detail.json",
         method: "get",
         processData: false,
         params: data
       }).then(res => {
         if (res.success) {
-          this.merchantList = res.data;
+          console.log(res);
+          this.detail = res.data;
+          this.detail.estimateSettlements.forEach(function(i) {
+            if (i.settlementType === "MERCHANT") i.boolean = true;
+            if (i.settlementType === "DISTRIBUTOR_SALES_REBATE") {
+              i.name = "销售返利";
+              if (!i.rate) {
+                i.rate = 5;
+                that.fenyongFun(i, i.rate);
+              }
+            }
+            if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE") {
+              i.name = "管理佣金"; //管理佣金
+              if (!i.rate) {
+                i.rate = 1;
+                that.fenyongFun(i, i.rate);
+              }
+            }
+            if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
+            if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
+          });
         } else {
           this.$error({
             title: "温馨提示",
@@ -249,29 +336,40 @@ export default {
         }
       });
     },
-    productList(merchantId, type, name, tag) {
+    productList() {
       let data = {
         pageNo: this.pageNo,
         pageSize: 10,
+        effective: this.effective,
         providerId: this.providerId,
-        merchantId: merchantId || "",
-        type: type || "",
-        tag: tag || "",
-        name: name || "",
-        putAway: 1
+        productName: this.productName
       };
+      if (!data.providerId) delete data.providerId;
+      if (!data.productName) delete data.productName;
+      let that = this;
       this.$axios({
-        url: "/endpoint/product/page.json",
+        url: "/endpoint/distributor/product/list.json",
         method: "get",
         processData: false,
         params: data
       }).then(res => {
         if (res.success) {
-          this.data2 = res.data.list;
-          this.countTotal = res.data.countTotal;
+          this.data2 = res.data.items;
+          this.countTotal = res.data.totalCount;
           this.data2.forEach(function(i) {
-            i.price = i.price / 100;
-            i.typeName = i.type === "PRODUCT" ? "普通商品" : "积分商品";
+            that.providerList.forEach(function(n) {
+              if (n.providerId === i.providerId)
+                i.providerName = n.providerName;
+            });
+            i.estimateSettlements.forEach(function(m) {
+              if (m.settlementType === "DISTRIBUTOR_MANAGER_REBATE")
+                i.MANAGERAmount = that.accurate_div(m.estimateAmount, 100);
+              if (m.settlementType === "DISTRIBUTOR_SALES_REBATE")
+                i.SALESAmount = that.accurate_div(m.estimateAmount, 100);
+              if (m.settlementType === "JUJI_PLATFORM")
+                i.PLATFORMAmount = that.accurate_div(m.estimateAmount, 100);
+            });
+            i.price = that.accurate_div(i.price, 100);
           });
         } else {
           this.$error({
@@ -289,13 +387,16 @@ export default {
 .search {
   margin-bottom: 54px;
 }
+
 .fold {
   width: calc(100% - 216px);
   display: inline-block;
 }
+
 .operator {
   margin-bottom: 18px;
 }
+
 @media screen and (max-width: 900px) {
   .fold {
     width: 100%;

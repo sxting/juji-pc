@@ -47,6 +47,14 @@ let routesObj = {
               invisible: true
             },
             {
+              path: '/product/Reviewed',
+              name: '商品审核',
+              menuId: '20200000',
+              component: () => import('@/pages/product/reviewed'),
+              icon: 'none',
+              invisible: true
+            },
+            {
               path: '/product/addProduct',
               name: '商品',
               component: () => import('@/pages/product/addProduct'),
@@ -76,6 +84,32 @@ let routesObj = {
               name: '订单列表',
               menuId: '30200000',
               component: () => import('@/pages/jiesuan/order'),
+              icon: 'none',
+              invisible: true
+            }
+          ]
+        },
+        {
+          path: '/operate',
+          name: '平台运营',
+          component: PageView,
+          icon: 'form',
+          menuId: '40000000',
+          invisible: true,
+          children: [
+            {
+              path: '/operate/juzhangOperate',
+              name: '桔长运营',
+              menuId: '40100000',
+              component: () => import('@/pages/operate/juzhangOperate'),
+              icon: 'none',
+              invisible: true
+            },
+            {
+              path: '/operate/juziOperate',
+              name: '桔子运营',
+              menuId: '40200000',
+              component: () => import('@/pages/operate/juziOperate'),
               icon: 'none',
               invisible: true
             }

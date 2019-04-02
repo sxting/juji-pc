@@ -10,6 +10,7 @@ import axios from './http'
 import '@/mock'
 import store from './store'
 import PouchDB from 'pouchdb'
+import G2 from '@antv/g2'
 Vue.prototype.$axios = axios
 Vue.config.productionTip = false
 Vue.use(Viser)
@@ -78,7 +79,7 @@ Vue.prototype.accurate_div = function (a, b) { // 除法计算
   d = Number(b.toString().replace('.', ''))
   return Vue.prototype.accurate_mul(c / d, Math.pow(10, f - e))
 }
-
+Vue.prototype.G2 = G2
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

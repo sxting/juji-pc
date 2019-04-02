@@ -8,6 +8,7 @@
         <a-col :md="8" :sm="24">
           <a-tabs @change="tabFun">
             <a-tab-pane tab="售卖中" key="1"></a-tab-pane>
+            <a-tab-pane tab="审核中" key="2"></a-tab-pane>
             <a-tab-pane tab="已下架" key="0"></a-tab-pane>
           </a-tabs>
         </a-col>
@@ -69,8 +70,8 @@
       <a-table :columns="columns" :dataSource="data2" :pagination="false">
         <span slot="action" slot-scope="text, record">
           <a @click="bianji(record)">编辑</a>
-          <a-divider v-if="putAway !== '0'" type="vertical" />
-          <a v-if="putAway !== '0'" @click="xiajia(record)" class="ant-dropdown-link">
+          <a-divider v-if="putAway === '1'" type="vertical" />
+          <a v-if="putAway === '1'" @click="xiajia(record)" class="ant-dropdown-link">
             下架
           </a>
         </span>
@@ -115,6 +116,41 @@ const columns = [
     scopedSlots: { customRender: "action" }
   }
 ];
+const columns2 = [
+  {
+    title: "商品类型",
+    dataIndex: "typeName"
+  },
+  {
+    title: "商品名称",
+    dataIndex: "productName"
+  },
+  {
+    title: "所需桔子",
+    dataIndex: "point"
+  },
+  {
+    title: "售价",
+    dataIndex: "price"
+  },
+  {
+    title: "所属商家",
+    dataIndex: "merchantName"
+  },
+  {
+    title: "审核状态",
+    dataIndex: "auditStatusMap.auditStatusName"
+  },
+  {
+    title: "未通过原因",
+    dataIndex: "auditStatusMap.rejectReason"
+  },
+  {
+    title: "操作",
+    key: "action",
+    scopedSlots: { customRender: "action" }
+  }
+];
 const data2 = [];
 const dataSource = [];
 
@@ -135,12 +171,12 @@ export default {
   data() {
     return {
       advanced: true,
-      columns: columns,
       dataSource: dataSource,
       selectedRowKeys: [],
       selectedRows: [],
       data2: data2,
       pageNo: 1,
+      columns: columns,
       pageSize: 10,
       providerId: "1215431996629494",
       countTotal: 0,
@@ -164,6 +200,8 @@ export default {
   methods: {
     tabFun(e){
       this.putAway = e;
+      if(this.putAway === '2') this.columns = columns2;
+      else this.columns = columns;
       this.productList();
     },
     submit() {
@@ -258,6 +296,7 @@ export default {
         }
       });
     },
+    
     productList(merchantId, type, name, tag) {
       let data = {
         pageNo: this.pageNo || 1,
@@ -279,6 +318,10 @@ export default {
           this.data2 = res.data.list;
           this.countTotal = res.data.countTotal;
           this.data2.forEach(function(i) {
+            if(i.auditStatusMap.auditStatus === 'PASS') i.auditStatusMap.auditStatusName = '通过';
+            if(i.auditStatusMap.auditStatus === 'INIT') i.auditStatusMap.auditStatusName = '待审核';
+            if(i.auditStatusMap.auditStatus === 'REJECT') i.auditStatusMap.auditStatusName = '拒绝';
+            
             i.price = i.price / 100;
             i.typeName = i.type === "PRODUCT" ? "普通商品" : "积分商品";
           });
