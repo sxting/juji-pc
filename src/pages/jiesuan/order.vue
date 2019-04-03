@@ -9,7 +9,7 @@
                 <a-range-picker @change="onChange" />
               </a-form-item>
             </a-col>
-   
+
             <a-col :md="8" :sm="24">
               <a-form-item label="订单状态" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
                 <a-select placeholder="请选择" :defaultValue="status" @change="statusChange">
@@ -20,13 +20,20 @@
                   <a-select-option :key="'CLOSE'">已关闭</a-select-option>
                   <a-select-option :key="'REFUND'">已退款</a-select-option>
                   <a-select-option :key="'PAID'">待使用</a-select-option>
-                  
+
                 </a-select>
               </a-form-item>
             </a-col>
-                     <a-col :md="8" :sm="24" v-if="merchantId">
+            <a-col :md="8" :sm="24">
+              <a-form-item label="全部运营商" :labelCol="{span: 5}"  :wrapperCol="{span: 18, offset: 1}">
+                <a-select placeholder="请选择" @change="providerListFun">
+                  <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24" v-if="merchantId">
               <a-form-item label="所属商家" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择" :defaultValue="merchantId" @change="merchantChange">
+                <a-select placeholder="请选择"  @change="merchantChange">
                   <!-- <a-select-option :key="'ALL'">全部商家</a-select-option> -->
                   <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                 </a-select>
@@ -164,7 +171,7 @@ const columns = [
     title: "商家名称",
     dataIndex: "merchantName"
   },
-  
+
   {
     title: "订单金额",
     dataIndex: "amount"
@@ -213,7 +220,7 @@ export default {
       merchantList: [],
       merchantId: "",
       visible: false,
-      status:'ALL',
+      status: "ALL",
       orderInfoOrder: {
         orderId: "",
         orderType: "",
@@ -224,24 +231,29 @@ export default {
         paidPoint: ""
       },
       vouchersList: [],
-      orderUser: { nickName: "", phone: "" }
+      orderUser: { nickName: "", phone: "" },
+      providerList: []
     };
   },
   created() {
-    this.providerId =
-      sessionStorage.getItem("PROCIDERID") ||
-      this.$route.query.providerId ||
-      "1215431996629494";
+    this.providerList = JSON.parse(
+      sessionStorage.getItem("LoginDate")
+    ).providerList;
+    this.providerId = this.providerList[0].providerId;
     this.merchantListFun(this.providerId);
   },
   methods: {
+    providerListFun(e) {
+      this.providerId = e;
+      this.merchantListFun(e);
+    },
     handleCancel() {
       this.visible = false;
     },
     toggleAdvanced() {
       this.advanced = !this.advanced;
     },
-    statusChange(e){
+    statusChange(e) {
       this.status = e;
       this.orderList();
     },
@@ -304,7 +316,6 @@ export default {
             if (i.status === "REFUND") i.orderTypeName = "已退款";
             i.paidAmount = that.accurate_div(i.paidAmount, 100);
             i.amount = that.accurate_div(i.amount, 100);
-            
           });
           this.countTotal = res.data.countTotal;
         } else {

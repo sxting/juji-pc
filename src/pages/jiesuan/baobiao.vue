@@ -10,9 +10,17 @@
                   <a-range-picker @change="onChange" />
                 </a-form-item>
               </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item label="全部运营商" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
+                  <a-select placeholder="请选择" @change="providerListFun">
+                    <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+
               <a-col :md="8" :sm="24" v-if="merchantId">
                 <a-form-item label="所属商家" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择" :defaultValue="merchantId" @change="merchantChange">
+                  <a-select placeholder="请选择"  @change="merchantChange">
                     <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                   </a-select>
                 </a-form-item>
@@ -43,16 +51,16 @@
                   <a-range-picker @change="onChange" />
                 </a-form-item>
               </a-col>
-              
-              <a-col :md="8" :sm="24" >
-                <a-form-item label="核销码"  :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-input v-model="voucherCode"/>
+
+              <a-col :md="8" :sm="24">
+                <a-form-item label="核销码" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
+                  <a-input v-model="voucherCode" />
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item label="核销门店" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择"  @change="storeChange">
-                    <a-select-option :key="'ALL'" >全部门店</a-select-option>
+                  <a-select placeholder="请选择" @change="storeChange">
+                    <a-select-option :key="'ALL'">全部门店</a-select-option>
                     <a-select-option v-for="(item) in cityStoreList" :key="item.id">{{item.name}}</a-select-option>
                   </a-select>
                 </a-form-item>
@@ -60,7 +68,7 @@
             </a-row>
             <span style="float: right; margin-top: 3px;">
               <a-button htmlType="submit" @click="back">返回</a-button>
-              
+
               <a-button htmlType="submit" @click="xiangqingFun">查询</a-button>
             </span>
           </div>
@@ -259,8 +267,8 @@ export default {
       changeBoo: false,
       storeId: "ALL",
       visible: false,
-      cityStoreList:[],
-      orderInfoOrder:{
+      cityStoreList: [],
+      orderInfoOrder: {
         orderId: "",
         orderType: "",
         dateCreated: "",
@@ -270,17 +278,22 @@ export default {
         paidPoint: ""
       },
       vouchersList: [],
-      orderUser: { nickName: "", phone: "" }
+      orderUser: { nickName: "", phone: "" },
+      providerList: []
     };
   },
   created() {
-    this.providerId =
-      sessionStorage.getItem("PROCIDERID") ||
-      this.$route.query.providerId ||
-      "1215431996629494";
+    this.providerList = JSON.parse(
+      sessionStorage.getItem("LoginDate")
+    ).providerList;
+    this.providerId = this.providerList[0].providerId;
     this.merchantListFun(this.providerId);
   },
   methods: {
+    providerListFun(e) {
+      this.providerId = e;
+       this.merchantListFun(e);
+    },
     toggleAdvanced() {
       this.advanced = !this.advanced;
     },
@@ -288,10 +301,10 @@ export default {
       this.pageNo = e;
       this.productList();
     },
-    handleCancel(){
+    handleCancel() {
       this.visible = false;
     },
-    back(){
+    back() {
       this.changeBoo = false;
     },
     onChange(dates, dateStrings) {
@@ -319,7 +332,7 @@ export default {
         this.remove();
       }
     },
-    
+
     formatDateTime(date, type) {
       let year = date.getFullYear();
       let month = date.getMonth() + 1;
@@ -420,10 +433,10 @@ export default {
         if (res.success) {
           this.changeBoo = true;
           this.data3 = res.data.list;
-          this.data3.forEach(function(i){
-            i.amount =that.accurate_div(i.amount,100) 
-          })
-          this.storeIdList(this.merchantId)
+          this.data3.forEach(function(i) {
+            i.amount = that.accurate_div(i.amount, 100);
+          });
+          this.storeIdList(this.merchantId);
         } else {
           this.$error({
             title: "温馨提示",
@@ -432,14 +445,14 @@ export default {
         }
       });
     },
-    orderList(e){
-      this.orderFun(e.order_id)
+    orderList(e) {
+      this.orderFun(e.order_id);
     },
-    storeChange(e){
+    storeChange(e) {
       this.storeId = e;
-      this.xiangqingFun()
+      this.xiangqingFun();
     },
-    storeIdList(event){
+    storeIdList(event) {
       let data = {
         merchantId: event
       };
@@ -459,10 +472,10 @@ export default {
         }
       });
     },
-    orderFun(orderId){
+    orderFun(orderId) {
       let data = {
-       orderId : orderId 
-      }
+        orderId: orderId
+      };
       this.$axios({
         url: "/endpoint/order/info.json",
         method: "get",
@@ -500,7 +513,6 @@ export default {
           });
         }
       });
-      
     }
   }
 };
@@ -524,35 +536,35 @@ export default {
 }
 
 .orderpage_detail_list table {
-    border-spacing: 0;
-    border: solid #D9D9D9;
-    border-width: 1px 0px 0px 1px;
-    padding: 0;
+  border-spacing: 0;
+  border: solid #d9d9d9;
+  border-width: 1px 0px 0px 1px;
+  padding: 0;
 }
 
 .orderpage_detail_list tr td {
-    line-height: 38px;
-    height: 38px;
-    border: solid #D9D9D9;
-    border-width: 0px 1px 1px 0px;
-    text-align: center;
-    padding: 0;
+  line-height: 38px;
+  height: 38px;
+  border: solid #d9d9d9;
+  border-width: 0px 1px 1px 0px;
+  text-align: center;
+  padding: 0;
 }
 
 .orderpage_detail_list tr td:nth-child(2n-1) {
-    color: #999999;
-    background-color: #F4F4F4;
-    width: 150px;
+  color: #999999;
+  background-color: #f4f4f4;
+  width: 150px;
 }
-.existingGroups-table{
-    width: 100%;
-    text-align: center;    
+.existingGroups-table {
+  width: 100%;
+  text-align: center;
 }
-.existingGroups-table tr{
-    height: 40px;
-    line-height: 40px;
+.existingGroups-table tr {
+  height: 40px;
+  line-height: 40px;
 }
-.existingGroups-table thead tr{
-    background: #f2f2f2;
+.existingGroups-table thead tr {
+  background: #f2f2f2;
 }
 </style>
