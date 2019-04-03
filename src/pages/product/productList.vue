@@ -29,9 +29,16 @@
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
+              <a-form-item label="全部运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.providerId" :defaultValue="providerId" :wrapperCol="{span: 18, offset: 1}">
+                <a-select placeholder="请选择" @change="providerListFun">
+                  <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
               <a-form-item label="所属商家" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择">
-                  <a-select-option value="">全部商家</a-select-option>
+                <a-select placeholder="请选择" >
+                  <!-- <a-select-option value="">全部商家</a-select-option> -->
                   <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                 </a-select>
               </a-form-item>
@@ -47,8 +54,6 @@
                 </a-select>
               </a-form-item>
             </a-col>
-          </a-row>
-          <a-row v-if="advanced">
             <a-col :md="8" :sm="24">
               <a-form-item label="商品名称" :labelCol="{span: 5}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 18, offset: 1}">
                 <a-input style="width: 100%" placeholder="请输入" />
@@ -178,26 +183,24 @@ export default {
       pageNo: 1,
       columns: columns,
       pageSize: 10,
-      providerId: "1215431996629494",
+      providerId: "",
       countTotal: 0,
       merchantList: [],
-      putAway: 1
+      putAway: 1,
+      providerList:[]
     };
   },
   created() {
-    this.providerId =
-      sessionStorage.getItem("PROCIDERID") ||
-      this.$route.query.providerId ||
-      "1215431996629494";
-    this.merchantListFun(
-      sessionStorage.getItem("PROCIDERID") ||
-        this.providerId ||
-        "1215431996629494"
-    );
+    this.providerList = JSON.parse(sessionStorage.getItem("LoginDate")).providerList;
+    this.providerId = this.providerList[0].providerId;
+    this.merchantListFun(this.providerId);
     this.productList();
   },
   mounted() {},
   methods: {
+    providerListFun(e){
+      this.merchantListFun(e);
+    },
     tabFun(e) {
       this.putAway = e;
       if (this.putAway === "2") this.columns = columns2;
@@ -219,7 +222,7 @@ export default {
     bianji(e) {
       this.$router.push({
         path: "/product/addProduct",
-        query: { providerId: "1215431996629494", productId: e.productId }
+        query: { providerId: this.providerId, productId: e.productId }
       });
     },
     xiajia(e) {
@@ -257,7 +260,7 @@ export default {
     addNew() {
       this.$router.push({
         path: "/product/addProduct",
-        query: { providerId: "1215431996629494" }
+        query: { providerId: this.providerId }
       });
     },
     handleMenuClick(e) {
