@@ -29,7 +29,7 @@
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="全部运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.providerId" :defaultValue="providerId" :wrapperCol="{span: 18, offset: 1}">
+              <a-form-item label="全部运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.providerId" :wrapperCol="{span: 18, offset: 1}">
                 <a-select placeholder="请选择" @change="providerListFun">
                   <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
                 </a-select>
@@ -37,8 +37,8 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="所属商家" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择" >
-                  <!-- <a-select-option value="">全部商家</a-select-option> -->
+                <a-select placeholder="请选择">
+                  <a-select-option value="">全部商家</a-select-option>
                   <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                 </a-select>
               </a-form-item>
@@ -187,18 +187,29 @@ export default {
       countTotal: 0,
       merchantList: [],
       putAway: 1,
-      providerList:[]
+      providerList: []
     };
   },
   created() {
-    this.providerList = JSON.parse(sessionStorage.getItem("LoginDate")).providerList;
+    this.providerList = JSON.parse(
+      sessionStorage.getItem("LoginDate")
+    ).providerList;
     this.providerId = this.providerList[0].providerId;
     this.merchantListFun(this.providerId);
+    this.$nextTick(() => {
+      this.form.setFieldsValue({
+        repository: {
+          providerId: this.providerId,
+          merchantId:''
+        }
+      });
+    });
     this.productList();
   },
   mounted() {},
   methods: {
-    providerListFun(e){
+    providerListFun(e) {
+      this.providerId = e;
       this.merchantListFun(e);
     },
     tabFun(e) {
