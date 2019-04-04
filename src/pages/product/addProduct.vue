@@ -20,7 +20,7 @@
           <a-input placeholder="请输入商品名称，限1-40字" />
         </a-form-item>
         <a-form-item label="底价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.costPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
-          <a-input-number style="width:100%" :min="0.01" :max="99999.99" placeholder="请输入商品底价" :disabled="productId?true:false" />
+          <a-input-number style="width:100%" :min="0" :max="99999.99" placeholder="请输入商品底价" :disabled="productId?true:false" />
         </a-form-item>
         <a-form-item label="原价" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" fieldDecoratorId="repository.originalPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
           <a-input-number style="width:100%" :min="0.01" :max="99999.99" placeholder="请输入商品原价" />
