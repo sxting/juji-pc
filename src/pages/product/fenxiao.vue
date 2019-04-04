@@ -58,10 +58,16 @@
             </a-form-item>
           </a-card>
           <a-card title="分佣设置" style="margin-top:20px">
+            <a-form-item label="管理佣金" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+              <a-input-number v-model="salesRateStr" :min="5" style="margin-right:5px;" :max="100" @blur="salesRateStrFun($event)" />%
+              <span style="margin-left:20px;">{{salesRateStrAmount/100}}元</span>
+            </a-form-item>
+            <a-form-item label="销售返利" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+              <a-input-number v-model="manageRateStr" :min="1" style="margin-right:5px;" :max="100" @blur="manageRateStrFun($event)" />%
+              <span style="margin-left:20px;">{{manageRateStrAmount/100}}元</span>
+            </a-form-item>
             <a-form-item v-for="(item) in detail.estimateSettlements" :key="item.settlementType" v-if="!item.boolean" :label="item.name" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
-              <span v-if="item.settlementType ==='DISTRIBUTOR_SALES_REBATE'||item.settlementType ==='DISTRIBUTOR_MANAGER_REBATE'">
-                <a-input-number @change="fenyongChange"  :value="item.rate" :min="item.settlementType==='DISTRIBUTOR_SALES_REBATE'?5:1"  style="margin-right:5px;" :max="100" @blur="fenyongFun(item,$event)"  />% <span  style="margin-left:20px;">{{item.estimateAmount/100}}元</span></span>
-              <span v-else>
+              <span >
                 <span style="margin-right:20px;">{{item.rate}}%</span> {{item.estimateAmount/100}}元</span>
             </a-form-item>
           </a-card>
@@ -168,9 +174,12 @@ export default {
         productName: ""
       },
       descriptions: "",
-      salesRateStr: 0,
-      manageRateStr: 0,
-      effective: 0
+      salesRateStr: 5,
+      manageRateStr: 1,
+      effective: 0,
+      salesRateStrAmount:0,
+      manageRateStrAmount:0,
+      
     };
   },
   created() {
@@ -223,49 +232,53 @@ export default {
     descriptionsFun(e) {
       this.descriptions = e;
     },
-    fenyongChange(e){
-      console.log(e)
+    salesRateStrFun(e){
+      this.salesRateStr =  e.target.value;
+      this.fenyongFun()
     },
-    fenyongFun(item, e) {
-      console.log(e.target.value)
-      // if (e&&false) {
-      //   item.rate = e;
-      //   if (item.settlementType === "DISTRIBUTOR_SALES_REBATE") {
-      //     this.salesRateStr = e;
-      //   }
-      //   if (item.settlementType === "DISTRIBUTOR_MANAGER_REBATE") {
-      //     this.manageRateStr = e;
-      //   }
-      //   let data = {
-      //     productId: this.productId,
-      //     manageRateStr: this.manageRateStr,
-      //     salesRateStr: this.salesRateStr
-      //   };
-      //   this.$axios({
-      //     url: "/endpoint/distributor/product/calculateEstimateSettlement.json",
-      //     method: "get",
-      //     processData: false,
-      //     params: data
-      //   }).then(res => {
-      //     if (res.success) {
-      //       res.data.forEach(function(i) {
-      //         if (i.settlementType === "MERCHANT") i.boolean = true;
-      //         if (i.settlementType === "DISTRIBUTOR_SALES_REBATE")
-      //           i.name = "销售返利";
-      //         if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE")
-      //           i.name = "管理佣金";
-      //         if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
-      //         if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
-      //       });
-      //       this.detail.estimateSettlements = res.data;
-      //     } else {
-      //       this.$error({
-      //         title: "温馨提示",
-      //         content: res.errorInfo
-      //       });
-      //     }
-      //   });
-      // }
+    manageRateStrFun(e){
+      this.manageRateStr = e.target.value;
+      this.fenyongFun()
+    },
+    fenyongFun() {
+        let data = {
+          productId: this.productId,
+          manageRateStr: this.manageRateStr,
+          salesRateStr: this.salesRateStr
+        };
+        let that = this;
+        this.$axios({
+          url: "/endpoint/distributor/product/calculateEstimateSettlement.json",
+          method: "get",
+          processData: false,
+          params: data
+        }).then(res => {
+          if (res.success) {
+            res.data.forEach(function(i) {
+              if (i.settlementType === "MERCHANT") i.boolean = true;
+              if (i.settlementType === "DISTRIBUTOR_SALES_REBATE"){
+                  that.salesRateStr = i.rate;
+                  i.name = "销售返利";
+                  i.boolean = true;
+                that.salesRateStrAmount = i.estimateAmount;
+              }
+              if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
+                i.name = "管理佣金";
+                that.manageRateStr = i.rate;
+                i.boolean = true;
+                that.manageRateStrAmount = i.estimateAmount;
+              }
+              if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
+              if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
+            });
+            this.detail.estimateSettlements = res.data;
+          } else {
+            this.$error({
+              title: "温馨提示",
+              content: res.errorInfo
+            });
+          }
+        });
     },
     handleChange1({ fileList }) {
       this.fileList = fileList;
@@ -383,10 +396,18 @@ export default {
           this.detail = res.data;
           this.detail.estimateSettlements.forEach(function(i) {
             if (i.settlementType === "MERCHANT") i.boolean = true;
-            if (i.settlementType === "DISTRIBUTOR_SALES_REBATE")
-              i.name = "销售返利";
-            if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE")
-              i.name = "管理佣金";
+            if (i.settlementType === "DISTRIBUTOR_SALES_REBATE"){
+                  that.salesRateStr = i.rate;
+                  i.name = "销售返利";
+                  i.boolean = true;
+                that.salesRateStrAmount = i.estimateAmount;
+              }
+              if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
+                i.boolean = true;
+                i.name = "管理佣金";
+                that.manageRateStr = i.rate;
+                that.manageRateStrAmount = i.estimateAmount;
+              }
             if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
             if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
           });
