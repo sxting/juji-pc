@@ -689,7 +689,7 @@ export default {
                   url: that.picUrl(n)
                 });
               });
-              that.picXQ.push({ fileList: fileList, picIds: i.content[0] });
+              that.picXQ.push({ fileList: fileList, picIds: i.content });
             });
           } else {
             that.picXQ = [{ fileList: [], picIds: "" }];
