@@ -5,13 +5,13 @@
         <a-tab-pane tab="待分销商品" key="0"></a-tab-pane>
         <a-tab-pane tab="分销商品" key="1"></a-tab-pane>
       </a-tabs>
-      <a-form layout="horizontal">
+      <a-form layout="horizontal" :autoFormCreate="(form) => this.form = form">
         <div>
           <a-row>
             <a-col :md="8" :sm="24">
-              <a-form-item label="所属运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 18, offset: 1}">
+              <a-form-item label="所属运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.providerId" :wrapperCol="{span: 18, offset: 1}">
                 <a-select placeholder="请选择">
-                  <a-select-option value="">全部商家</a-select-option>
+                  <a-select-option value="">全部运营商</a-select-option>
                   <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
                 </a-select>
               </a-form-item>
@@ -21,6 +21,9 @@
                 <a-input style="width: 100%" placeholder="请输入" />
               </a-form-item>
             </a-col>
+            <span style="float: right; margin-top: 3px;">
+              <a-button htmlType="submit" @click="chaxun">查询</a-button>
+            </span>
           </a-row>
 
         </div>
@@ -164,42 +167,82 @@ export default {
         productName: ""
       },
       descriptions: "",
-      salesRateStr: "",
-      manageRateStr: "",
-      effective:0
+      salesRateStr: 0,
+      manageRateStr: 0,
+      effective: 0
     };
   },
   created() {
-    this.providerId = sessionStorage.getItem("PROCIDERID");
     this.providerList = JSON.parse(
       sessionStorage.getItem("LoginDate")
     ).providerList;
+    // this.providerId = this.providerList[0].providerId;
+    this.$nextTick(() => {
+      this.form.setFieldsValue({
+        repository: {
+          providerId: "",
+          productName: ""
+        }
+      });
+    });
     this.productList();
   },
   mounted() {},
   methods: {
+    chaxun() {
+      let that = this;
+      this.form.validateFields((err, values) => {
+        that.providerId = values.repository.providerId;
+        that.productName = values.repository.productName;
+      });
+      this.productList();
+    },
     descriptionsFun(e) {
       this.descriptions = e;
     },
     fenyongFun(item, e) {
       if (e) {
         item.rate = e;
-        if (item.settlementType === "DISTRIBUTOR_SALES_REBATE")
+        if (item.settlementType === "DISTRIBUTOR_SALES_REBATE"){
           this.salesRateStr = e;
-        if (item.settlementType === "DISTRIBUTOR_MANAGER_REBATE")
+        }
+        if (item.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
           this.manageRateStr = e;
-        item.estimateAmount = this.accurate_mul(
-          this.accurate_div(this.detail.price, 100),
-          this.accurate_div(item.rate, 100)
-        );
-        item.estimateAmount = this.accurate_mul(item.estimateAmount, 100);
+        }
+        let data = {
+          productId: this.productId,
+          manageRateStr: this.manageRateStr,
+          salesRateStr: this.salesRateStr
+        };
+        this.$axios({
+          url: "/endpoint/distributor/product/calculateEstimateSettlement.json",
+          method: "get",
+          processData: false,
+          params: data
+        }).then(res => {
+          if (res.success) {
+            res.data.forEach(function(i) {
+              if (i.settlementType === "MERCHANT") i.boolean = true;
+              if (i.settlementType === "DISTRIBUTOR_SALES_REBATE") i.name = "销售返利"
+              if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE") i.name = "管理佣金"
+              if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
+              if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
+            });
+            this.detail.estimateSettlements = res.data
+          } else {
+            this.$error({
+              title: "温馨提示",
+              content: res.errorInfo
+            });
+          }
+        });
       }
     },
     handleChange1({ fileList }) {
       this.fileList = fileList;
     },
-    tabFun(e){
-      this.effective =e;
+    tabFun(e) {
+      this.effective = e;
       this.productList();
     },
     submit() {
@@ -212,23 +255,23 @@ export default {
       }
       let data = {
         productId: this.productId,
-        salesRateStr: this.salesRateStr || 5,
-        manageRateStr: this.manageRateStr || 1,
+        salesRateStr: this.salesRateStr,
+        manageRateStr: this.manageRateStr,
         descriptions: this.descriptions,
         picIds: picIds
       };
-      let url = '/endpoint/distributor/product/create.json'
-      let url2 = '/endpoint/distributor/product/modify.json'
-      console.log(this.effective)
+      let url = "/endpoint/distributor/product/create.json";
+      let url2 = "/endpoint/distributor/product/modify.json";
+      console.log(this.effective);
       this.$axios({
-        url: this.effective ===0?url:url2,
+        url: this.effective === 0 ? url : url2,
         method: "get",
         processData: false,
         params: data
       }).then(res => {
         if (res.success) {
           this.showBoolean = true;
-          this.effective = 0
+          this.effective = 0;
           this.productList();
         } else {
           this.$error({
@@ -311,25 +354,13 @@ export default {
           this.detail = res.data;
           this.detail.estimateSettlements.forEach(function(i) {
             if (i.settlementType === "MERCHANT") i.boolean = true;
-            if (i.settlementType === "DISTRIBUTOR_SALES_REBATE") {
-              i.name = "销售返利";
-              if (!i.rate) {
-                i.rate = 5;
-                that.fenyongFun(i, i.rate);
-              }
-            }
-            if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE") {
-              i.name = "管理佣金"; //管理佣金
-              if (!i.rate) {
-                i.rate = 1;
-                that.fenyongFun(i, i.rate);
-              }
-            }
+            if (i.settlementType === "DISTRIBUTOR_SALES_REBATE")i.name = "销售返利"
+            if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE") i.name = "管理佣金"
             if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
             if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
           });
           this.descriptions = res.data.descriptions;
-          let fileList2 = res.data.picIds ;
+          let fileList2 = res.data.picIds;
           if (fileList2 && fileList2.length > 0) {
             let fileList = [];
             fileList2.forEach(function(n, m) {
@@ -341,8 +372,8 @@ export default {
               });
             });
             this.fileList = fileList;
-          }else{
-            this.fileList = []
+          } else {
+            this.fileList = [];
           }
         } else {
           this.$error({
@@ -365,7 +396,6 @@ export default {
         providerId: this.providerId,
         productName: this.productName
       };
-      if (!data.providerId) delete data.providerId;
       if (!data.productName) delete data.productName;
       let that = this;
       this.$axios({

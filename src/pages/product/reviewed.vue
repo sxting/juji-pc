@@ -20,7 +20,7 @@
               <a-col :md="12" :sm="24">
                 <a-form-item label="所属运营商" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
                   <a-select placeholder="请选择" :value="providerId" @change="providerFun">
-                    <a-select-option value="ALL">全部商家</a-select-option>
+                    <a-select-option value="ALL">全部运营商</a-select-option>
                     <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
                   </a-select>
                 </a-form-item>
