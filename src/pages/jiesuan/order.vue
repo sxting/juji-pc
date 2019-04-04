@@ -6,7 +6,7 @@
           <a-row>
             <a-col :md="8" :sm="24">
               <a-form-item label="选择日期" fieldDecoratorId="repository.date" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-range-picker @change="onChange" />
+                <a-range-picker @change="onChange" :defaultValue="[moment(today[0], 'YYYY-MM-DD'), moment(today[1], 'YYYY-MM-DD')]"/>
               </a-form-item>
             </a-col>
 
@@ -232,7 +232,8 @@ export default {
       orderUser: { nickName: "", phone: "" },
       providerList: [],
       pageNo:1,
-      countTotal:10
+      countTotal:10,
+      today:this.timeForMat(0)
     };
   },
   created() {
@@ -240,6 +241,8 @@ export default {
       sessionStorage.getItem("LoginDate")
     ).providerList;
     this.providerId = this.providerList[0].providerId;
+        this.dateStart = this.today[0];
+    this.dateEnd = this.today[1];
     this.merchantListFun(this.providerId);
   },
   methods: {

@@ -228,7 +228,7 @@ export default {
       storeId:'',
       code:'',
       pageNo:1,
-      countTotal:10
+      countTotal:10,
     };
   },
   created() {
@@ -236,7 +236,8 @@ export default {
       sessionStorage.getItem("LoginDate")
     ).providerList;
     this.providerId = this.providerList[0].providerId;
-     this.voucherRecordsListFun()
+
+    this.voucherRecordsListFun()
   },
   methods: {
     providerListFun(e) {

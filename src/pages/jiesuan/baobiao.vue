@@ -7,7 +7,7 @@
             <a-row>
               <a-col :md="8" :sm="24">
                 <a-form-item label="选择日期" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-range-picker @change="onChange" />
+                  <a-range-picker @change="onChange" :defaultValue="[moment(yestoday[0], 'YYYY-MM-DD'), moment(yestoday[1], 'YYYY-MM-DD')]"/>
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
@@ -254,7 +254,6 @@ for (let i = 0; i < 100; i++) {
     updatedAt: "2018-07-26"
   });
 }
-
 export default {
   name: "BaobiaoList",
   components: { StandardTable },
@@ -291,7 +290,8 @@ export default {
       },
       vouchersList: [],
       orderUser: { nickName: "", phone: "" },
-      providerList: []
+      providerList: [],
+      yestoday:this.timeForMat(1)
     };
   },
   created() {
@@ -299,6 +299,9 @@ export default {
       sessionStorage.getItem("LoginDate")
     ).providerList;
     this.providerId = this.providerList[0].providerId;
+    this.dateStart = this.yestoday[0];
+    this.dateEnd = this.yestoday[1];
+    
     this.merchantListFun(this.providerId);
   },
   methods: {
@@ -427,8 +430,8 @@ export default {
       let data = {
         pageNo: this.pageNo,
         pageSize: 10,
-        providerId:'1215456239071388'|| this.providerId,
-        merchantId:'101551700977183295'|| this.merchantId,
+        providerId: this.providerId,
+        merchantId:this.merchantId,
         productId: this.productId,
         dateStart: this.dateStart,
         dateEnd: this.dateEnd,

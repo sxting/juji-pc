@@ -11,7 +11,9 @@ import '@/mock'
 import store from './store'
 import PouchDB from 'pouchdb'
 import G2 from '@antv/g2'
+import moment from 'moment'
 Vue.prototype.$axios = axios
+Vue.prototype.moment = moment
 Vue.config.productionTip = false
 Vue.use(Viser)
 Vue.use(Antd)
@@ -80,6 +82,39 @@ Vue.prototype.accurate_div = function (a, b) { // 除法计算
   return Vue.prototype.accurate_mul(c / d, Math.pow(10, f - e))
 }
 Vue.prototype.G2 = G2
+
+// 时间转换
+Vue.prototype.timeForMat = function (count) {
+  // 拼接时间
+  const time1 = new Date()
+  const time2 = new Date()
+  if (count === 1) {
+    time1.setTime(time1.getTime() - (24 * 60 * 60 * 1000))
+  } else {
+    if (count >= 0) {
+      time1.setTime(time1.getTime())
+    } else {
+      if (count === -2) {
+        time1.setTime(time1.getTime() + (24 * 60 * 60 * 1000) * 2)
+      } else {
+        time1.setTime(time1.getTime() + (24 * 60 * 60 * 1000))
+      }
+    }
+  }
+
+  const Y1 = time1.getFullYear()
+  const M1 = ((time1.getMonth() + 1) > 9 ? (time1.getMonth() + 1) : '0' + (time1.getMonth() + 1))
+  const D1 = (time1.getDate() > 9 ? time1.getDate() : '0' + time1.getDate())
+  const timer1 = Y1 + '-' + M1 + '-' + D1 // 当前时间
+
+  time2.setTime(time2.getTime() - (24 * 60 * 60 * 1000 * count))
+  const Y2 = time2.getFullYear()
+  const M2 = ((time2.getMonth() + 1) > 9 ? (time2.getMonth() + 1) : '0' + (time2.getMonth() + 1))
+  const D2 = (time2.getDate() > 9 ? time2.getDate() : '0' + time2.getDate())
+  const timer2 = Y2 + '-' + M2 + '-' + D2 // 之前的7天或者30天 + ' ' + '00:00:00'
+  return [timer2, timer1]
+}
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
