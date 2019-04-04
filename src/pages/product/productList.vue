@@ -204,6 +204,7 @@ export default {
         }
       });
     });
+    sessionStorage.setItem("menuBoolean",true);
     this.productList();
   },
   mounted() {},
