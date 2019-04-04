@@ -1,18 +1,18 @@
 <template>
   <a-card>
     <div>
-      <a-form layout="horizontal">
+      <a-form layout="horizontal" :autoFormCreate="(form) => this.form = form">
         <div>
           <a-row>
             <a-col :md="8" :sm="24">
-              <a-form-item label="选择日期" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
+              <a-form-item label="选择日期" fieldDecoratorId="repository.date" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
                 <a-range-picker @change="onChange" />
               </a-form-item>
             </a-col>
 
             <a-col :md="8" :sm="24">
-              <a-form-item label="订单状态" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择" :defaultValue="status" @change="statusChange">
+              <a-form-item label="订单状态" fieldDecoratorId="repository.status" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
+                <a-select placeholder="请选择" @change="statusChange">
                   <a-select-option :key="'ALL'">全部状态</a-select-option>
                   <a-select-option :key="'CREATED'">待付款</a-select-option>
                   <a-select-option :key="'CONSUME'">待评价</a-select-option>
@@ -25,30 +25,26 @@
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="全部运营商" :labelCol="{span: 5}"  :wrapperCol="{span: 18, offset: 1}">
+              <a-form-item label="运营商" fieldDecoratorId="repository.providerId" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
                 <a-select placeholder="请选择" @change="providerListFun">
                   <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="8" :sm="24" v-if="merchantId">
-              <a-form-item label="所属商家" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择"  @change="merchantChange">
-                  <!-- <a-select-option :key="'ALL'">全部商家</a-select-option> -->
+            <a-col :md="8" :sm="24">
+              <a-form-item label="所属商家" fieldDecoratorId="repository.merchantId" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
+                <a-select placeholder="请选择" @change="merchantChange">
+                  <a-select-option :key="'ALL'">全部商家</a-select-option>
                   <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
+            <span style="float: right; margin-top: 3px;">
+              <a-button type="primary" @click="submit">查询</a-button>
+            </span>
           </a-row>
         </div>
-        <!-- <span style="float: right; margin-top: 3px;">
-          <a-button type="primary">查询</a-button>
-          <a-button style="margin-left: 8px">重置</a-button>
-          <a @click="toggleAdvanced" style="margin-left: 8px">
-            {{advanced ? '收起' : '展开'}}
-            <a-icon :type="advanced ? 'up' : 'down'" />
-          </a>
-        </span> -->
+
       </a-form>
     </div>
     <div>
@@ -243,6 +239,12 @@ export default {
     this.merchantListFun(this.providerId);
   },
   methods: {
+    submit() {
+      this.form.validateFields((err, values) => {
+        console.log(values.repository);
+      });
+      this.orderList();
+    },
     providerListFun(e) {
       this.providerId = e;
       this.merchantListFun(e);
@@ -255,12 +257,10 @@ export default {
     },
     statusChange(e) {
       this.status = e;
-      this.orderList();
     },
     onChange(dates, dateStrings) {
       this.dateStart = dateStrings[0];
       this.dateEnd = dateStrings[1];
-      this.orderList();
     },
     remove() {
       this.dataSource = this.dataSource.filter(
@@ -280,7 +280,6 @@ export default {
     },
     merchantChange(e) {
       this.merchantId = e;
-      this.orderList();
     },
     orderList() {
       let data = {
@@ -330,6 +329,7 @@ export default {
       let data = {
         providerId: providerId
       };
+      let that = this;
       this.$axios({
         url: "/endpoint/juji/provider/merchant/list.json",
         method: "get",
@@ -338,8 +338,18 @@ export default {
       }).then(res => {
         if (res.success) {
           this.merchantList = res.data;
-          this.merchantId = this.merchantList[0].id;
+          console.log(this.merchantList)
+          this.merchantId =this.merchantList[0]? this.merchantList[0].id:'';
           this.orderList();
+          this.$nextTick(() => {
+            this.form.setFieldsValue({
+              repository: {
+                merchantId: that.merchantId,
+                status: "ALL",
+                providerId: providerId
+              }
+            });
+          });
         } else {
           this.$error({
             title: "温馨提示",
@@ -349,7 +359,6 @@ export default {
       });
     },
     orderListfun(e) {
-      console.log(e);
       this.orderFun(e.orderId);
     },
     orderFun(orderId) {

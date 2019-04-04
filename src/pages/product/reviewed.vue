@@ -85,8 +85,8 @@
       </a-form-item>
       <a-form-item label="售价" :labelCol="{span: 7}" v-if="productInfo.type === 'POINT'" :wrapperCol="{span: 10}">
         <div>
-          桔子{{productInfo.point}}+
-          <span v-if="productInfo.price">钱{{productInfo.price/100}}</span>
+          桔子{{productInfo.point}}
+          <span v-if="productInfo.price">+钱{{productInfo.price/100}}</span>
         </div>
       </a-form-item>
       <a-form-item label="商品首图" :labelCol="{span: 7}" :wrapperCol="{span: 10}">

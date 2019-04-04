@@ -12,7 +12,7 @@
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item label="全部运营商" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择" @change="providerListFun">
+                  <a-select placeholder="请选择" :defaultValue="providerId" @change="providerListFun" >
                     <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
                   </a-select>
                 </a-form-item>
@@ -184,17 +184,29 @@ const columns = [
     title: "商品名称",
     dataIndex: "productName"
   },
-  // {
-  //   title: "商家名称",
-  //   dataIndex: "providerName"
-  // },
   {
-    title: "核销数量",
-    dataIndex: "num"
+    title: "商家名称",
+    dataIndex: "merchantName"
   },
   {
     title: "核销金额",
-    dataIndex: "amount"
+    dataIndex: "orderPaidAmount"
+  },
+  {
+    title: "商家分账",
+    dataIndex: "merchantAmount"
+  },
+   {
+    title: "运营商分账",
+    dataIndex: "providerAmount"
+  },
+    {
+    title: "购物返利",
+    dataIndex: "salerAmount"
+  },
+    {
+    title: "管理佣金",
+    dataIndex: "managerAmount"
   },
   {
     title: "操作",
@@ -204,25 +216,25 @@ const columns = [
 ];
 const columns2 = [
   {
-    title: "核销时间",
+    title: "结算时间",
 
-    dataIndex: "use_time"
+    dataIndex: "orderTime"
   },
   {
-    title: "核销门店",
-    dataIndex: "use_store_name"
+    title: "结算门店",
+    dataIndex: "storeName"
   },
   {
-    title: "核销数量",
-    dataIndex: "num"
+    title: "商品名称",
+    dataIndex: "productName"
   },
   {
-    title: "核销金额",
-    dataIndex: "amount"
+    title: "数量",
+    dataIndex: "totalNum"
   },
   {
-    title: "核销码",
-    dataIndex: "voucher_code"
+    title: "结算金额",
+    dataIndex: "merchantAmount"
   },
   {
     title: "操作",
@@ -380,9 +392,8 @@ export default {
       let that = this;
       if (!data.dateStart) delete data.dateStart;
       if (!data.dateEnd) delete data.dateEnd;
-
       this.$axios({
-        url: "/endpoint/settle/list.json",
+        url: "/endpoint/settle/reportList.json",
         method: "get",
         processData: false,
         params: data
@@ -391,7 +402,11 @@ export default {
           this.data2 = res.data.list;
           this.data2.forEach(function(i) {
             i.typeName = i.type === "POINT" ? "积分商品" : "普通商品";
-            i.amount = that.accurate_div(i.amount, 100);
+            i.orderPaidAmount = that.accurate_div(i.orderPaidAmount*1, 100);
+            i.merchantAmount = that.accurate_div(i.merchantAmount*1, 100);
+            i.providerAmount = that.accurate_div(i.providerAmount*1, 100);
+            i.salerAmount = that.accurate_div(i.salerAmount*1, 100);
+            i.managerAmount = that.accurate_div(i.managerAmount*1, 100);
           });
           this.countTotal = res.data.countTotal;
         } else {
@@ -412,8 +427,8 @@ export default {
       let data = {
         pageNo: this.pageNo,
         pageSize: 10,
-        providerId: this.providerId,
-        merchantId: this.merchantId,
+        providerId:'1215456239071388'|| this.providerId,
+        merchantId:'101551700977183295'|| this.merchantId,
         productId: this.productId,
         dateStart: this.dateStart,
         dateEnd: this.dateEnd,
@@ -425,7 +440,7 @@ export default {
       if (!data.productId) delete data.productId;
       let that = this;
       this.$axios({
-        url: "/endpoint/product/settle/list.json",
+        url: "/endpoint/settle/reportDetailList.json",
         method: "get",
         processData: false,
         params: data
@@ -434,7 +449,7 @@ export default {
           this.changeBoo = true;
           this.data3 = res.data.list;
           this.data3.forEach(function(i) {
-            i.amount = that.accurate_div(i.amount, 100);
+            i.merchantAmount = that.accurate_div(i.merchantAmount, 100);
           });
           this.storeIdList(this.merchantId);
         } else {
@@ -446,7 +461,7 @@ export default {
       });
     },
     orderList(e) {
-      this.orderFun(e.order_id);
+      this.orderFun(e.orderId);
     },
     storeChange(e) {
       this.storeId = e;

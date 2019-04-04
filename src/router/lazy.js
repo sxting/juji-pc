@@ -93,7 +93,7 @@ let routesObj = {
               menuId: '30300000',
               component: () => import('@/pages/jiesuan/verification'),
               icon: 'none',
-              invisible: true
+              invisible: false
             }
           ]
         },

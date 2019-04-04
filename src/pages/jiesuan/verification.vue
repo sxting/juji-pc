@@ -3,36 +3,54 @@
     <div>
       <a-form layout="horizontal">
         <div>
-          <a-row>
-            <a-col :md="8" :sm="24">
-              <a-form-item label="选择日期" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-range-picker @change="onChange" />
-              </a-form-item>
-            </a-col>
+          <a-form layout="horizontal" :autoFormCreate="(form) => this.form = form">
+            <div :class="advanced ? null: 'fold'">
+              <a-row>
+                <a-col :md="8" :sm="24">
+                <a-form-item label="选择日期" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
+                  <a-range-picker @change="onChange" />
+                </a-form-item>
+              </a-col>
+                <a-col :md="8" :sm="24">
+                  <a-form-item label="运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.providerId" :wrapperCol="{span: 18, offset: 1}">
+                    <a-select placeholder="请选择" @change="providerListFun">
+                      <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :md="8" :sm="24">
+                  <a-form-item label="所属商家" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 18, offset: 1}">
+                    <a-select placeholder="请选择">
+                      <a-select-option value="">全部商家</a-select-option>
+                      <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :md="8" :sm="24">
+                  <a-form-item label="核销门店" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 18, offset: 1}">
+                    <a-select placeholder="请选择">
+                      <a-select-option value="">全部门店</a-select-option>
+                      <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
    
-            <a-col :md="8" :sm="24">
-              <a-form-item label="订单状态" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择" :defaultValue="status" @change="statusChange">
-                  <a-select-option :key="'ALL'">全部状态</a-select-option>
-                  <a-select-option :key="'CREATED'">待付款</a-select-option>
-                  <a-select-option :key="'CONSUME'">待评价</a-select-option>
-                  <a-select-option :key="'FINISH'">已完成</a-select-option>
-                  <a-select-option :key="'CLOSE'">已关闭</a-select-option>
-                  <a-select-option :key="'REFUND'">已退款</a-select-option>
-                  <a-select-option :key="'PAID'">待使用</a-select-option>
-                  
-                </a-select>
-              </a-form-item>
-            </a-col>
-                     <a-col :md="8" :sm="24" v-if="merchantId">
-              <a-form-item label="所属商家" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择" :defaultValue="merchantId" @change="merchantChange">
-                  <!-- <a-select-option :key="'ALL'">全部商家</a-select-option> -->
-                  <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-          </a-row>
+                <a-col :md="8" :sm="24">
+                  <a-form-item label="商品名称" :labelCol="{span: 5}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 18, offset: 1}">
+                    <a-input style="width: 100%" placeholder="请输入" />
+                  </a-form-item>
+                </a-col>
+                <a-col :md="8" :sm="24">
+                  <a-form-item label="核销码" :labelCol="{span: 5}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 18, offset: 1}">
+                    <a-input style="width: 100%" placeholder="请输入" />
+                  </a-form-item>
+                </a-col>
+              </a-row>
+            </div>
+            <span style="float: right; margin-top: 3px;">
+              <a-button htmlType="submit" @click="submit">查询</a-button>
+            </span>
+          </a-form>
         </div>
         <!-- <span style="float: right; margin-top: 3px;">
           <a-button type="primary">查询</a-button>
@@ -144,42 +162,30 @@
 import StandardTable from "../../components/table/StandardTable";
 const columns = [
   {
-    title: "订单编号",
+    title: "核销时间",
 
     dataIndex: "orderId"
   },
   {
-    title: "下单时间",
+    title: "核销门店",
     dataIndex: "dateCreated"
   },
   {
-    title: "订单状态",
+    title: "商品名称",
     dataIndex: "orderTypeName"
   },
   {
-    title: "商品名称",
+    title: "核销数量",
     dataIndex: "body"
   },
   {
-    title: "商家名称",
+    title: "核销金额",
     dataIndex: "merchantName"
   },
-  
+
   {
-    title: "订单金额",
+    title: "核销码",
     dataIndex: "amount"
-  },
-  {
-    title: "桔子",
-    dataIndex: "point"
-  },
-  {
-    title: "支付金额",
-    dataIndex: "paidAmount"
-  },
-  {
-    title: "实付桔子",
-    dataIndex: "paidPoint"
   },
   {
     title: "操作",
@@ -213,7 +219,7 @@ export default {
       merchantList: [],
       merchantId: "",
       visible: false,
-      status:'ALL',
+      status: "ALL",
       orderInfoOrder: {
         orderId: "",
         orderType: "",
@@ -228,11 +234,11 @@ export default {
     };
   },
   created() {
-    this.providerId =
-      sessionStorage.getItem("PROCIDERID") ||
-      this.$route.query.providerId ||
-      "1215431996629494";
-    this.merchantListFun(this.providerId);
+    this.providerList = JSON.parse(
+      sessionStorage.getItem("LoginDate")
+    ).providerList;
+    this.providerId = this.providerList[0].providerId;
+    // this.merchantListFun(this.providerId);
   },
   methods: {
     handleCancel() {
@@ -241,7 +247,7 @@ export default {
     toggleAdvanced() {
       this.advanced = !this.advanced;
     },
-    statusChange(e){
+    statusChange(e) {
       this.status = e;
       this.orderList();
     },
@@ -304,7 +310,6 @@ export default {
             if (i.status === "REFUND") i.orderTypeName = "已退款";
             i.paidAmount = that.accurate_div(i.paidAmount, 100);
             i.amount = that.accurate_div(i.amount, 100);
-            
           });
           this.countTotal = res.data.countTotal;
         } else {

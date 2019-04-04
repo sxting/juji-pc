@@ -29,7 +29,7 @@
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="全部运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.providerId" :wrapperCol="{span: 18, offset: 1}">
+              <a-form-item label="运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.providerId" :wrapperCol="{span: 18, offset: 1}">
                 <a-select placeholder="请选择" @change="providerListFun">
                   <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
                 </a-select>
@@ -186,7 +186,7 @@ export default {
       providerId: "",
       countTotal: 0,
       merchantList: [],
-      putAway: 1,
+      putAway: '1',
       providerList: []
     };
   },
