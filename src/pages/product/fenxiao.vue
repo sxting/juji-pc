@@ -31,7 +31,7 @@
       <div>
         <a-table :columns="columns" :dataSource="data2" :pagination="false">
           <span slot="action" slot-scope="text, record">
-            <a @click="bianji(record)">分销推广</a>
+            <a @click="bianji(record)">{{effective === '1'?'查看详情':'分销推广'}}</a>
           </span>
         </a-table>
         <div style="margin-top:20px;">
@@ -80,6 +80,7 @@
           </a-card>
           <a-form-item :wrapperCol="{span: 10, offset: 7}">
             <a-button @click="submit">提交</a-button>
+            <a-button style="margin-left:20px" v-if="effective === '1'" @click="stopFX">停止分销</a-button>
           </a-form-item>
         </a-form>
 
@@ -189,6 +190,28 @@ export default {
   },
   mounted() {},
   methods: {
+    stopFX() {
+      let data = {
+        productId: this.productId
+      };
+      this.$axios({
+        url: "/endpoint/distributor/product/stopped.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          this.showBoolean = true;
+          this.effective = 0;
+          this.productList();
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
     chaxun() {
       let that = this;
       this.form.validateFields((err, values) => {
@@ -203,10 +226,10 @@ export default {
     fenyongFun(item, e) {
       if (e) {
         item.rate = e;
-        if (item.settlementType === "DISTRIBUTOR_SALES_REBATE"){
+        if (item.settlementType === "DISTRIBUTOR_SALES_REBATE") {
           this.salesRateStr = e;
         }
-        if (item.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
+        if (item.settlementType === "DISTRIBUTOR_MANAGER_REBATE") {
           this.manageRateStr = e;
         }
         let data = {
@@ -223,12 +246,14 @@ export default {
           if (res.success) {
             res.data.forEach(function(i) {
               if (i.settlementType === "MERCHANT") i.boolean = true;
-              if (i.settlementType === "DISTRIBUTOR_SALES_REBATE") i.name = "销售返利"
-              if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE") i.name = "管理佣金"
+              if (i.settlementType === "DISTRIBUTOR_SALES_REBATE")
+                i.name = "销售返利";
+              if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE")
+                i.name = "管理佣金";
               if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
               if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
             });
-            this.detail.estimateSettlements = res.data
+            this.detail.estimateSettlements = res.data;
           } else {
             this.$error({
               title: "温馨提示",
@@ -354,8 +379,10 @@ export default {
           this.detail = res.data;
           this.detail.estimateSettlements.forEach(function(i) {
             if (i.settlementType === "MERCHANT") i.boolean = true;
-            if (i.settlementType === "DISTRIBUTOR_SALES_REBATE")i.name = "销售返利"
-            if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE") i.name = "管理佣金"
+            if (i.settlementType === "DISTRIBUTOR_SALES_REBATE")
+              i.name = "销售返利";
+            if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE")
+              i.name = "管理佣金";
             if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
             if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
           });
