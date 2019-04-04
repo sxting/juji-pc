@@ -133,7 +133,7 @@ export default {
           if(res.data.menuList&&res.data.menuList.length>0){
             this.$router.push('/product/productList')
             var aaa = JSON.parse(sessionStorage.getItem('menu'))
-            if(!aaa) window.location.reload()
+            if(aaa) window.location.reload()
           }else{
             this.$error({
             title: "温馨提示",

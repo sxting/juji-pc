@@ -130,7 +130,6 @@ let routesObj = {
 var aaa = JSON.parse(sessionStorage.getItem('menu'))
 if (aaa && aaa.length > 0) {
   routesObj.routes[1].children.forEach(i => {
-    console.log(aaa)
     aaa.forEach(n => {
       if (n.menuId === i.menuId) i.invisible = false
       i.children.forEach(m => {
@@ -141,6 +140,4 @@ if (aaa && aaa.length > 0) {
     })
   })
 }
-
-console.log(routesObj)
 export default new Router(routesObj)
