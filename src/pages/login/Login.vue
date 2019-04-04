@@ -86,7 +86,7 @@ export default {
     let token = this.$route.query.token;
     if(token){
       sessionStorage.setItem('App-Token',token)
-      this.$router.push('/login')
+      // this.$router.push('/login')
       this.arCallback();
     }
   },
@@ -132,7 +132,7 @@ export default {
           console.log(res)
           if(res.data.menuList&&res.data.menuList.length>0){
             this.$router.push('/product/productList')
-            // window.location.reload()
+            window.location.reload()
           }else{
             this.$error({
             title: "温馨提示",

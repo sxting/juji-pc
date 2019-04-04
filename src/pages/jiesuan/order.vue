@@ -48,12 +48,14 @@
       </a-form>
     </div>
     <div>
-
-      <a-table :columns="columns" :dataSource="data2">
+      <a-table :columns="columns" :dataSource="data2" :pagination="false">
         <span slot="action" slot-scope="text, record">
           <a @click="orderListfun(record)">查看详情</a>
         </span>
       </a-table>
+       <div style="margin-top:20px;">
+        <a-pagination style="float:right" @change="paginationFun" :current="pageNo" :pageSize="10" :total="countTotal" />
+      </div>
     </div>
 
     <a-modal title="详情" :visible="visible" @ok="handleCancel" @cancel="handleCancel" width="1000px">
@@ -228,7 +230,9 @@ export default {
       },
       vouchersList: [],
       orderUser: { nickName: "", phone: "" },
-      providerList: []
+      providerList: [],
+      pageNo:1,
+      countTotal:10
     };
   },
   created() {
@@ -239,10 +243,15 @@ export default {
     this.merchantListFun(this.providerId);
   },
   methods: {
+    paginationFun(e){
+      this.pageNo = e;
+      this.orderList();
+    },
     submit() {
       this.form.validateFields((err, values) => {
         console.log(values.repository);
       });
+      this.pageNo = 1;
       this.orderList();
     },
     providerListFun(e) {

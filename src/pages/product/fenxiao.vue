@@ -60,7 +60,7 @@
           <a-card title="分佣设置" style="margin-top:20px">
             <a-form-item v-for="(item) in detail.estimateSettlements" :key="item.settlementType" v-if="!item.boolean" :label="item.name" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
               <span v-if="item.settlementType ==='DISTRIBUTOR_SALES_REBATE'||item.settlementType ==='DISTRIBUTOR_MANAGER_REBATE'">
-                <a-input-number :value="item.rate" :min="item.settlementType==='DISTRIBUTOR_SALES_REBATE'?5:1"  style="margin-right:5px;" :max="100" @change="fenyongFun(item,$event)" />% <span  style="margin-left:20px;">{{item.estimateAmount/100}}元</span></span>
+                <a-input-number @change="fenyongChange"  :value="item.rate" :min="item.settlementType==='DISTRIBUTOR_SALES_REBATE'?5:1"  style="margin-right:5px;" :max="100" @blur="fenyongFun(item,$event)"  />% <span  style="margin-left:20px;">{{item.estimateAmount/100}}元</span></span>
               <span v-else>
                 <span style="margin-right:20px;">{{item.rate}}%</span> {{item.estimateAmount/100}}元</span>
             </a-form-item>
@@ -223,45 +223,49 @@ export default {
     descriptionsFun(e) {
       this.descriptions = e;
     },
+    fenyongChange(e){
+      console.log(e)
+    },
     fenyongFun(item, e) {
-      if (e) {
-        item.rate = e;
-        if (item.settlementType === "DISTRIBUTOR_SALES_REBATE") {
-          this.salesRateStr = e;
-        }
-        if (item.settlementType === "DISTRIBUTOR_MANAGER_REBATE") {
-          this.manageRateStr = e;
-        }
-        let data = {
-          productId: this.productId,
-          manageRateStr: this.manageRateStr,
-          salesRateStr: this.salesRateStr
-        };
-        this.$axios({
-          url: "/endpoint/distributor/product/calculateEstimateSettlement.json",
-          method: "get",
-          processData: false,
-          params: data
-        }).then(res => {
-          if (res.success) {
-            res.data.forEach(function(i) {
-              if (i.settlementType === "MERCHANT") i.boolean = true;
-              if (i.settlementType === "DISTRIBUTOR_SALES_REBATE")
-                i.name = "销售返利";
-              if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE")
-                i.name = "管理佣金";
-              if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
-              if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
-            });
-            this.detail.estimateSettlements = res.data;
-          } else {
-            this.$error({
-              title: "温馨提示",
-              content: res.errorInfo
-            });
-          }
-        });
-      }
+      console.log(e.target.value)
+      // if (e&&false) {
+      //   item.rate = e;
+      //   if (item.settlementType === "DISTRIBUTOR_SALES_REBATE") {
+      //     this.salesRateStr = e;
+      //   }
+      //   if (item.settlementType === "DISTRIBUTOR_MANAGER_REBATE") {
+      //     this.manageRateStr = e;
+      //   }
+      //   let data = {
+      //     productId: this.productId,
+      //     manageRateStr: this.manageRateStr,
+      //     salesRateStr: this.salesRateStr
+      //   };
+      //   this.$axios({
+      //     url: "/endpoint/distributor/product/calculateEstimateSettlement.json",
+      //     method: "get",
+      //     processData: false,
+      //     params: data
+      //   }).then(res => {
+      //     if (res.success) {
+      //       res.data.forEach(function(i) {
+      //         if (i.settlementType === "MERCHANT") i.boolean = true;
+      //         if (i.settlementType === "DISTRIBUTOR_SALES_REBATE")
+      //           i.name = "销售返利";
+      //         if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE")
+      //           i.name = "管理佣金";
+      //         if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
+      //         if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
+      //       });
+      //       this.detail.estimateSettlements = res.data;
+      //     } else {
+      //       this.$error({
+      //         title: "温馨提示",
+      //         content: res.errorInfo
+      //       });
+      //     }
+      //   });
+      // }
     },
     handleChange1({ fileList }) {
       this.fileList = fileList;

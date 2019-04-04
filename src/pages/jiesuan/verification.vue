@@ -4,13 +4,13 @@
       <a-form layout="horizontal">
         <div>
           <a-form layout="horizontal" :autoFormCreate="(form) => this.form = form">
-            <div :class="advanced ? null: 'fold'">
+            <div>
               <a-row>
                 <a-col :md="8" :sm="24">
-                <a-form-item label="选择日期" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-range-picker @change="onChange" />
-                </a-form-item>
-              </a-col>
+                  <a-form-item label="选择日期" :labelCol="{span: 5}" fieldDecoratorId="repository.date" :wrapperCol="{span: 18, offset: 1}">
+                    <a-range-picker @change="dateOnChange" />
+                  </a-form-item>
+                </a-col>
                 <a-col :md="8" :sm="24">
                   <a-form-item label="运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.providerId" :wrapperCol="{span: 18, offset: 1}">
                     <a-select placeholder="请选择" @change="providerListFun">
@@ -27,48 +27,44 @@
                   </a-form-item>
                 </a-col>
                 <a-col :md="8" :sm="24">
-                  <a-form-item label="核销门店" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 18, offset: 1}">
+                  <a-form-item label="核销门店" :labelCol="{span: 5}" fieldDecoratorId="repository.storeId" :wrapperCol="{span: 18, offset: 1}">
                     <a-select placeholder="请选择">
                       <a-select-option value="">全部门店</a-select-option>
-                      <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
+                      <a-select-option v-for="(item) in cityStoreList" :key="item.id">{{item.name}}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
-   
+
                 <a-col :md="8" :sm="24">
                   <a-form-item label="商品名称" :labelCol="{span: 5}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 18, offset: 1}">
                     <a-input style="width: 100%" placeholder="请输入" />
                   </a-form-item>
                 </a-col>
                 <a-col :md="8" :sm="24">
-                  <a-form-item label="核销码" :labelCol="{span: 5}" fieldDecoratorId="repository.productName" :wrapperCol="{span: 18, offset: 1}">
+                  <a-form-item label="核销码" :labelCol="{span: 5}" fieldDecoratorId="repository.code" :wrapperCol="{span: 18, offset: 1}">
                     <a-input style="width: 100%" placeholder="请输入" />
                   </a-form-item>
                 </a-col>
+                <span style="float: right; margin-top: 3px;">
+                  <a-button @click="submit">查询</a-button>
+                </span>
               </a-row>
             </div>
-            <span style="float: right; margin-top: 3px;">
-              <a-button htmlType="submit" @click="submit">查询</a-button>
-            </span>
+
           </a-form>
         </div>
-        <!-- <span style="float: right; margin-top: 3px;">
-          <a-button type="primary">查询</a-button>
-          <a-button style="margin-left: 8px">重置</a-button>
-          <a @click="toggleAdvanced" style="margin-left: 8px">
-            {{advanced ? '收起' : '展开'}}
-            <a-icon :type="advanced ? 'up' : 'down'" />
-          </a>
-        </span> -->
       </a-form>
     </div>
     <div>
 
-      <a-table :columns="columns" :dataSource="data2">
+      <a-table :columns="columns" :dataSource="data2" :pagination="false">
         <span slot="action" slot-scope="text, record">
           <a @click="orderListfun(record)">查看详情</a>
         </span>
       </a-table>
+      <div style="margin-top:20px;">
+        <a-pagination style="float:right" @change="paginationFun" :current="pageNo" :pageSize="10" :total="countTotal" />
+      </div>
     </div>
 
     <a-modal title="详情" :visible="visible" @ok="handleCancel" @cancel="handleCancel" width="1000px">
@@ -77,14 +73,10 @@
           <tr class="ui-grid-row">
             <td class="">订单号</td>
             <td class="" style="width:350px;">{{orderInfoOrder.orderId}}</td>
-            <!-- <td class="">退款单号</td>
-            <td class="trans-status" style="width:350px;"></td> -->
           </tr>
           <tr>
             <td class="">下单时间</td>
             <td class="" style="width:220px;">{{orderInfoOrder.dateCreated}}</td>
-            <!-- <td class="">退款时间</td>
-            <td class="" style="width:220px;"></td> -->
           </tr>
           <tr>
             <td class="">订单状态</td>
@@ -229,8 +221,14 @@ export default {
         paidAmount: "",
         paidPoint: ""
       },
+      productName:'',
       vouchersList: [],
-      orderUser: { nickName: "", phone: "" }
+      cityStoreList: [],
+      orderUser: { nickName: "", phone: "" },
+      storeId:'',
+      code:'',
+      pageNo:1,
+      countTotal:10
     };
   },
   created() {
@@ -238,23 +236,80 @@ export default {
       sessionStorage.getItem("LoginDate")
     ).providerList;
     this.providerId = this.providerList[0].providerId;
-    // this.merchantListFun(this.providerId);
+     this.voucherRecordsListFun()
   },
   methods: {
+    providerListFun(e) {
+      this.providerId = e;
+      this.merchantListFun(e);
+    },
+    paginationFun(e){
+      this.pageNo = e;
+      this.voucherRecordsListFun();
+    },
+    submit() {
+      let that = this;
+      this.form.validateFields((err, values) => {
+        that.providerId = values.repository.providerId;
+        that.merchantId = values.repository.merchantId;
+        that.storeId = values.repository.storeId;
+        that.productName = values.repository.productName;
+        that.code = values.repository.code;
+      });
+      this.voucherRecordsListFun()
+    },
+    merchantListFun(providerId) {
+      let data = {
+        providerId: providerId
+      };
+      this.$axios({
+        url: "/endpoint/juji/provider/merchant/list.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          this.merchantList = res.data;
+          this.merchantId = this.merchantList[0] ? this.merchantList[0].id : "";
+          if (this.merchantId) this.storeListFun();
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    dateOnChange(dates, dateStrings) {
+      this.dateStart = dateStrings[0];
+      this.dateEnd = dateStrings[1];
+    },
+    storeListFun() {
+      let data = {
+        merchantId: this.merchantId
+      };
+      this.$axios({
+        url: "/endpoint/juji/merchant/store/list.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          this.cityStoreList = res.data;
+          this.storeId = this.cityStoreList[0] ? this.cityStoreList[0].id : "";
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
     handleCancel() {
       this.visible = false;
     },
     toggleAdvanced() {
       this.advanced = !this.advanced;
-    },
-    statusChange(e) {
-      this.status = e;
-      this.orderList();
-    },
-    onChange(dates, dateStrings) {
-      this.dateStart = dateStrings[0];
-      this.dateEnd = dateStrings[1];
-      this.orderList();
     },
     remove() {
       this.dataSource = this.dataSource.filter(
@@ -272,68 +327,26 @@ export default {
         this.remove();
       }
     },
-    merchantChange(e) {
-      this.merchantId = e;
-      this.orderList();
-    },
-    orderList() {
+    voucherRecordsListFun() {
       let data = {
-        pageNo: this.pageNo,
-        pageSize: 10,
         providerId: this.providerId,
         merchantId: this.merchantId,
-        dateStart: this.dateStart,
-        dateEnd: this.dateEnd,
-        status: this.status,
-        productName: ""
+        dateStart:this.dateStart,
+        dateEnd:this.dateEnd,
+        pageNo: this.pageNo,
+        pageSize: 10,
+        storeId: this.storeId,
+        productId: '',
+        code: this.code
       };
-      if (!data.dateStart) delete data.dateStart;
-      if (!data.dateEnd) delete data.dateEnd;
-      if (!data.productName) delete data.productName;
-
-      let that = this;
       this.$axios({
-        url: "/endpoint/order/page.json",
+        url: "/endpoint/voucherRecords.json",
         method: "get",
         processData: false,
         params: data
       }).then(res => {
         if (res.success) {
-          this.data2 = res.data.list;
-          this.data2.forEach(function(i) {
-            // i.typeName = i.type === "POINT" ? "积分商品" : "普通商品";
-            if (i.status === "CREATED") i.orderTypeName = "待付款";
-            if (i.status === "PAID") i.orderTypeName = "待使用";
-            if (i.status === "CONSUME") i.orderTypeName = "待评价";
-            if (i.status === "FINISH") i.orderTypeName = "已完成";
-            if (i.status === "CLOSE") i.orderTypeName = "已关闭";
-            if (i.status === "REFUND") i.orderTypeName = "已退款";
-            i.paidAmount = that.accurate_div(i.paidAmount, 100);
-            i.amount = that.accurate_div(i.amount, 100);
-          });
-          this.countTotal = res.data.countTotal;
-        } else {
-          this.$error({
-            title: "温馨提示",
-            content: res.errorInfo
-          });
-        }
-      });
-    },
-    merchantListFun(providerId) {
-      let data = {
-        providerId: providerId
-      };
-      this.$axios({
-        url: "/endpoint/juji/provider/merchant/list.json",
-        method: "get",
-        processData: false,
-        params: data
-      }).then(res => {
-        if (res.success) {
-          this.merchantList = res.data;
-          this.merchantId = this.merchantList[0].id;
-          this.orderList();
+          this.data2 = res.data
         } else {
           this.$error({
             title: "温馨提示",

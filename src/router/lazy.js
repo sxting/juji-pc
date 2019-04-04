@@ -127,20 +127,20 @@ let routesObj = {
     }
   ]
 }
-// var aaa = JSON.parse(sessionStorage.getItem('menu'))
-// if (aaa && aaa.length > 0) {
-//   routesObj.routes[1].children.forEach(i => {
-//     console.log(aaa)
-//     aaa.forEach(n => {
-//       if (n.menuId === i.menuId) i.invisible = false
-//       i.children.forEach(m => {
-//         n.children.forEach(q => {
-//           if (q.menuId === m.menuId) m.invisible = false
-//         })
-//       })
-//     })
-//   })
-// }
+var aaa = JSON.parse(sessionStorage.getItem('menu'))
+if (aaa && aaa.length > 0) {
+  routesObj.routes[1].children.forEach(i => {
+    console.log(aaa)
+    aaa.forEach(n => {
+      if (n.menuId === i.menuId) i.invisible = false
+      i.children.forEach(m => {
+        n.children.forEach(q => {
+          if (q.menuId === m.menuId) m.invisible = false
+        })
+      })
+    })
+  })
+}
 
 console.log(routesObj)
 export default new Router(routesObj)
