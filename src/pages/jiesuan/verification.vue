@@ -156,28 +156,28 @@ const columns = [
   {
     title: "核销时间",
 
-    dataIndex: "orderId"
+    dataIndex: "useTime"
   },
   {
     title: "核销门店",
-    dataIndex: "dateCreated"
+    dataIndex: "useStoreName"
   },
   {
     title: "商品名称",
-    dataIndex: "orderTypeName"
+    dataIndex: "productName"
   },
   {
     title: "核销数量",
-    dataIndex: "body"
+    dataIndex: "useNum"
   },
   {
     title: "核销金额",
-    dataIndex: "merchantName"
+    dataIndex: "useAmount"
   },
 
   {
     title: "核销码",
-    dataIndex: "amount"
+    dataIndex: "voucherCodes"
   },
   {
     title: "操作",
@@ -342,6 +342,7 @@ export default {
         code: this.code,
         productName:this.productName
       };
+      let that = this;
       this.$axios({
         url: "/endpoint/voucherRecords.json",
         method: "get",
@@ -350,6 +351,9 @@ export default {
       }).then(res => {
         if (res.success) {
           this.data2 = res.data.list
+          this.data2.forEach(function(i){
+            i.useAmount = that.accurate_div(i.useAmount*1, 100);
+          })
         } else {
           this.$error({
             title: "温馨提示",
