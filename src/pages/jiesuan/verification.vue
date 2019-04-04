@@ -255,6 +255,7 @@ export default {
         that.storeId = values.repository.storeId;
         that.productName = values.repository.productName;
         that.code = values.repository.code;
+        that.productName = values.repository.productName;
       });
       this.voucherRecordsListFun()
     },
@@ -337,7 +338,8 @@ export default {
         pageSize: 10,
         storeId: this.storeId,
         productId: '',
-        code: this.code
+        code: this.code,
+        productName:this.productName
       };
       this.$axios({
         url: "/endpoint/voucherRecords.json",
@@ -346,7 +348,7 @@ export default {
         params: data
       }).then(res => {
         if (res.success) {
-          this.data2 = res.data
+          this.data2 = res.data.list
         } else {
           this.$error({
             title: "温馨提示",
