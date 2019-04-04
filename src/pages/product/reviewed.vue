@@ -206,6 +206,39 @@ const columns = [
     }
   }
 ];
+const columns2 = [
+  {
+    title: "审核时间",
+    dataIndex: "dateCreated"
+  },
+  {
+    title: "所属运营商",
+    dataIndex: "providerName"
+  },
+  {
+    title: "商品类型",
+    dataIndex: "typeName"
+  },
+  {
+    title: "商品名称",
+    dataIndex: "productName"
+  },
+  {
+    title: "所需桔子",
+    dataIndex: "point"
+  },
+  {
+    title: "售价",
+    dataIndex: "price"
+  },
+  {
+    title: "操作",
+    key: "action",
+    scopedSlots: {
+      customRender: "action"
+    }
+  }
+];
 const data = [];
 const dataSource = [];
 
@@ -441,6 +474,8 @@ export default {
     },
     tabsFun(e) {
       this.status = e;
+      if(this.status  === 'PASS') this.columns = columns2;
+      else this.columns = columns;
       this.reviewedList();
     },
     butongguoFun(e) {

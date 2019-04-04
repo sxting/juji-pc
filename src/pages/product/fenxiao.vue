@@ -60,7 +60,7 @@
           <a-card title="分佣设置" style="margin-top:20px">
             <a-form-item v-for="(item) in detail.estimateSettlements" :key="item.settlementType" v-if="!item.boolean" :label="item.name" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
               <span v-if="item.settlementType ==='DISTRIBUTOR_SALES_REBATE'||item.settlementType ==='DISTRIBUTOR_MANAGER_REBATE'">
-                <a-input-number :value="item.rate" :min="item.settlementType==='DISTRIBUTOR_SALES_REBATE'?5:1" :max="100" style="margin-right:20px;" @change="fenyongFun(item,$event)" />% {{item.estimateAmount/100}}元</span>
+                <a-input-number :value="item.rate" :min="item.settlementType==='DISTRIBUTOR_SALES_REBATE'?5:1"  style="margin-right:5px;" :max="100" @change="fenyongFun(item,$event)" />% <span  style="margin-left:20px;">{{item.estimateAmount/100}}元</span></span>
               <span v-else>
                 <span style="margin-right:20px;">{{item.rate}}%</span> {{item.estimateAmount/100}}元</span>
             </a-form-item>
