@@ -20,7 +20,7 @@
                 </a-col>
                 <a-col :md="8" :sm="24">
                   <a-form-item label="所属商家" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 18, offset: 1}">
-                    <a-select placeholder="请选择">
+                    <a-select placeholder="请选择" @change="merchantIdFun" >
                       <a-select-option value="">全部商家</a-select-option>
                       <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                     </a-select>
@@ -247,6 +247,10 @@ export default {
     paginationFun(e){
       this.pageNo = e;
       this.voucherRecordsListFun();
+    },
+    merchantIdFun(e){
+      this.merchantId =e ;
+      this.storeListFun();
     },
     submit() {
       let that = this;
