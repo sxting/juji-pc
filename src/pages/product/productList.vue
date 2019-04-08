@@ -72,7 +72,7 @@
     </div>
     <div>
 
-      <a-table :columns="columns" :dataSource="data2" :pagination="false">
+      <a-table :columns="columns" :dataSource="data2" :pagination="false" :locale="{emptyText: '暂无数据'}">
         <span slot="action" slot-scope="text, record">
           <a @click="bianji(record)">编辑</a>
           <a-divider v-if="putAway === '1'" type="vertical" />

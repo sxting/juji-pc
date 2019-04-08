@@ -44,7 +44,7 @@
             </div>
             <div>
 
-                <a-table :columns="columns" :dataSource="data" :pagination="false">
+                <a-table :columns="columns" :dataSource="data" :pagination="false" :locale="{emptyText: '暂无数据'}">
                     <span slot="action" slot-scope="text, record">
                         <a @click="chakan(record)">查看详情</a>
                     </span>

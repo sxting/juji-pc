@@ -54,7 +54,7 @@
       </div>
       <div>
 
-        <a-table :columns="columns" :dataSource="data" :pagination="false">
+        <a-table :columns="columns" :dataSource="data" :pagination="false" :locale="{emptyText: '暂无数据'}">
           <span slot="action" slot-scope="text, record">
             <a @click="chakan(record)">查看详情</a>
           </span>
@@ -522,6 +522,7 @@ export default {
           this.butongguo=''
           this.data.forEach(function(i) {
             i.price = that.accurate_div(i.price, 100);
+            i.point = i.point || 0
             i.typeName = i.type === "PRODUCT" ? "普通商品" : "积分商品";
           });
         } else {

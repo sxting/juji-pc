@@ -8,7 +8,7 @@
               <a-row>
                 <a-col :md="8" :sm="24">
                   <a-form-item label="选择日期" :labelCol="{span: 5}" fieldDecoratorId="repository.date" :wrapperCol="{span: 18, offset: 1}">
-                    <a-range-picker @change="dateOnChange" />
+                    <a-range-picker @change="dateOnChange" :defaultValue="[moment(today[0], 'YYYY-MM-DD'), moment(today[1], 'YYYY-MM-DD')]"/>
                   </a-form-item>
                 </a-col>
                 <a-col :md="8" :sm="24">
@@ -57,7 +57,7 @@
     </div>
     <div>
 
-      <a-table :columns="columns" :dataSource="data2" :pagination="false">
+      <a-table :columns="columns" :dataSource="data2" :pagination="false" :locale="{emptyText: '暂无数据'}">
         <span slot="action" slot-scope="text, record">
           <a @click="orderListfun(record)">查看详情</a>
         </span>
@@ -228,13 +228,16 @@ export default {
       storeId: "",
       code: "",
       pageNo: 1,
-      countTotal: 10
+      countTotal: 10,
+      today:this.timeForMat(0)
     };
   },
   created() {
     this.providerList = JSON.parse(
       sessionStorage.getItem("LoginDate")
     ).providerList;
+     this.dateStart = this.today[0];
+    this.dateEnd = this.today[1];
     this.providerId = this.providerList[0].providerId;
 
     this.voucherRecordsListFun();

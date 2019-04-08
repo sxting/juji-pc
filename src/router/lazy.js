@@ -134,7 +134,7 @@ let routesObj = {
             {
               path: '/activity/kanjiaList',
               name: '砍价列表',
-              menuId: '40100000',
+              menuId: '50100000',
               component: () => import('@/pages/activity/kanjiaList'),
               icon: 'none',
               invisible: true
@@ -142,7 +142,7 @@ let routesObj = {
             {
               path: '/activity/pintuanList',
               name: '拼团列表',
-              menuId: '40200000',
+              menuId: '50200000',
               component: () => import('@/pages/activity/pintuanList'),
               icon: 'none',
               invisible: true
@@ -150,15 +150,13 @@ let routesObj = {
             {
               path: '/activity/addKanjia',
               name: '新增砍价',
-              menuId: '40100000',
               component: () => import('@/pages/activity/addKanjia'),
               icon: 'none',
               invisible: true
             },
             {
               path: '/activity/addPintuan',
-              name: '新增列表',
-              menuId: '40200000',
+              name: '新增拼团',
               component: () => import('@/pages/activity/addPintuan'),
               icon: 'none',
               invisible: true

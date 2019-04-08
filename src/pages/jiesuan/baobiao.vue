@@ -31,7 +31,7 @@
         </a-form>
       </div>
       <div>
-        <a-table :columns="columns" :dataSource="data2" :pagination="false">
+        <a-table :columns="columns" :dataSource="data2" :pagination="false" :locale="{emptyText: '暂无数据'}">
           <span slot="action" slot-scope="text, record">
             <a @click="xiangqingList(record)">查看详情</a>
           </span>
@@ -75,7 +75,7 @@
         </a-form>
       </div>
       <div>
-        <a-table :columns="columns2" :dataSource="data3" :pagination="false">
+        <a-table :columns="columns2" :dataSource="data3" :pagination="false" :locale="{emptyText: '暂无数据'}">
           <span slot="action" slot-scope="text, record">
             <a @click="orderList(record)">查看详情</a>
           </span>

@@ -29,7 +29,7 @@
         </div>
       </a-form>
       <div>
-        <a-table :columns="columns" :dataSource="data2" :pagination="false">
+        <a-table :columns="columns" :dataSource="data2" :pagination="false" :locale="{emptyText: '暂无数据'}">
           <span slot="action" slot-scope="text, record">
             <a @click="bianji(record)">{{effective === '1'?'查看详情':'分销推广'}}</a>
           </span>
