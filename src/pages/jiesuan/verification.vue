@@ -20,7 +20,7 @@
                 </a-col>
                 <a-col :md="8" :sm="24">
                   <a-form-item label="所属商家" :labelCol="{span: 5}" fieldDecoratorId="repository.merchantId" :wrapperCol="{span: 18, offset: 1}">
-                    <a-select placeholder="请选择" @change="merchantIdFun" >
+                    <a-select placeholder="请选择" @change="merchantIdFun">
                       <a-select-option value="">全部商家</a-select-option>
                       <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                     </a-select>
@@ -221,14 +221,14 @@ export default {
         paidAmount: "",
         paidPoint: ""
       },
-      productName:'',
+      productName: "",
       vouchersList: [],
       cityStoreList: [],
       orderUser: { nickName: "", phone: "" },
-      storeId:'',
-      code:'',
-      pageNo:1,
-      countTotal:10,
+      storeId: "",
+      code: "",
+      pageNo: 1,
+      countTotal: 10
     };
   },
   created() {
@@ -237,20 +237,30 @@ export default {
     ).providerList;
     this.providerId = this.providerList[0].providerId;
 
-    this.voucherRecordsListFun()
+    this.voucherRecordsListFun();
   },
   methods: {
     providerListFun(e) {
       this.providerId = e;
       this.merchantListFun(e);
     },
-    paginationFun(e){
+    paginationFun(e) {
       this.pageNo = e;
       this.voucherRecordsListFun();
     },
-    merchantIdFun(e){
-      this.merchantId =e ;
-      this.storeListFun();
+    merchantIdFun(e) {
+      this.merchantId = e;
+      if (this.merchantId) this.storeListFun();
+      else {
+        this.cityStoreList = [];
+        this.$nextTick(() => {
+            this.form.setFieldsValue({
+              repository: {
+                storeId:""
+              }
+            });
+          });
+      }
     },
     submit() {
       let that = this;
@@ -262,7 +272,7 @@ export default {
         that.code = values.repository.code;
         that.productName = values.repository.productName;
       });
-      this.voucherRecordsListFun()
+      this.voucherRecordsListFun();
     },
     merchantListFun(providerId) {
       let data = {
@@ -281,7 +291,7 @@ export default {
           this.$nextTick(() => {
             this.form.setFieldsValue({
               repository: {
-                merchantId:  that.merchantList[0] ? that.merchantList[0].id : ""
+                merchantId: that.merchantList[0] ? that.merchantList[0].id : ""
               }
             });
           });
@@ -353,14 +363,14 @@ export default {
       let data = {
         providerId: this.providerId,
         merchantId: this.merchantId,
-        dateStart:this.dateStart,
-        dateEnd:this.dateEnd,
+        dateStart: this.dateStart,
+        dateEnd: this.dateEnd,
         pageNo: this.pageNo,
         pageSize: 10,
         storeId: this.storeId,
-        productId: '',
+        productId: "",
         code: this.code,
-        productName:this.productName
+        productName: this.productName
       };
       let that = this;
       this.$axios({
@@ -370,10 +380,10 @@ export default {
         params: data
       }).then(res => {
         if (res.success) {
-          this.data2 = res.data.list
-          this.data2.forEach(function(i){
-            i.useAmount = that.accurate_div(i.useAmount*1, 100);
-          })
+          this.data2 = res.data.list;
+          this.data2.forEach(function(i) {
+            i.useAmount = that.accurate_div(i.useAmount * 1, 100);
+          });
         } else {
           this.$error({
             title: "温馨提示",
