@@ -496,6 +496,7 @@ export default {
     },
     onChange(e) {
       this.pageNo = e;
+      this.reviewedList();
     },
     reviewedList() {
       let data = {

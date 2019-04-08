@@ -429,7 +429,7 @@ export default {
                 ? this.fileList1[0].response
                 : this.fileList1[0].name,
               picIds: picIds,
-              point: this.productType === "POINT" ? this.point : "",
+              point: this.productType === "POINT" ? this.point : 0,
               price: this.price?this.accurate_mul(this.price, 100):0,
               productName: values.repository.productName,
               productStores: storeIdArr,

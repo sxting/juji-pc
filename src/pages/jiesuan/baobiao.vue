@@ -85,7 +85,7 @@
         </div>
       </div>
     </div>
-    <a-modal title="详情" :visible="visible" @ok="handleCancel" @cancel="handleCancel" width="1000px">
+    <a-modal title="详情" :visible="visible" @ok="handleCancel" @cancel="handleCancel" width="1000px" :footer="null">
       <div class="orderpage_detail_list">
         <table>
           <tr class="ui-grid-row">

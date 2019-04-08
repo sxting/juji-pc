@@ -122,6 +122,48 @@ let routesObj = {
               invisible: true
             }
           ]
+        },
+        {
+          path: '/activity',
+          name: '活动管理',
+          component: PageView,
+          icon: 'form',
+          menuId: '50000000',
+          invisible: true,
+          children: [
+            {
+              path: '/activity/kanjiaList',
+              name: '砍价列表',
+              menuId: '40100000',
+              component: () => import('@/pages/activity/kanjiaList'),
+              icon: 'none',
+              invisible: true
+            },
+            {
+              path: '/activity/pintuanList',
+              name: '拼团列表',
+              menuId: '40200000',
+              component: () => import('@/pages/activity/pintuanList'),
+              icon: 'none',
+              invisible: true
+            },
+            {
+              path: '/activity/addKanjia',
+              name: '新增砍价',
+              menuId: '40100000',
+              component: () => import('@/pages/activity/addKanjia'),
+              icon: 'none',
+              invisible: true
+            },
+            {
+              path: '/activity/addPintuan',
+              name: '新增列表',
+              menuId: '40200000',
+              component: () => import('@/pages/activity/addPintuan'),
+              icon: 'none',
+              invisible: true
+            }
+          ]
         }
       ]
     }
