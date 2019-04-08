@@ -80,7 +80,7 @@
           </tr>
           <tr>
             <td class="">订单状态</td>
-            <td class="" style="width:220px;">{{orderInfoOrder.orderTypeName}}</td>
+            <td class="" style="width:220px;">{{orderInfoOrder.statusName}}</td>
           </tr>
         </table>
       </div>
