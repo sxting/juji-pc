@@ -268,6 +268,7 @@ export default {
       let data = {
         providerId: providerId
       };
+      let that = this;
       this.$axios({
         url: "/endpoint/juji/provider/merchant/list.json",
         method: "get",
@@ -277,6 +278,13 @@ export default {
         if (res.success) {
           this.merchantList = res.data;
           this.merchantId = this.merchantList[0] ? this.merchantList[0].id : "";
+          this.$nextTick(() => {
+            this.form.setFieldsValue({
+              repository: {
+                merchantId:  that.merchantList[0] ? that.merchantList[0].id : ""
+              }
+            });
+          });
           if (this.merchantId) this.storeListFun();
         } else {
           this.$error({
@@ -294,6 +302,7 @@ export default {
       let data = {
         merchantId: this.merchantId
       };
+      let that = this;
       this.$axios({
         url: "/endpoint/juji/merchant/store/list.json",
         method: "get",
@@ -303,6 +312,13 @@ export default {
         if (res.success) {
           this.cityStoreList = res.data;
           this.storeId = this.cityStoreList[0] ? this.cityStoreList[0].id : "";
+          this.$nextTick(() => {
+            this.form.setFieldsValue({
+              repository: {
+                storeId: that.cityStoreList[0] ? that.cityStoreList[0].id : ""
+              }
+            });
+          });
         } else {
           this.$error({
             title: "温馨提示",

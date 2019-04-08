@@ -414,9 +414,9 @@ export default {
               cutOffDays: values.repository.cutOffDays, //核销截止日期
               description: JSON.stringify(picXQArr),
               idx: values.repository.idx,
-              limitMaxNum: this.limitMaxNum,
-              limitPerDayNum: this.limitPerDayNum,
-              limitPerOrderNum: this.limitPerOrderNum,
+              limitMaxNum: this.limitMaxNum || 9999,
+              limitPerDayNum: this.limitPerDayNum || 9999,
+              limitPerOrderNum: this.limitPerOrderNum || 9999,
               merchantId: values.repository.merchantId,
               merchantName: this.merchantName,
               note: JSON.stringify(note),
