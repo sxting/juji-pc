@@ -45,8 +45,8 @@
         <a-row>
           <a-col>
             <a-tabs @change="tabsFun">
-              <a-tab-pane :tab="'进行中'" key="READY"></a-tab-pane>
-              <a-tab-pane :tab="'未开始'" key="STARTED"></a-tab-pane>
+              <a-tab-pane :tab="'进行中'" key="STARTED"></a-tab-pane>
+              <a-tab-pane :tab="'未开始'" key="READY"></a-tab-pane>
               <a-tab-pane :tab="'已结束'" key="ENDED"></a-tab-pane>
             </a-tabs>
           </a-col>
@@ -57,10 +57,16 @@
 
         <a-table :columns="columns" :dataSource="data" :pagination="false" :locale="{emptyText: '暂无数据'}">
           <span slot="action" slot-scope="text, record">
-            <a @click="chakan(record)">查看详情</a>
-            <a-divider type="vertical" />
-            <a @click="xiajia(record)" class="ant-dropdown-link">
+            <a @click="chakan(record)" v-if="status ==='STARTED' || status ==='ENDED'">查看详情</a>
+            <a @click="chakan(record)" v-if="status ==='READY'">编辑</a>
+            <a v-if="status ==='READY'" @click="startFun(record)" class="ant-dropdown-link">
+              立即开始
+            </a>
+            <a v-if="status ==='STARTED'" @click="stopFun(record)" class="ant-dropdown-link">
               结束活动
+            </a>
+            <a v-if="status ==='READY'" @click="delFun(record)" class="ant-dropdown-link">
+              删除
             </a>
           </span>
         </a-table>
@@ -240,7 +246,7 @@ export default {
       providerId: "ALL",
       countTotal: 1,
       productType: "ALL",
-      status: "READY",
+      status: "STARTED",
       productName: "",
       productInfo: {},
       dateStart: "",
@@ -250,7 +256,8 @@ export default {
       REJECTNUM: 0,
       id: "",
       yestoday: this.timeForMat(1),
-      providerList: JSON.parse(sessionStorage.getItem("LoginDate")).providerList
+      providerList: JSON.parse(sessionStorage.getItem("LoginDate")).providerList,
+      activityType:'BARGAIN'
     };
   },
   created() {
@@ -264,16 +271,82 @@ export default {
   },
   mounted() {},
   methods: {
+    startFun(e) {
+      let data  = {
+        providerId : this.providerId,
+        activityId : e.activityId,
+        activityType : this.activityType
+      }
+      this.$axios({
+        url: "/endpoint/activity/operate/starting.json",
+        method: "get",
+        processData: false,
+         params: data
+      }).then(res => {
+        if (res.success) {
+          this.activityList();
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    stopFun(e) {
+      let data  = {
+        providerId : this.providerId,
+        activityId : e.activityId,
+        activityType : this.activityType
+      }
+      this.$axios({
+        url: "/endpoint/activity/operate/ending.json",
+        method: "get",
+        processData: false,
+         params: data
+      }).then(res => {
+        if (res.success) {
+          this.activityList();
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    delFun(e) {
+      let data  = {
+        providerId : this.providerId,
+        activityId : e.activityId,
+        activityType : this.activityType
+      }
+      this.$axios({
+        url: "/endpoint/activity/operate/delete.json",
+        method: "get",
+        processData: false,
+         params: data
+      }).then(res => {
+        if (res.success) {
+          this.activityList();
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
     providerListFun(e) {
       this.providerId = e;
     },
     addNew() {
       this.$router.push({
         path: "/activity/addKanjia",
-        query: { providerId: this.providerId, activityType: "BARGAIN" }
+        query: { providerId: this.providerId, activityType: this.activityType }
       });
     },
-    timeChange(e) {
+    timeChange(dates, dateStrings) {
       this.dateStart = dateStrings[0];
       this.dateEnd = dateStrings[1];
       this.activityList();
@@ -318,24 +391,13 @@ export default {
       }
     },
     chakan(e) {
-      this.id = e.activityId;
-      let that = this;
-      this.$axios({
-        url: "/endpoint/activity/operate/detail.json",
-        method: "get",
-        processData: false,
-        params: {
+      this.$router.push({
+        path: "/activity/addKanjia",
+        query: {
+          providerId: this.providerId,
+          activityType: this.activityType,
           activityId: e.activityId,
-          providerId: that.providerId,
-          activityType: "BARGAIN"
-        }
-      }).then(res => {
-        if (res.success) {
-        } else {
-          this.$error({
-            title: "温馨提示",
-            content: res.errorInfo
-          });
+          status:this.status
         }
       });
     },
@@ -372,7 +434,7 @@ export default {
         pageSize: 10,
         providerId: this.providerId,
         productName: this.productName,
-        activityType: "BARGAIN",
+        activityType: this.activityType,
         activityStatus: this.status,
         startDate: this.dateStart,
         endDate: this.dateEnd
@@ -390,7 +452,7 @@ export default {
           this.data.forEach(function(i) {
             i.originalPrice = that.accurate_div(i.originalPrice, 100);
             i.costPrice = that.accurate_div(i.costPrice, 100);
-            i.time = i.startTime + "-" + i.endDate;
+            i.time = i.startTime + "-" + i.endTime;
           });
         } else {
           this.$error({
