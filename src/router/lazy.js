@@ -150,14 +150,14 @@ let routesObj = {
             {
               path: '/activity/addKanjia',
               name: '新增砍价',
-              component: () => import('@/pages/activity/addKanjia'),
+              component: () => import('@/pages/activity/addActivity'),
               icon: 'none',
               invisible: true
             },
             {
               path: '/activity/addPintuan',
               name: '新增拼团',
-              component: () => import('@/pages/activity/addPintuan'),
+              component: () => import('@/pages/activity/addActivity'),
               icon: 'none',
               invisible: true
             }

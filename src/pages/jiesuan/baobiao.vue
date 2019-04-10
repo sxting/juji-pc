@@ -1,18 +1,18 @@
 <template>
   <a-card>
     <div v-if="!changeBoo">
-      <div :class="advanced ? 'search' : null">
+      <div>
         <a-form layout="horizontal">
-          <div :class="advanced ? null: 'fold'">
+          <div>
             <a-row>
               <a-col :md="8" :sm="24">
                 <a-form-item label="选择日期" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-range-picker @change="onChange" :defaultValue="[moment(yestoday[0], 'YYYY-MM-DD'), moment(yestoday[1], 'YYYY-MM-DD')]"/>
+                  <a-range-picker @change="onChange" :defaultValue="[moment(yestoday[0], 'YYYY-MM-DD'), moment(yestoday[1], 'YYYY-MM-DD')]" />
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item label="全部运营商" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择" :defaultValue="providerId" @change="providerListFun" >
+                  <a-select placeholder="请选择" :defaultValue="providerId" @change="providerListFun">
                     <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
                   </a-select>
                 </a-form-item>
@@ -20,16 +20,41 @@
 
               <a-col :md="8" :sm="24" v-if="merchantId">
                 <a-form-item label="所属商家" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择"  @change="merchantChange">
+                  <a-select placeholder="请选择" @change="merchantChange">
                     <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
-            </a-row>
 
+            </a-row>
+            <div>
+              <a-button @click="excelFun" type="primary">导出报表</a-button>
+            </div>
           </div>
         </a-form>
       </div>
+      <a-row style="margin: 0 -12px">
+        <a-col :sm="24" :md="12" :xl="6" style="padding: 12px 12px 24px;">
+          <a-card title="商家结算" style="margin-top:20px">
+            {{numSet.merchantAmount || 0}}
+          </a-card>
+        </a-col>
+        <a-col :sm="24" :md="12" :xl="6" style="padding: 12px 12px 24px;">
+          <a-card title="运营商分佣" style="margin-top:20px">
+            {{numSet.providerAmount || 0}}
+          </a-card>
+        </a-col>
+        <a-col :sm="24" :md="12" :xl="6" style="padding: 12px 12px 24px;">
+          <a-card title="购物返利" style="margin-top:20px">
+            {{numSet.salerAmount || 0}}
+          </a-card>
+        </a-col>
+        <a-col :sm="24" :md="12" :xl="6" style="padding: 12px 12px 24px;">
+          <a-card title="管理佣金" style="margin-top:20px">
+            {{numSet.managerAmount || 0}}
+          </a-card>
+        </a-col>
+      </a-row>
       <div>
         <a-table :columns="columns" :dataSource="data2" :pagination="false" :locale="{emptyText: '暂无数据'}">
           <span slot="action" slot-scope="text, record">
@@ -174,6 +199,8 @@
 
 <script>
 import StandardTable from "../../components/table/StandardTable";
+import axios from "axios";
+
 const columns = [
   {
     title: "商品类型",
@@ -196,15 +223,15 @@ const columns = [
     title: "商家分账",
     dataIndex: "merchantAmount"
   },
-   {
+  {
     title: "运营商分账",
     dataIndex: "providerAmount"
   },
-    {
+  {
     title: "购物返利",
     dataIndex: "salerAmount"
   },
-    {
+  {
     title: "管理佣金",
     dataIndex: "managerAmount"
   },
@@ -291,7 +318,8 @@ export default {
       vouchersList: [],
       orderUser: { nickName: "", phone: "" },
       providerList: [],
-      yestoday:this.timeForMat(1)
+      yestoday: this.timeForMat(1),
+      numSet: {}
     };
   },
   created() {
@@ -301,13 +329,33 @@ export default {
     this.providerId = this.providerList[0].providerId;
     this.dateStart = this.yestoday[0];
     this.dateEnd = this.yestoday[1];
-    
+
     this.merchantListFun(this.providerId);
   },
   methods: {
+    excelFun() {
+      let data = {
+        pageNo: this.pageNo,
+        pageSize: 10,
+        providerId: this.providerId,
+        merchantId: this.merchantId,
+        dateStart: this.dateStart,
+        dateEnd: this.dateEnd
+      };
+      let param = "";
+      let apiUrl =
+        axios.defaults.baseURL+':9980' + "/endpoint/settle/reportListExcel.download";
+      if (data.pageNo) param += "&pageNo=" + this.pageNo;
+      if (data.providerId) param += "&providerId=" + this.providerId;
+      if (data.merchantId) param += "&merchantId=" + this.merchantId;
+      if (data.dateStart) param += "&pageNo=" + this.dateStart;
+      if (data.dateEnd) param += "&pageNo=" + this.dateEnd;
+
+      window.location.href = apiUrl + "?pageSize=10" + param;
+    },
     providerListFun(e) {
       this.providerId = e;
-       this.merchantListFun(e);
+      this.merchantListFun(e);
     },
     toggleAdvanced() {
       this.advanced = !this.advanced;
@@ -403,13 +451,14 @@ export default {
       }).then(res => {
         if (res.success) {
           this.data2 = res.data.list;
+          this.numSet = res.data;
           this.data2.forEach(function(i) {
             i.typeName = i.type === "POINT" ? "积分商品" : "普通商品";
-            i.orderPaidAmount = that.accurate_div(i.orderPaidAmount*1, 100);
-            i.merchantAmount = that.accurate_div(i.merchantAmount*1, 100);
-            i.providerAmount = that.accurate_div(i.providerAmount*1, 100);
-            i.salerAmount = that.accurate_div(i.salerAmount*1, 100);
-            i.managerAmount = that.accurate_div(i.managerAmount*1, 100);
+            i.orderPaidAmount = that.accurate_div(i.orderPaidAmount * 1, 100);
+            i.merchantAmount = that.accurate_div(i.merchantAmount * 1, 100);
+            i.providerAmount = that.accurate_div(i.providerAmount * 1, 100);
+            i.salerAmount = that.accurate_div(i.salerAmount * 1, 100);
+            i.managerAmount = that.accurate_div(i.managerAmount * 1, 100);
           });
           this.countTotal = res.data.countTotal;
         } else {
@@ -431,7 +480,7 @@ export default {
         pageNo: this.pageNo,
         pageSize: 10,
         providerId: this.providerId,
-        merchantId:this.merchantId,
+        merchantId: this.merchantId,
         productId: this.productId,
         dateStart: this.dateStart,
         dateEnd: this.dateEnd,
