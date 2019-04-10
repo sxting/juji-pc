@@ -36,22 +36,22 @@
       <a-row style="margin: 0 -12px">
         <a-col :sm="24" :md="12" :xl="6" style="padding: 12px 12px 24px;">
           <a-card title="商家结算" style="margin-top:20px">
-            {{numSet.merchantAmount || 0}}
+            {{numSet.merchantAmount/100 || 0}}
           </a-card>
         </a-col>
         <a-col :sm="24" :md="12" :xl="6" style="padding: 12px 12px 24px;">
           <a-card title="运营商分佣" style="margin-top:20px">
-            {{numSet.providerAmount || 0}}
+            {{numSet.providerAmount/100 || 0}}
           </a-card>
         </a-col>
         <a-col :sm="24" :md="12" :xl="6" style="padding: 12px 12px 24px;">
           <a-card title="购物返利" style="margin-top:20px">
-            {{numSet.salerAmount || 0}}
+            {{numSet.salerAmount/100 || 0}}
           </a-card>
         </a-col>
         <a-col :sm="24" :md="12" :xl="6" style="padding: 12px 12px 24px;">
           <a-card title="管理佣金" style="margin-top:20px">
-            {{numSet.managerAmount || 0}}
+            {{numSet.managerAmount/100 || 0}}
           </a-card>
         </a-col>
       </a-row>
@@ -344,7 +344,7 @@ export default {
       };
       let param = "";
       let apiUrl =
-        axios.defaults.baseURL+':9980' + "/endpoint/settle/reportListExcel.download";
+        axios.defaults.baseURL + "/endpoint/settle/reportListExcel.download";
       if (data.pageNo) param += "&pageNo=" + this.pageNo;
       if (data.providerId) param += "&providerId=" + this.providerId;
       if (data.merchantId) param += "&merchantId=" + this.merchantId;
