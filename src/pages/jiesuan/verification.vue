@@ -384,6 +384,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.data2 = res.data.list;
+          this.countTotal = res.data.countTotal;
           this.data2.forEach(function(i) {
             i.useAmount = that.accurate_div(i.useAmount * 1, 100);
           });
