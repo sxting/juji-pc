@@ -2,10 +2,10 @@
   <div>
     <a-card :body-style="{padding: '24px 32px'}" :bordered="false">
       <a-form :autoFormCreate="(form) => {this.form = form;}">
-        <a-form-item label="商品类型" help="请选择参与活动的商品，一旦发布，活动期间该商品不可修改" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="商品名称" help="请选择参与活动的商品，一旦发布，活动期间该商品不可修改" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-button v-if="!productRadio" type="primary" @click="checkProduct">选择商品</a-button>
           <span v-else>
-            <span>{{productRadio.productName}} 售价:{{productRadio.price/100}} 原价:{{productRadio.originalPrice/100}} 底价:{{productRadio.costPrice/100}}</span>
+            <span>{{productRadio.productName}}    售价:{{productRadio.price/100}}元    原价:{{productRadio.originalPrice/100}}元   底价:{{productRadio.costPrice/100}}元</span>
             <a-button type="primary" :disabled="status === 'STARTED' ||status === 'ENDED'||status === 'READY'" v-if="productRadio" @click="delProduct">删除商品</a-button>
           </span>
         </a-form-item>
@@ -14,7 +14,7 @@
         </a-form-item>
         <a-form-item label="砍价力度" v-if="activityType === 'BARGAIN'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <div v-for="(item,index) in activityList" :key="index">
-            需
+            {{index>0?'再':''}}需
             <a-input-number :min="1" :step="1" @change="bargainCountFun($event,item)" :value="item.bargainCount" :disabled="status === 'STARTED' ||status === 'ENDED'" :max="24" /> 刀， 砍掉
             <a-input-number :min="0" :step="1" @change="bargainAmountFun($event,item)" :value="item.bargainAmount" :disabled="status === 'STARTED' ||status === 'ENDED'" :max="99999" /> 元
             <a-button type="primary" :disabled="status === 'STARTED' ||status === 'ENDED'" v-if="index ===0" @click="addActivityList(index)">新增</a-button>
@@ -26,7 +26,7 @@
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" :max="24" v-model="splicedPrice" /> 元
         </a-form-item>
         <a-form-item label="活动日期" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :value="dateValue" @change="timeChange" :placeholder="['开始','结束']" />
+          <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="dateValue" @change="timeChange" :placeholder="['开始','结束']" />
         </a-form-item>
         <a-form-item :wrapperCol="{span: 10, offset: 7}">
           <a-button style="margin-right:20px" v-if="status !== 'STARTED'" @click="submit">保存并发布</a-button>
@@ -49,8 +49,8 @@
   </div>
 
 </template>
-
 <script>
+import moment from 'moment'
 import { Modal } from "ant-design-vue";
 var num = 0;
 export default {
@@ -104,25 +104,37 @@ export default {
     }
   },
   methods: {
+    disabledDate(current) {
+      // Can not select days before today and today
+      return current && current < moment().endOf('day');
+    },
     addActivityList(index) {
-      num++;
-      this.activityList.push({
-        bargainAmount: 0, //砍价金额
-        bargainCount: 0, //砍价次数
-        bargainStage: num, //砍价规则顺序
-        initiatorBargainCount: 1, //发起者砍价次数
-        participantBargainCount: 1 //参与者砍价次数
-      });
+      if (this.activityList.length > 4) {
+        this.$error({
+            title: "温馨提示",
+            content: '最多新增五组'
+          });
+      } else {
+        num++;
+        this.activityList.push({
+          bargainAmount: 0, //砍价金额
+          bargainCount: 0, //砍价次数
+          bargainStage: num, //砍价规则顺序
+          initiatorBargainCount: 1, //发起者砍价次数
+          participantBargainCount: 1 //参与者砍价次数
+        });
+      }
     },
     paginationChange(e) {
       this.pageNo = e;
+      this.productListFun();
     },
     delProduct() {
       this.productRadio = "";
     },
     delActivityList(e) {
       num--;
-      this.activityList.splice(e);
+      this.activityList.splice(e,1);
     },
     timeChange(dates, dateStrings) {
       this.dateValue = dates;
@@ -144,10 +156,10 @@ export default {
         }
       ];
       let that = this;
-      let activityList2 = [] ;
-      this.activityList.forEach(function(i){
-        activityList2.push(i)
-      })
+      let activityList2 = [];
+      this.activityList.forEach(function(i) {
+        activityList2.push(i);
+      });
       activityList2.forEach(element => {
         element.bargainAmount = that.accurate_mul(element.bargainAmount, 100);
       });
@@ -158,8 +170,7 @@ export default {
         productId: this.productId,
         providerId: this.providerId,
         activityId: this.activityId,
-        rules:
-          this.activityType === "BARGAIN" ? activityList2 : pintuanRule,
+        rules: this.activityType === "BARGAIN" ? activityList2 : pintuanRule,
         startTime: this.dateStart + " 00:00:00",
         timeLimit: this.timeLimit || 24,
         timeLimitUnit: "HOUR"
@@ -177,7 +188,10 @@ export default {
           let path = "/activity/kanjiaList";
           let path2 = "/activity/pintuanList";
           this.$router.push({
-            path: this.activityType === "BARGAIN" ? path : path2
+            path: this.activityType === "BARGAIN" ? path : path2,
+            query: {
+              providerId: this.providerId,
+            }
           });
         } else {
           this.activityList.forEach(element => {
@@ -197,8 +211,8 @@ export default {
       let data = {
         providerId: this.providerId,
         activityType: this.activityType,
-        productName: "",
-        pageNo: 1,
+        productName: this.productName,
+        pageNo: this.pageNo,
         pageSize: 50
       };
       this.$axios({
@@ -209,6 +223,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.productList = res.data.list;
+          this.countTotal =res.data.countTotal
         } else {
           this.$error({
             title: "温馨提示",
@@ -221,11 +236,16 @@ export default {
       let path = "/activity/kanjiaList";
       let path2 = "/activity/pintuanList";
       this.$router.push({
-        path: this.activityType === "BARGAIN" ? path : path2
+        path: this.activityType === "BARGAIN" ? path : path2,
+        query: {
+          providerId: this.providerId,
+        }
       });
     },
     onSearch(e) {
-      console.log(e);
+      this.productName = e;
+      this.
+      this.productListFun()
     },
     radioChange(e) {
       this.visible = false;
@@ -253,17 +273,15 @@ export default {
         if (res.success) {
           this.timeLimit = res.data.timeLimit;
           this.productRadio = {
+            productName :res.data.productName,
             originalPrice: res.data.originalPrice,
             costPrice: res.data.costPrice,
             price: res.data.salesPrice
           };
           this.activityList = res.data.rules;
-          this.activityList.forEach(function(i){
-           i.bargainAmount = that.accurate_div(
-              i.bargainAmount,
-              100
-            );
-          })
+          this.activityList.forEach(function(i) {
+            i.bargainAmount = that.accurate_div(i.bargainAmount, 100);
+          });
           this.dateValue = [
             this.moment(res.data.startTime, "YYYY-MM-DD"),
             this.moment(res.data.endTime, "YYYY-MM-DD")
