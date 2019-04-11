@@ -71,7 +71,7 @@
                 <a  class="ant-dropdown-link">结束活动</a>
               </a-popconfirm>
             <a-divider v-if="status ==='READY'" type="vertical" />
-            <a-popconfirm title="是否确认？"v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="delFun(record)">
+            <a-popconfirm title="是否确认？" v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="delFun(record)">
                 <a-icon slot="icon" type="question-circle-o" style="color: red" />
                 <a  class="ant-dropdown-link">删除</a>
               </a-popconfirm>
