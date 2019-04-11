@@ -5,7 +5,7 @@
         <a-form-item label="商品名称" help="请选择参与活动的商品，一旦发布，活动期间该商品不可修改" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-button v-if="!productRadio" type="primary" @click="checkProduct">选择商品</a-button>
           <span v-else>
-            <span>{{productRadio.productName}}    售价:{{productRadio.price/100}}元    原价:{{productRadio.originalPrice/100}}元   底价:{{productRadio.costPrice/100}}元</span>
+            <span>{{productRadio.productName}} 售价:{{productRadio.price/100}}元 原价:{{productRadio.originalPrice/100}}元 底价:{{productRadio.costPrice/100}}元</span>
             <a-button type="primary" :disabled="status === 'STARTED' ||status === 'ENDED'||status === 'READY'" v-if="productRadio" @click="delProduct">删除商品</a-button>
           </span>
         </a-form-item>
@@ -50,7 +50,7 @@
 
 </template>
 <script>
-import moment from 'moment'
+import moment from "moment";
 import { Modal } from "ant-design-vue";
 var num = 0;
 export default {
@@ -106,14 +106,14 @@ export default {
   methods: {
     disabledDate(current) {
       // Can not select days before today and today
-      return current && current < moment().endOf('day');
+      return current && current < moment().endOf("day");
     },
     addActivityList(index) {
       if (this.activityList.length > 4) {
         this.$error({
-            title: "温馨提示",
-            content: '最多新增五组'
-          });
+          title: "温馨提示",
+          content: "最多新增五组"
+        });
       } else {
         num++;
         this.activityList.push({
@@ -134,7 +134,7 @@ export default {
     },
     delActivityList(e) {
       num--;
-      this.activityList.splice(e,1);
+      this.activityList.splice(e, 1);
     },
     timeChange(dates, dateStrings) {
       this.dateValue = dates;
@@ -190,7 +190,7 @@ export default {
           this.$router.push({
             path: this.activityType === "BARGAIN" ? path : path2,
             query: {
-              providerId: this.providerId,
+              providerId: this.providerId
             }
           });
         } else {
@@ -223,7 +223,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.productList = res.data.list;
-          this.countTotal =res.data.countTotal
+          this.countTotal = res.data.countTotal;
         } else {
           this.$error({
             title: "温馨提示",
@@ -238,14 +238,13 @@ export default {
       this.$router.push({
         path: this.activityType === "BARGAIN" ? path : path2,
         query: {
-          providerId: this.providerId,
+          providerId: this.providerId
         }
       });
     },
     onSearch(e) {
       this.productName = e;
-      this.
-      this.productListFun()
+      this.this.productListFun();
     },
     radioChange(e) {
       this.visible = false;
@@ -273,15 +272,20 @@ export default {
         if (res.success) {
           this.timeLimit = res.data.timeLimit;
           this.productRadio = {
-            productName :res.data.productName,
+            productName: res.data.productName,
             originalPrice: res.data.originalPrice,
             costPrice: res.data.costPrice,
             price: res.data.salesPrice
           };
-          this.activityList = res.data.rules;
-          this.activityList.forEach(function(i) {
-            i.bargainAmount = that.accurate_div(i.bargainAmount, 100);
-          });
+          if (this.activityType === "BARGAIN") {
+            this.activityList = res.data.rules;
+            this.activityList.forEach(function(i) {
+              i.bargainAmount = that.accurate_div(i.bargainAmount, 100);
+            });
+          }else if(this.activityType === 'SPLICED'){
+            this.splicedPrice = that.accurate_div(res.data.rules[0].splicedPrice, 100);
+          }
+
           this.dateValue = [
             this.moment(res.data.startTime, "YYYY-MM-DD"),
             this.moment(res.data.endTime, "YYYY-MM-DD")
