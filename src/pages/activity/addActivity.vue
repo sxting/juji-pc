@@ -253,6 +253,12 @@ export default {
             price: res.data.salesPrice
           };
           this.activityList = res.data.rules;
+          this.activityList.forEach(function(i){
+           i.bargainAmount = that.accurate_div(
+              i.bargainAmount,
+              100
+            );
+          })
           this.dateValue = [
             this.moment(res.data.startTime, "YYYY-MM-DD"),
             this.moment(res.data.endTime, "YYYY-MM-DD")
