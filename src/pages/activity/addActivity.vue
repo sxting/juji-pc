@@ -244,7 +244,7 @@ export default {
     },
     onSearch(e) {
       this.productName = e;
-      this.this.productListFun();
+      this.productListFun();
     },
     radioChange(e) {
       this.visible = false;
