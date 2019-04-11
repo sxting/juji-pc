@@ -348,8 +348,8 @@ export default {
       if (data.pageNo) param += "&pageNo=" + this.pageNo;
       if (data.providerId) param += "&providerId=" + this.providerId;
       if (data.merchantId) param += "&merchantId=" + this.merchantId;
-      if (data.dateStart) param += "&pageNo=" + this.dateStart;
-      if (data.dateEnd) param += "&pageNo=" + this.dateEnd;
+      if (data.dateStart) param += "&dateStart=" + this.dateStart;
+      if (data.dateEnd) param += "&dateEnd=" + this.dateEnd;
 
       window.location.href = apiUrl + "?pageSize=10" + param;
     },
