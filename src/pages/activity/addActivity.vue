@@ -22,7 +22,7 @@
           </div>
 
         </a-form-item>
-        <a-form-item label="拼团价" v-else :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+        <a-form-item label="拼团价" v-else :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" :max="24" v-model="splicedPrice" /> 元
         </a-form-item>
         <a-form-item label="活动日期" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
