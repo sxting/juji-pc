@@ -247,9 +247,13 @@ export default {
       this.productListFun();
     },
     radioChange(e) {
+      this.productName = '';
+      this.productListFun();
       this.visible = false;
     },
     handleCancel() {
+      this.productName = '';
+      this.productListFun();
       this.visible = false;
     },
     checkProduct() {
