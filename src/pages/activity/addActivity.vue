@@ -26,7 +26,7 @@
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" :max="24" v-model="splicedPrice" /> 元
         </a-form-item>
         <a-form-item label="活动日期" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :value="dateValue"  @change="timeChange" :placeholder="['开始','结束']" />
+          <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :value="dateValue" @change="timeChange" :placeholder="['开始','结束']" />
         </a-form-item>
         <a-form-item :wrapperCol="{span: 10, offset: 7}">
           <a-button style="margin-right:20px" v-if="status !== 'STARTED'" @click="submit">保存并发布</a-button>
@@ -86,7 +86,7 @@ export default {
       pageNo: 1,
       activityId: "",
       status: "",
-      dateValue:null
+      dateValue: null
     };
   },
   created() {
@@ -125,6 +125,7 @@ export default {
       this.activityList.splice(e);
     },
     timeChange(dates, dateStrings) {
+      this.dateValue = dates;
       this.dateStart = dateStrings[0];
       this.dateEnd = dateStrings[1];
     },
@@ -162,7 +163,7 @@ export default {
       let url = "/endpoint/activity/operate/create.json";
       let url2 = "/endpoint/activity/operate/modify.json";
       this.$axios({
-        url: !this.activityId|| this.status === "ENDED" ? url : url2,
+        url: !this.activityId || this.status === "ENDED" ? url : url2,
         method: "post",
         processData: false,
         data: data
@@ -174,6 +175,12 @@ export default {
             path: this.activityType === "BARGAIN" ? path : path2
           });
         } else {
+          this.activityList.forEach(element => {
+            element.bargainAmount = this.accurate_div(
+              element.bargainAmount,
+              100
+            );
+          });
           this.$error({
             title: "温馨提示",
             content: res.errorInfo
@@ -246,10 +253,13 @@ export default {
             price: res.data.salesPrice
           };
           this.activityList = res.data.rules;
-          this.dateValue = [this.moment(res.data.startTime, 'YYYY-MM-DD'), this.moment(res.data.endTime, 'YYYY-MM-DD')]
-          this.dateStart = res.data.startTime
-          this.dateEnd = res.data.endTime
-          this.productId = res.data.productId
+          this.dateValue = [
+            this.moment(res.data.startTime, "YYYY-MM-DD"),
+            this.moment(res.data.endTime, "YYYY-MM-DD")
+          ];
+          this.dateStart = res.data.startTime;
+          this.dateEnd = res.data.endTime;
+          this.productId = res.data.productId;
         } else {
           this.$error({
             title: "温馨提示",

@@ -268,7 +268,7 @@ export default {
                 i.boolean = true;
                 that.manageRateStrAmount = i.estimateAmount;
               }
-              if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
+              if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽佣"; //平台抽佣
               if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
             });
             this.detail.estimateSettlements = res.data;
@@ -408,7 +408,7 @@ export default {
                 that.manageRateStr = i.rate;
                 that.manageRateStrAmount = i.estimateAmount;
               }
-            if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽拥"; //平台抽拥
+            if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽佣"; //平台抽佣
             if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
           });
           this.descriptions = res.data.descriptions;

@@ -149,7 +149,7 @@ let routesObj = {
             },
             {
               path: '/activity/addKanjia',
-              name: '新增砍价',
+              name: '活动管理',
               component: () => import('@/pages/activity/addActivity'),
               icon: 'none',
               invisible: true
