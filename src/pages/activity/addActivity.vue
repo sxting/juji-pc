@@ -143,8 +143,13 @@ export default {
           splicedPrice: this.accurate_mul(this.splicedPrice, 100) //拼团金额
         }
       ];
-      this.activityList.forEach(element => {
-        element.bargainAmount = this.accurate_mul(element.bargainAmount, 100);
+      let that = this;
+      let activityList2 = [] ;
+      this.activityList.forEach(function(i){
+        activityList2.push(i)
+      })
+      activityList2.forEach(element => {
+        element.bargainAmount = that.accurate_mul(element.bargainAmount, 100);
       });
       this.productId = this.productRadio.productId;
       let data = {
@@ -154,7 +159,7 @@ export default {
         providerId: this.providerId,
         activityId: this.activityId,
         rules:
-          this.activityType === "BARGAIN" ? this.activityList : pintuanRule,
+          this.activityType === "BARGAIN" ? activityList2 : pintuanRule,
         startTime: this.dateStart + " 00:00:00",
         timeLimit: this.timeLimit || 24,
         timeLimitUnit: "HOUR"
