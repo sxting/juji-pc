@@ -245,7 +245,7 @@ const columns2 = [
   {
     title: "结算时间",
 
-    dataIndex: "orderTime"
+    dataIndex: "useTime"
   },
   {
     title: "结算门店",
