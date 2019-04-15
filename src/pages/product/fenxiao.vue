@@ -22,7 +22,7 @@
               </a-form-item>
             </a-col>
             <span style="float: right; margin-top: 3px;">
-              <a-button htmlType="submit" @click="chaxun">查询</a-button>
+              <a-button type="primary" @click="chaxun">查询</a-button>
             </span>
           </a-row>
 

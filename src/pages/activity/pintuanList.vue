@@ -31,7 +31,7 @@
               </a-col>
               <a-col :md="12" :sm="24">
                 <span style="float: right; margin-top: 3px;">
-                  <a-button htmlType="submit" @click="submit">查询</a-button>
+                  <a-button type="primary" @click="submit">查询</a-button>
                 </span>
               </a-col>
             </a-row>
@@ -174,8 +174,8 @@
         <a-input v-if="tongguo==='1'" type="text" maxlength="40" v-model="butongguo" @change="butongguoFun" class="juniu_input" placeholder="请填写不通过原因" />
       </a-form-item>
       <a-form-item :wrapperCol="{span: 10, offset: 7}">
-        <a-button htmlType="submit" style="margin-right:20px" @click="reviewedSubmit">提交</a-button>
-        <a-button htmlType="submit" @click="quxiao">取消</a-button>
+        <a-button type="primary" style="margin-right:20px" @click="reviewedSubmit">提交</a-button>
+        <a-button type="primary" @click="quxiao">取消</a-button>
 
       </a-form-item>
     </div>

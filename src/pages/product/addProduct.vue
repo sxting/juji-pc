@@ -146,7 +146,7 @@
         </a-form-item>
 
         <a-form-item :wrapperCol="{span: 10, offset: 7}">
-          <a-button htmlType="submit" @click="submit">提交</a-button>
+          <a-button type="primary" @click="submit">提交</a-button>
         </a-form-item>
       </a-form>
       <!--门店v-if="showStoreSelect"-->

@@ -62,7 +62,7 @@
           </a-row>
         </div>
         <span style="float: right; margin-top: 3px;">
-          <a-button htmlType="submit" @click="submit">查询</a-button>
+          <a-button type="primary" @click="submit">查询</a-button>
           <a @click="toggleAdvanced" style="margin-left: 8px">
             {{advanced ? '收起' : '展开'}}
             <a-icon :type="advanced ? 'up' : 'down'" />

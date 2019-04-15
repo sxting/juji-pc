@@ -55,7 +55,7 @@
             <a style="float: right">忘记密码</a>
           </div>
           <a-form-item> -->
-            <a-button  style="width: 100%;margin-top: 24px" size="large" htmlType="submit" @click="onSubmit" type="primary">微信扫码登陆</a-button>
+            <a-button  style="width: 100%;margin-top: 24px" size="large" type="primary" @click="onSubmit" >微信扫码登陆</a-button>
           <!-- </a-form-item>
           <div>
             其他登录方式

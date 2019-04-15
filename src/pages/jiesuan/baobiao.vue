@@ -92,9 +92,9 @@
               </a-col>
             </a-row>
             <span style="float: right; margin-top: 3px;">
-              <a-button htmlType="submit" @click="back">返回</a-button>
+              <a-button type="primary" @click="back">返回</a-button>
 
-              <a-button htmlType="submit" @click="xiangqingFun">查询</a-button>
+              <a-button type="primary" @click="xiangqingFun">查询</a-button>
             </span>
           </div>
         </a-form>
