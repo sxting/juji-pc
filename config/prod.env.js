@@ -5,6 +5,7 @@ module.exports = {
   // BASE_API_ADDR: '"//juzi-dev.juniuo.cn"',
   
   BASE_API_ADDR: '"//shopping.jujipay.com"',
-  BASE_API_ADDR_TEST: '"//juzi-dev.juniuo.cn"',
+  BASE_API_ADDR_DEV: '"//juzi-dev.juniuo.cn"',
+  BASE_API_ADDR_TEST: '"//upic-test.juniuo.com"',
   
 }

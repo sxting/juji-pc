@@ -58,11 +58,11 @@
             </a-form-item>
           </a-card>
           <a-card title="分佣设置" style="margin-top:20px">
-            <a-form-item label="管理佣金" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+            <a-form-item label="销售返利" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
               <a-input-number v-model="salesRateStr" :min="5" style="margin-right:5px;" :max="100" @blur="salesRateStrFun($event)" />%
               <span style="margin-left:20px;">{{salesRateStrAmount/100}}元</span>
             </a-form-item>
-            <a-form-item label="销售返利" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+            <a-form-item label="管理佣金" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
               <a-input-number v-model="manageRateStr" :min="1" style="margin-right:5px;" :max="100" @blur="manageRateStrFun($event)" />%
               <span style="margin-left:20px;">{{manageRateStrAmount/100}}元</span>
             </a-form-item>
