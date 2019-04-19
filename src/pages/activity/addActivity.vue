@@ -22,8 +22,21 @@
           </div>
 
         </a-form-item>
-        <a-form-item label="拼团价" v-else :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="拼团价" v-else-if="activityType === 'SPLICED'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" :max="24" v-model="splicedPrice" /> 元
+        </a-form-item>
+        <a-form-item label="秒杀价" v-else :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+          <a-radio-group v-model="skillCoin"  @change="skillCoinFun">
+            <a-radio :value="'钱'">钱</a-radio>
+            <a-radio :value="'桔子'">桔子</a-radio>
+          </a-radio-group>
+          <div>
+            <a-input-number :min="0" :value="activityPrice" v-if="skillCoin==='钱'" @change="priceChange($event)" :max="99999.99"  style="width:200px;margin-right:10px;"  placeholder="请输入钱数" />
+            <a-input-number :min="0" :value="activityPoint" v-if="skillCoin==='桔子'" @change="pointChange($event)" :max="99999" style="width:200px" placeholder="请输入桔子数量" />
+          </div>
+        </a-form-item>
+        <a-form-item label="活动库存" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+          <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" :max="24" v-model="activityStock" /> 件
         </a-form-item>
         <a-form-item label="活动日期" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="dateValue" @change="timeChange" :placeholder="['开始','结束']" />
@@ -86,7 +99,11 @@ export default {
       pageNo: 1,
       activityId: "",
       status: "",
-      dateValue: null
+      dateValue: null,
+      skillCoin:'钱',
+      activityPrice:0,
+      activityPoint:0,
+      activityStock:0
     };
   },
   created() {
@@ -104,6 +121,14 @@ export default {
     }
   },
   methods: {
+    skillCoinFun(){
+    },
+    priceChange(e){
+      this.activityPrice = e;
+    },
+    pointChange(e){
+      this.activityPoint = e;
+    },
     disabledDate(current) {
       // Can not select days before today and today
       return current && current < moment().endOf('day');
@@ -148,11 +173,11 @@ export default {
       item.bargainAmount = e;
     },
     submit() {
-      let pintuanRule = [
+      let seckillRull = [
         {
-          enableMock: 0, //模拟成团
-          splicedPeopleCount: 2, //拼团人数
-          splicedPrice: this.accurate_mul(this.splicedPrice, 100) //拼团金额
+          activityPrice:0,
+          activityPoint:0,
+          activityStock:0
         }
       ];
       let that = this;
@@ -164,13 +189,34 @@ export default {
         element.bargainAmount = that.accurate_mul(element.bargainAmount, 100);
       });
       this.productId = this.productRadio.productId;
+
+      let rules = null;
+      if(this.activityType === "BARGAIN"){
+        rules = activityList2;
+      }else if(this.activityType === "SPLICED"){
+        rules = [
+          {
+            enableMock: 0, //模拟成团
+            splicedPeopleCount: 2, //拼团人数
+            splicedPrice: this.accurate_mul(this.splicedPrice, 100) //拼团金额
+          }
+        ];
+      }else if(this.activityType === "SEC_KILL"){
+        rules = [
+          {
+            activityPrice:this.accurate_mul(this.activityPrice, 100),
+            activityPoint:this.activityPoint,
+            activityStock:this.activityStock
+          }
+        ];
+      }
       let data = {
         activityType: this.activityType,
         endTime: this.dateEnd + " 23:59:59",
         productId: this.productId,
         providerId: this.providerId,
         activityId: this.activityId,
-        rules: this.activityType === "BARGAIN" ? activityList2 : pintuanRule,
+        rules: rules,
         startTime: this.dateStart + " 00:00:00",
         timeLimit: this.timeLimit || 24,
         timeLimitUnit: "HOUR"
@@ -185,10 +231,16 @@ export default {
         data: data
       }).then(res => {
         if (res.success) {
-          let path = "/activity/kanjiaList";
-          let path2 = "/activity/pintuanList";
+          let path = "";
+          if(this.activityType === "BARGAIN"){
+            path = "/activity/kanjiaList";
+          }else if(this.activityType === "SPLICED"){
+            path ="/activity/pintuanList";
+          }else{
+            path = "/activity/seckillList";
+          }
           this.$router.push({
-            path: this.activityType === "BARGAIN" ? path : path2,
+            path: path,
             query: {
               providerId: this.providerId,
             }

@@ -148,6 +148,14 @@ let routesObj = {
               invisible: true
             },
             {
+              path: '/activity/seckillList',
+              name: '秒杀列表',
+              menuId: '50300000',
+              component: () => import('@/pages/activity/seckillList'),
+              icon: 'none',
+              invisible: true
+            },
+            {
               path: '/activity/addKanjia',
               name: '活动管理',
               component: () => import('@/pages/activity/addActivity'),
