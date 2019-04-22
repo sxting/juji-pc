@@ -12,7 +12,7 @@
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item label="排序方式" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择" @change="merchantChange">
+                  <a-select placeholder="请选择" :defaultValue="'COMMISSION'" @change="merchantChange">
                     <a-select-option :key="'COMMISSION'">返佣金额</a-select-option>
                     <a-select-option :key="'SUBORDINATE'">下级桔长数</a-select-option>
                     <a-select-option :key="'SHARE'">分享次数</a-select-option>
@@ -82,19 +82,6 @@ const columns = [
   }
 ];
 
-const dataSource = [];
-
-for (let i = 0; i < 100; i++) {
-  dataSource.push({
-    key: i,
-    no: "NO " + i,
-    description: "这是一段描述",
-    callNo: Math.floor(Math.random() * 1000),
-    status: Math.floor(Math.random() * 10) % 4,
-    updatedAt: "2018-07-26"
-  });
-}
-
 export default {
   name: "juzhangOperate",
   components: { StandardTable },
@@ -116,6 +103,7 @@ export default {
   methods: {
     paginationChange(e) {
       this.pageNo = e;
+      this.distributorSummaryList();
     },
     xiangqingList(e) {
       console.log(e);
@@ -146,7 +134,8 @@ export default {
         params: data
       }).then(res => {
         if (res.success) {
-          this.data =res.data.list
+          this.data =res.data.list;
+          this.countTotal = res.data.countTotal;
           this.data.forEach(function(i){
             i.commissionAmount = that.accurate_div(i.commissionAmount * 1, 100);
           })
