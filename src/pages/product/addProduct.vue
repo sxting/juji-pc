@@ -144,10 +144,14 @@
           已选择 {{allShopsNumber}} 家门店
           <span class="buttons" @click="checkStord">选择门店</span>
         </a-form-item>
-
-        <a-form-item :wrapperCol="{span: 10, offset: 7}">
-          <a-button type="primary" @click="submit">提交</a-button>
+        <a-form-item :wrapperCol="{span: 10, offset: 7}" v-if="unAuditCount>0">
+          <span style="color: #f5222d;">商品审核中，暂不支持编辑</span>
         </a-form-item>
+        <a-form-item :wrapperCol="{span: 10, offset: 7}">
+          <a-button type="primary" v-if="!unAuditCount" @click="submit">提交</a-button>
+          <a-button type="primary" v-if="unAuditCount>0" disabled @click="submit">提交</a-button>
+        </a-form-item>
+        
       </a-form>
       <!--门店v-if="showStoreSelect"-->
 
@@ -213,7 +217,8 @@ export default {
       price: "",
       checkedList: [],
       selectedItems:[],
-      productId: sessionStorage.getItem("PROCIDERID") || ""
+      productId: sessionStorage.getItem("PROCIDERID") || "",
+      unAuditCount: 0
     };
   },
   created() {
@@ -619,6 +624,7 @@ export default {
         params: { productId: this.productId }
       }).then(res => {
         if (res.success) {
+          this.unAuditCount = res.data.unAuditCount;
           this.productType = res.data.type;
           this.biaoqian = res.data.tag;
           this.price = Number(this.accurate_div(res.data.price, 100));

@@ -1,6 +1,7 @@
 <template>
   <a-card>
     <div v-if="showBoolean">
+      <div><span>{{effective}}</span></div>
       <a-tabs @change="tabFun">
         <a-tab-pane tab="待分销商品" key="0"></a-tab-pane>
         <a-tab-pane tab="分销商品" key="1"></a-tab-pane>
@@ -9,7 +10,7 @@
         <div>
           <a-row>
             <a-col :md="10" :sm="24">
-              <a-form-item label="所属运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.providerId" :wrapperCol="{span: 18, offset: 1}">
+              <a-form-item label="所属运营商" :labelCol="{span: 7}" fieldDecoratorId="repository.providerId" :wrapperCol="{span: 16, offset: 1}">
                 <a-select placeholder="请选择">
                   <a-select-option value="">全部运营商</a-select-option>
                   <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
@@ -41,6 +42,7 @@
     </div>
 
     <div v-if="!showBoolean">
+      <div><span>{{effective}}</span></div>
       <div>
         <a-form layout="horizontal" @submit="submit" :autoFormCreate="(form) => this.form = form">
           <a-card title="商品信息" style="margin-top:20px">
@@ -286,6 +288,7 @@ export default {
     },
     tabFun(e) {
       console.log(e);
+      console.log(typeof this.effective);
       this.effective = e;
       this.productList();
     },
