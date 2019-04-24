@@ -145,7 +145,7 @@
           <span class="buttons" @click="checkStord">选择门店</span>
         </a-form-item>
         <a-form-item :wrapperCol="{span: 10, offset: 7}" v-if="unAuditCount>0">
-          <span style="color: #f5222d;">商品审核中，暂不支持编辑</span>
+          <span style="color: #f5222d;">商品正在审核中，无法修改</span>
         </a-form-item>
         <a-form-item :wrapperCol="{span: 10, offset: 7}">
           <a-button type="primary" v-if="!unAuditCount" @click="submit">提交</a-button>
