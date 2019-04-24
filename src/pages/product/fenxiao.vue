@@ -8,7 +8,7 @@
       <a-form layout="horizontal" :autoFormCreate="(form) => this.form = form">
         <div>
           <a-row>
-            <a-col :md="8" :sm="24">
+            <a-col :md="10" :sm="24">
               <a-form-item label="所属运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.providerId" :wrapperCol="{span: 18, offset: 1}">
                 <a-select placeholder="请选择">
                   <a-select-option value="">全部运营商</a-select-option>
@@ -66,10 +66,12 @@
               <a-input-number v-model="manageRateStr" :min="1" style="margin-right:5px;" :max="100" @blur="manageRateStrFun($event)" />%
               <span style="margin-left:20px;">{{manageRateStrAmount/100}}元</span>
             </a-form-item>
-            <a-form-item v-for="(item) in detail.estimateSettlements" :key="item.settlementType" v-if="!item.boolean" :label="item.name" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
-              <span >
-                <span style="margin-right:20px;">{{item.rate}}%</span> {{item.estimateAmount/100}}元</span>
-            </a-form-item>
+            <div v-for="(item) in detail.estimateSettlements" :key="item.settlementType"  >
+                <a-form-item v-if="!item.boolean" :label="item.name" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+                  <span><span style="margin-right:20px;">{{item.rate}}%</span> {{item.estimateAmount/100}}元</span>
+                </a-form-item>
+            </div>
+            
           </a-card>
           <a-card title="推广素材" style="margin-top:20px">
             <a-form-item label="推广文案" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
@@ -167,7 +169,6 @@ export default {
       merchantList: [],
       fileList: [],
       productId: "",
-      effective: 0,
       providerList: [],
       showBoolean: true,
       detail: {
@@ -284,6 +285,7 @@ export default {
       this.fileList = fileList;
     },
     tabFun(e) {
+      console.log(e);
       this.effective = e;
       this.productList();
     },
@@ -324,6 +326,7 @@ export default {
       });
     },
     bianji(e) {
+      console.log(e);
       this.showBoolean = false;
       this.productId = e.productId;
       this.productDetail(e.productId);

@@ -28,11 +28,11 @@
         <a-form-item label="秒杀价" v-else :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="skillCoin"  @change="skillCoinFun">
             <a-radio :value="'钱'">钱</a-radio>
-            <a-radio :value="'桔子'">桔子</a-radio>
+            <a-radio :value="'桔子'">钱+桔子</a-radio>
           </a-radio-group>
           <div>
-            <a-input-number :min="0" :value="activityPrice" v-if="skillCoin==='钱'" @change="priceChange($event)" :max="99999.99"  style="width:200px;margin-right:10px;"  placeholder="请输入钱数" />
-            <a-input-number :min="0" :value="activityPoint" v-if="skillCoin==='桔子'" @change="pointChange($event)" :max="99999" style="width:200px" placeholder="请输入桔子数量" />
+            <a-input-number :min="0" :value="activityPrice" @change="priceChange($event)" :max="99999.99"  style="width:200px;margin-right:10px;"  placeholder="请输入钱数" /><span>元</span>
+            <a-input-number :min="0" :value="activityPoint" v-if="skillCoin==='桔子'" @change="pointChange($event)" :max="99999" style="width:200px" placeholder="请输入桔子数量" /><span v-if="skillCoin==='桔子'">桔子</span>
           </div>
         </a-form-item>
         <a-form-item label="活动库存" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
@@ -122,6 +122,9 @@ export default {
   },
   methods: {
     skillCoinFun(){
+      if(this.skillCoin==='钱'){
+        this.activityPoint = 0;
+      }
     },
     priceChange(e){
       this.activityPrice = e;
