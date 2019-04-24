@@ -1,7 +1,7 @@
 <template>
   <a-card>
     <div v-if="showBoolean">
-      <div><span>{{effective}}</span></div>
+      <!-- <div><span>{{effective}}</span></div> -->
       <a-tabs @change="tabFun">
         <a-tab-pane tab="待分销商品" key="0"></a-tab-pane>
         <a-tab-pane tab="分销商品" key="1"></a-tab-pane>
@@ -42,7 +42,7 @@
     </div>
 
     <div v-if="!showBoolean">
-      <div><span>{{effective}}</span></div>
+      <!-- <div><span>{{effective}}</span></div> -->
       <div>
         <a-form layout="horizontal" @submit="submit" :autoFormCreate="(form) => this.form = form">
           <a-card title="商品信息" style="margin-top:20px">
@@ -179,7 +179,7 @@ export default {
       descriptions: "",
       salesRateStr: 5,
       manageRateStr: 1,
-      effective: 0,
+      effective: '0',
       salesRateStrAmount:0,
       manageRateStrAmount:0,
       
@@ -214,7 +214,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.showBoolean = true;
-          this.effective = 0;
+          this.effective = '0';
           this.productList();
         } else {
           this.$error({
@@ -311,14 +311,14 @@ export default {
       let url2 = "/endpoint/distributor/product/modify.json";
       console.log(this.effective);
       this.$axios({
-        url: this.effective === 0 ? url : url2,
+        url: this.effective === '0' ? url : url2,
         method: "get",
         processData: false,
         params: data
       }).then(res => {
         if (res.success) {
           this.showBoolean = true;
-          this.effective = 0;
+          this.effective = '0';
           this.productList();
         } else {
           this.$error({
