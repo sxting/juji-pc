@@ -75,10 +75,10 @@
         {{productInfo.productName}}
       </a-form-item>
       <a-form-item label="结算价" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
-        {{productInfo.productName}}
+        {{productInfo.costPrice/100}}
       </a-form-item>
       <a-form-item label="原价" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
-        {{productInfo.productName}}
+        {{productInfo.originalPrice/100}}
       </a-form-item>
       <a-form-item label="售价" :labelCol="{span: 7}" v-if="productInfo.type === 'PRODUCT'" :wrapperCol="{span: 10}">
         {{productInfo.price/100}}
@@ -288,7 +288,7 @@ export default {
   },
   created() {
     this.reviewedList();
-    
+
   },
   mounted() {},
   methods: {
