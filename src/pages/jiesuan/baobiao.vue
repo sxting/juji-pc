@@ -506,7 +506,7 @@ export default {
           this.data3.forEach(function(i) {
             i.merchantAmount = that.accurate_div(i.merchantAmount, 100);
           });
-          this.storeIdList(this.merchantId);
+          this.storeIdList(this.detailMerchantId);
         } else {
           this.$error({
             title: "温馨提示",
