@@ -301,6 +301,7 @@ export default {
       providerId: "",
       merchantList: [],
       merchantId: "ALL",
+      detailMerchantId: "",
       countTotal: 1,
       voucherCode: "",
       changeBoo: false,
@@ -474,6 +475,7 @@ export default {
     xiangqingList(e) {
       this.providerId = e.providerId;
       this.productId = e.productId;
+      this.detailMerchantId = e.merchantId;
       this.xiangqingFun();
     },
     xiangqingFun() {
@@ -481,7 +483,7 @@ export default {
         pageNo: this.pageNo,
         pageSize: 10,
         providerId: this.providerId,
-        merchantId: this.merchantId,
+        merchantId: this.detailMerchantId,
         productId: this.productId,
         dateStart: this.dateStart,
         dateEnd: this.dateEnd,
