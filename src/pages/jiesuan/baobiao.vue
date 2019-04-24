@@ -300,7 +300,7 @@ export default {
       pageNo: 1,
       providerId: "",
       merchantList: [],
-      merchantId: "",
+      merchantId: "ALL",
       countTotal: 1,
       voucherCode: "",
       changeBoo: false,
@@ -422,7 +422,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.merchantList = res.data;
-          this.merchantId = this.merchantList[0].id;
+          this.merchantId = "ALL";
           this.productList();
         } else {
           this.$error({
