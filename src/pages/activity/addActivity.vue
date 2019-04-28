@@ -26,13 +26,13 @@
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" :max="24" v-model="splicedPrice" /> 元
         </a-form-item>
         <a-form-item label="秒杀价" v-else :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-radio-group v-model="skillCoin"  @change="skillCoinFun">
+          <a-radio-group v-model="skillCoin" :disabled="status === 'STARTED' ||status === 'ENDED'"  @change="skillCoinFun">
             <a-radio :value="'钱'">钱</a-radio>
-            <a-radio :value="'桔子'">钱+桔子</a-radio>
+            <a-radio :value="'桔子'" v-show="!((status === 'STARTED' ||status === 'ENDED')&&activityPoint==0)">钱+桔子</a-radio>
           </a-radio-group>
           <div>
-            <a-input-number :min="0" :value="activityPrice" @change="priceChange($event)" :max="99999.99"  style="width:200px;margin-right:10px;"  placeholder="请输入钱数" /><span>元</span>
-            <a-input-number :min="0" :value="activityPoint" v-if="skillCoin==='桔子'" @change="pointChange($event)" :max="99999" style="width:200px" placeholder="请输入桔子数量" /><span v-if="skillCoin==='桔子'">桔子</span>
+            <a-input-number :min="0" :value="activityPrice" :disabled="status === 'STARTED' ||status === 'ENDED'" @change="priceChange($event)" :max="99999.99"  style="width:200px;margin-right:10px;"  placeholder="请输入钱数" /><span>元</span>
+            <a-input-number :min="0" :value="activityPoint" :disabled="status === 'STARTED' ||status === 'ENDED'" v-if="skillCoin==='桔子'" @change="pointChange($event)" :max="99999" style="width:200px" placeholder="请输入桔子数量" /><span v-if="skillCoin==='桔子'">桔子</span>
           </div>
         </a-form-item>
         <a-form-item label="活动库存" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
@@ -330,6 +330,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.timeLimit = res.data.timeLimit;
+          
           this.productRadio = {
             productName: res.data.productName,
             originalPrice: res.data.originalPrice,
@@ -343,6 +344,13 @@ export default {
             });
           }else if(this.activityType === 'SPLICED'){
             this.splicedPrice = that.accurate_div(res.data.rules[0].splicedPrice, 100);
+          }else if(this.activityType === 'SEC_KILL'){
+            this.activityPrice = that.accurate_div(res.data.rules[0].activityPrice, 100);
+            this.activityPoint = res.data.rules[0].activityPoint;
+            if(res.data.rules[0].activityPoint>0){
+              this.skillCoin = '桔子';
+            }
+            this.activityStock = res.data.rules[0].activityStock;
           }
 
           this.dateValue = [
