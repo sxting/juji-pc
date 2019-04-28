@@ -5,6 +5,7 @@ export default {
     theme: 'dark',
     layout: 'side',
     systemName: '桔集',
+    systemVersion: 'v1.0.00',
     multipage: true
   },
   mutations: {
