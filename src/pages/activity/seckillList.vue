@@ -1,37 +1,24 @@
 <template>
   <a-card>
     <div v-if="showTable">
-      <div class="operator">
-        <a-row>
-          <a-col>
-            <a-tabs @change="tabsFun">
-              <a-tab-pane :tab="'待审核('+INITNUM+')'" key="INIT"></a-tab-pane>
-              <a-tab-pane :tab="'已通过('+PASSNUM+')'" key="PASS"></a-tab-pane>
-              <a-tab-pane :tab="'已拒绝('+REJECTNUM+')'" key="REJECT"></a-tab-pane>
-            </a-tabs>
-          </a-col>
-        </a-row>
 
-      </div>
       <div>
+        <a-col>
+          <a-button @click="addNew" type="primary">新增秒杀活动</a-button>
+        </a-col>
         <a-form layout="horizontal">
           <div>
             <a-row>
               <a-col :md="12" :sm="24">
-                <a-form-item label="所属运营商" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择" :value="providerId" @change="providerFun">
-                    <a-select-option value="ALL">全部运营商</a-select-option>
+                <a-form-item label="运营商" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
+                  <a-select placeholder="请选择" @change="providerListFun" :defaultValue="providerId">
                     <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
               <a-col :md="12" :sm="24">
-                <a-form-item label="商品类型" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择" :value="productType" @change="productTypeFun">
-                    <a-select-option value="ALL">全部类型</a-select-option>
-                    <a-select-option value="PRODUCT">普通商品</a-select-option>
-                    <a-select-option value="POINT">积分商品</a-select-option>
-                  </a-select>
+                <a-form-item label="选择日期" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
+                  <a-range-picker @change="timeChange" :defaultValue="[moment(yestoday[0], 'YYYY-MM-DD'), moment(yestoday[1], 'YYYY-MM-DD')]" />
                 </a-form-item>
               </a-col>
 
@@ -51,12 +38,43 @@
           </div>
 
         </a-form>
+
+      </div>
+
+      <div class="operator">
+        <a-row>
+          <a-col>
+            <a-tabs @change="tabsFun">
+              <a-tab-pane :tab="'进行中'" key="STARTED"></a-tab-pane>
+              <a-tab-pane :tab="'未开始'" key="READY"></a-tab-pane>
+              <a-tab-pane :tab="'已结束'" key="ENDED"></a-tab-pane>
+            </a-tabs>
+          </a-col>
+        </a-row>
+
       </div>
       <div>
 
         <a-table :columns="columns" :dataSource="data" :pagination="false" :locale="{emptyText: '暂无数据'}">
           <span slot="action" slot-scope="text, record">
-            <a @click="chakan(record)">查看详情</a>
+            <a @click="chakan(record)" v-if="status ==='STARTED' || status ==='ENDED'">查看详情</a>
+            <a-divider v-if="status ==='STARTED'" type="vertical" />
+            <a @click="chakan(record)" v-if="status ==='READY'">编辑</a>
+            <a-divider v-if="status ==='READY'" type="vertical" />
+            
+             <a-popconfirm title="是否确认？" v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="startFun(record)">
+                <a-icon slot="icon" type="question-circle-o" style="color: red" />
+                <a  class="ant-dropdown-link">立即开始</a>
+              </a-popconfirm>
+            <a-popconfirm title="是否确认？" v-if="status ==='STARTED'" okText="确认" cancelText="否" @confirm="stopFun(record)">
+                <a-icon slot="icon" type="question-circle-o" style="color: red" />
+                <a  class="ant-dropdown-link">结束活动</a>
+              </a-popconfirm>
+            <a-divider v-if="status ==='READY'" type="vertical" />
+            <a-popconfirm title="是否确认？" v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="delFun(record)">
+                <a-icon slot="icon" type="question-circle-o" style="color: red" />
+                <a  class="ant-dropdown-link">删除</a>
+              </a-popconfirm>
           </span>
         </a-table>
         <div style="margin-top:20px;">
@@ -75,10 +93,10 @@
         {{productInfo.productName}}
       </a-form-item>
       <a-form-item label="结算价" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
-        {{productInfo.costPrice/100}}
+        {{productInfo.productName}}
       </a-form-item>
       <a-form-item label="原价" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
-        {{productInfo.originalPrice/100}}
+        {{productInfo.productName}}
       </a-form-item>
       <a-form-item label="售价" :labelCol="{span: 7}" v-if="productInfo.type === 'PRODUCT'" :wrapperCol="{span: 10}">
         {{productInfo.price/100}}
@@ -175,61 +193,20 @@
 import StandardTable from "../../components/table/StandardTable";
 const columns = [
   {
-    title: "提交时间",
-    dataIndex: "dateCreated"
-  },
-  {
-    title: "所属运营商",
-    dataIndex: "providerName"
-  },
-  {
-    title: "商品类型",
-    dataIndex: "typeName"
-  },
-  {
     title: "商品名称",
     dataIndex: "productName"
   },
   {
-    title: "所需桔子",
-    dataIndex: "point"
+    title: "商品原价",
+    dataIndex: "originalPrice"
   },
   {
-    title: "售价",
-    dataIndex: "price"
+    title: "商品底价",
+    dataIndex: "costPrice"
   },
   {
-    title: "操作",
-    key: "action",
-    scopedSlots: {
-      customRender: "action"
-    }
-  }
-];
-const columns2 = [
-  {
-    title: "审核时间",
-    dataIndex: "dateCreated"
-  },
-  {
-    title: "所属运营商",
-    dataIndex: "providerName"
-  },
-  {
-    title: "商品类型",
-    dataIndex: "typeName"
-  },
-  {
-    title: "商品名称",
-    dataIndex: "productName"
-  },
-  {
-    title: "所需桔子",
-    dataIndex: "point"
-  },
-  {
-    title: "售价",
-    dataIndex: "price"
+    title: "活动起止时间",
+    dataIndex: "time"
   },
   {
     title: "操作",
@@ -243,7 +220,7 @@ const data = [];
 const dataSource = [];
 
 export default {
-  name: "Reviewed",
+  name: "KanjiaList",
   components: {
     StandardTable
   },
@@ -276,22 +253,111 @@ export default {
       providerId: "ALL",
       countTotal: 1,
       productType: "ALL",
-      status: "INIT",
+      status: "STARTED",
       productName: "",
       productInfo: {},
+      dateStart: "",
+      dateEnd: "",
       INITNUM: 0,
       PASSNUM: 0,
       REJECTNUM: 0,
       id: "",
-      providerList: JSON.parse(sessionStorage.getItem("LoginDate")).providerList
+      yestoday: this.timeForMat(1),
+      providerList: JSON.parse(sessionStorage.getItem("LoginDate")).providerList,
+      activityType:'SEC_KILL'
     };
   },
   created() {
-    this.reviewedList();
-
+    this.providerList = JSON.parse(
+      sessionStorage.getItem("LoginDate")
+    ).providerList;
+    this.providerId = this.$route.query.providerId?this.$route.query.providerId:this.providerList[0].providerId;
+    this.dateStart = this.yestoday[0];
+    this.dateEnd = this.yestoday[1];
+    this.activityList();
   },
   mounted() {},
   methods: {
+    startFun(e) {
+      let data  = {
+        providerId : this.providerId,
+        activityId : e.activityId,
+        activityType : this.activityType
+      }
+      this.$axios({
+        url: "/endpoint/activity/operate/starting.json",
+        method: "get",
+        processData: false,
+         params: data
+      }).then(res => {
+        if (res.success) {
+          this.activityList();
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    stopFun(e) {
+      let data  = {
+        providerId : this.providerId,
+        activityId : e.activityId,
+        activityType : this.activityType
+      }
+      this.$axios({
+        url: "/endpoint/activity/operate/ending.json",
+        method: "get",
+        processData: false,
+         params: data
+      }).then(res => {
+        if (res.success) {
+          this.activityList();
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    delFun(e) {
+      let data  = {
+        providerId : this.providerId,
+        activityId : e.activityId,
+        activityType : this.activityType
+      }
+      this.$axios({
+        url: "/endpoint/activity/operate/delete.json",
+        method: "get",
+        processData: false,
+         params: data
+      }).then(res => {
+        if (res.success) {
+          this.activityList();
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    providerListFun(e) {
+      this.providerId = e;
+    },
+    addNew() {
+      this.$router.push({
+        path: "/activity/addKanjia",
+        query: { providerId: this.providerId, activityType: this.activityType }
+      });
+    },
+    timeChange(dates, dateStrings) {
+      this.dateStart = dateStrings[0];
+      this.dateEnd = dateStrings[1];
+      this.activityList();
+    },
     statuNum() {
       this.$axios({
         url: "/endpoint/product/audit/status.json",
@@ -331,152 +397,22 @@ export default {
         }
       }
     },
-    tongguoHttp() {
-      this.$axios({
-        url: "/endpoint/product/audit/pass.json",
-        method: "get",
-        processData: false,
-        params: {
-          id: this.id
-        }
-      }).then(res => {
-        if (res.success) {
-          this.showTable = true;
-          this.reviewedList();
-        } else {
-          this.$error({
-            title: "温馨提示",
-            content: res.errorInfo
-          });
-        }
-      });
-    },
-    butongguoHttp() {
-      this.$axios({
-        url: "/endpoint/product/audit/reject.json",
-        method: "get",
-        processData: false,
-        params: {
-          id: this.id,
-          reason: this.butongguo
-        }
-      }).then(res => {
-        if (res.success) {
-          this.showTable = true;
-          this.reviewedList();
-        } else {
-          this.$error({
-            title: "温馨提示",
-            content: res.errorInfo
-          });
-        }
-      });
-    },
     chakan(e) {
-      this.id = e.id;
-      let that = this;
-      this.$axios({
-        url: "/endpoint/product/audit/record/info.json",
-        method: "get",
-        processData: false,
-        params: {
-          id: e.id
-        }
-      }).then(res => {
-        if (res.success) {
-          this.productInfo = res.data;
-          this.showTable = false;
-          this.fileList1 = [
-            {
-              uid: "-1",
-              name: res.data.picId,
-              status: "done",
-              url: this.picUrl(res.data.picId)
-            }
-          ];
-          this.buyerNotes = [];
-          this.picXQ = [];
-          let noteArr = JSON.parse(res.data.note);
-          let picXQArr = JSON.parse(res.data.description);
-          let fileList2 = res.data.picIds ? res.data.picIds.split(",") : [];
-          if (fileList2 && fileList2.length > 0) {
-            let fileList = [];
-            fileList2.forEach(function(n, m) {
-              fileList.push({
-                uid: m + "1",
-                name: n,
-                status: "done",
-                url: that.picUrl(n)
-              });
-            });
-            this.fileList2 = fileList;
-          } else {
-            this.fileList2 = [];
-          }
-          if (noteArr && noteArr.length > 0) {
-            noteArr.forEach(function(i) {
-              let content = [];
-              if (i.content) {
-                i.content.forEach(function(n) {
-                  content.push({
-                    item: n
-                  });
-                });
-                that.buyerNotes.push({
-                  title: i.title,
-                  details: content
-                });
-              }
-            });
-          } else {
-            that.buyerNote = [
-              {
-                title: "",
-                details: [
-                  {
-                    item: ""
-                  }
-                ]
-              }
-            ];
-          }
-          if (picXQArr && picXQArr.length > 0) {
-            picXQArr.forEach(function(i) {
-              let fileList = [];
-              i.picIds.forEach(function(n, m) {
-                fileList.push({
-                  uid: m + "1",
-                  name: n,
-                  status: "done",
-                  url: that.picUrl(n)
-                });
-              });
-              that.picXQ.push({
-                fileList: fileList,
-                picIds: i.content[0]
-              });
-            });
-          } else {
-            that.picXQ = [
-              {
-                fileList: [],
-                picIds: ""
-              }
-            ];
-          }
-        } else {
-          this.$error({
-            title: "温馨提示",
-            content: res.errorInfo
-          });
+      this.$router.push({
+        path: "/activity/addKanjia",
+        query: {
+          providerId: this.providerId,
+          activityType: this.activityType,
+          activityId: e.activityId,
+          status:this.status
         }
       });
     },
     tabsFun(e) {
       this.status = e;
-      if(this.status  === 'PASS') this.columns = columns2;
+      if (this.status === "PASS") this.columns = columns2;
       else this.columns = columns;
-      this.reviewedList();
+      this.activityList();
     },
     butongguoFun(e) {
       // console.log(e)
@@ -489,41 +425,41 @@ export default {
       this.productType = e;
     },
     productNameFun(e) {
-      this.productName = e;
+      console.log(e);
+      this.productName = e.target.value;
     },
     submit() {
-      this.reviewedList();
+      this.activityList();
     },
     onChange(e) {
       this.pageNo = e;
-      this.reviewedList();
+      this.activityList();
     },
-    reviewedList() {
+    activityList() {
       let data = {
         pageNo: this.pageNo,
         pageSize: 10,
         providerId: this.providerId,
-        productType: this.productType,
-        status: this.status,
-        body: this.productName
+        productName: this.productName,
+        activityType: this.activityType,
+        activityStatus: this.status,
+        startDate: this.dateStart,
+        endDate: this.dateEnd
       };
       let that = this;
-      if (!data.body) delete data.body;
+      if (!data.productName) delete data.productName;
       this.$axios({
-        url: "/endpoint/product/audit/record/page.json",
+        url: "/endpoint/activity/operate/list.json",
         method: "get",
         processData: false,
         params: data
       }).then(res => {
         if (res.success) {
-          this.data = res.data.list;
-          this.countTotal = res.data.countTotal;
-          this.statuNum();
-          this.butongguo=''
+          this.data = res.data.elements;
           this.data.forEach(function(i) {
-            i.price = that.accurate_div(i.price, 100);
-            i.point = i.point || 0
-            i.typeName = i.type === "PRODUCT" ? "普通商品" : "积分商品";
+            i.originalPrice = that.accurate_div(i.originalPrice, 100);
+            i.costPrice = that.accurate_div(i.costPrice, 100);
+            i.time = i.startTime + "-" + i.endTime;
           });
         } else {
           this.$error({

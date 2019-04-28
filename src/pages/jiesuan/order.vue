@@ -33,7 +33,7 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="所属商家" fieldDecoratorId="repository.merchantId" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="请选择" @change="merchantChange">
+                <a-select placeholder="全部商家" :defaultValue="ALL" @change="merchantChange">
                   <a-select-option :key="'ALL'">全部商家</a-select-option>
                   <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                 </a-select>
@@ -231,17 +231,17 @@ export default {
       vouchersList: [],
       orderUser: { nickName: "", phone: "" },
       providerList: [],
-      pageNo:1,
-      countTotal:10,
-      today:this.timeForMat(0)
+      pageNo: 1,
+      countTotal: 10,
+      today: this.timeForMat(0)
     };
   },
-  created() {
+  created () {
     this.providerList = JSON.parse(
       sessionStorage.getItem("LoginDate")
     ).providerList;
     this.providerId = this.providerList[0].providerId;
-        this.dateStart = this.today[0];
+    this.dateStart = this.today[0];
     this.dateEnd = this.today[1];
     this.merchantListFun(this.providerId);
   },
@@ -350,8 +350,8 @@ export default {
       }).then(res => {
         if (res.success) {
           this.merchantList = res.data;
-          console.log(this.merchantList)
-          this.merchantId =this.merchantList[0]? this.merchantList[0].id:'';
+          console.log(this.merchantList);
+          this.merchantId = "ALL";
           this.orderList();
           this.$nextTick(() => {
             this.form.setFieldsValue({

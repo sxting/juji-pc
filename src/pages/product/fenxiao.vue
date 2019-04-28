@@ -1,6 +1,7 @@
 <template>
   <a-card>
     <div v-if="showBoolean">
+      <!-- <div><span>{{effective}}</span></div> -->
       <a-tabs @change="tabFun">
         <a-tab-pane tab="待分销商品" key="0"></a-tab-pane>
         <a-tab-pane tab="分销商品" key="1"></a-tab-pane>
@@ -8,8 +9,8 @@
       <a-form layout="horizontal" :autoFormCreate="(form) => this.form = form">
         <div>
           <a-row>
-            <a-col :md="8" :sm="24">
-              <a-form-item label="所属运营商" :labelCol="{span: 5}" fieldDecoratorId="repository.providerId" :wrapperCol="{span: 18, offset: 1}">
+            <a-col :md="10" :sm="24">
+              <a-form-item label="所属运营商" :labelCol="{span: 7}" fieldDecoratorId="repository.providerId" :wrapperCol="{span: 16, offset: 1}">
                 <a-select placeholder="请选择">
                   <a-select-option value="">全部运营商</a-select-option>
                   <a-select-option v-for="(item) in providerList" :key="item.providerId">{{item.providerName}}</a-select-option>
@@ -22,7 +23,7 @@
               </a-form-item>
             </a-col>
             <span style="float: right; margin-top: 3px;">
-              <a-button htmlType="submit" @click="chaxun">查询</a-button>
+              <a-button type="primary" @click="chaxun">查询</a-button>
             </span>
           </a-row>
 
@@ -41,6 +42,7 @@
     </div>
 
     <div v-if="!showBoolean">
+      <!-- <div><span>{{effective}}</span></div> -->
       <div>
         <a-form layout="horizontal" @submit="submit" :autoFormCreate="(form) => this.form = form">
           <a-card title="商品信息" style="margin-top:20px">
@@ -58,18 +60,20 @@
             </a-form-item>
           </a-card>
           <a-card title="分佣设置" style="margin-top:20px">
-            <a-form-item label="管理佣金" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+            <a-form-item label="销售返利" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
               <a-input-number v-model="salesRateStr" :min="5" style="margin-right:5px;" :max="100" @blur="salesRateStrFun($event)" />%
               <span style="margin-left:20px;">{{salesRateStrAmount/100}}元</span>
             </a-form-item>
-            <a-form-item label="销售返利" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+            <a-form-item label="管理佣金" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
               <a-input-number v-model="manageRateStr" :min="1" style="margin-right:5px;" :max="100" @blur="manageRateStrFun($event)" />%
               <span style="margin-left:20px;">{{manageRateStrAmount/100}}元</span>
             </a-form-item>
-            <a-form-item v-for="(item) in detail.estimateSettlements" :key="item.settlementType" v-if="!item.boolean" :label="item.name" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
-              <span >
-                <span style="margin-right:20px;">{{item.rate}}%</span> {{item.estimateAmount/100}}元</span>
-            </a-form-item>
+            <div v-for="(item) in detail.estimateSettlements" :key="item.settlementType"  >
+                <a-form-item v-if="!item.boolean" :label="item.name" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+                  <span><span style="margin-right:20px;">{{item.rate}}%</span> {{item.estimateAmount/100}}元</span>
+                </a-form-item>
+            </div>
+            
           </a-card>
           <a-card title="推广素材" style="margin-top:20px">
             <a-form-item label="推广文案" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
@@ -167,7 +171,6 @@ export default {
       merchantList: [],
       fileList: [],
       productId: "",
-      effective: 0,
       providerList: [],
       showBoolean: true,
       detail: {
@@ -176,7 +179,7 @@ export default {
       descriptions: "",
       salesRateStr: 5,
       manageRateStr: 1,
-      effective: 0,
+      effective: '0',
       salesRateStrAmount:0,
       manageRateStrAmount:0,
       
@@ -211,7 +214,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.showBoolean = true;
-          this.effective = 0;
+          this.effective = '0';
           this.productList();
         } else {
           this.$error({
@@ -284,6 +287,8 @@ export default {
       this.fileList = fileList;
     },
     tabFun(e) {
+      console.log(e);
+      console.log(typeof this.effective);
       this.effective = e;
       this.productList();
     },
@@ -306,14 +311,14 @@ export default {
       let url2 = "/endpoint/distributor/product/modify.json";
       console.log(this.effective);
       this.$axios({
-        url: this.effective === 0 ? url : url2,
+        url: this.effective === '0' ? url : url2,
         method: "get",
         processData: false,
         params: data
       }).then(res => {
         if (res.success) {
           this.showBoolean = true;
-          this.effective = 0;
+          this.effective = '0';
           this.productList();
         } else {
           this.$error({
@@ -324,6 +329,7 @@ export default {
       });
     },
     bianji(e) {
+      console.log(e);
       this.showBoolean = false;
       this.productId = e.productId;
       this.productDetail(e.productId);

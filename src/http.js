@@ -2,7 +2,7 @@ import axios from 'axios'
 import router from './router'
 
 // axios 配置 process.env.BASE_API_ADDR_TEST process.env.BASE_API_ADDR
-axios.defaults.baseURL = JSON.parse(JSON.stringify(window.location.host.indexOf('oauth2.jujipay.com') > -1 ? process.env.BASE_API_ADDR_TEST : process.env.BASE_API_ADDR))
+axios.defaults.baseURL = JSON.parse(JSON.stringify(window.location.host.indexOf('oauth2.jujipay.com') > -1 ? process.env.BASE_API_ADDR : process.env.BASE_API_ADDR_TEST))
 
 // http request 拦截器
 axios.interceptors.request.use(

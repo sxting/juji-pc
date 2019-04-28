@@ -20,7 +20,8 @@
 
               <a-col :md="8" :sm="24" v-if="merchantId">
                 <a-form-item label="所属商家" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择" @change="merchantChange">
+                  <a-select placeholder="全部商家" :defaultValue="ALL" @change="merchantChange">
+                    <a-select-option :key="'ALL'" >全部商家</a-select-option>
                     <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                   </a-select>
                 </a-form-item>
@@ -92,9 +93,9 @@
               </a-col>
             </a-row>
             <span style="float: right; margin-top: 3px;">
-              <a-button htmlType="submit" @click="back">返回</a-button>
+              <a-button type="primary" @click="back">返回</a-button>
 
-              <a-button htmlType="submit" @click="xiangqingFun">查询</a-button>
+              <a-button type="primary" @click="xiangqingFun">查询</a-button>
             </span>
           </div>
         </a-form>
@@ -245,7 +246,7 @@ const columns2 = [
   {
     title: "结算时间",
 
-    dataIndex: "orderTime"
+    dataIndex: "useTime"
   },
   {
     title: "结算门店",
@@ -299,7 +300,8 @@ export default {
       pageNo: 1,
       providerId: "",
       merchantList: [],
-      merchantId: "",
+      merchantId: "ALL",
+      detailMerchantId: "",
       countTotal: 1,
       voucherCode: "",
       changeBoo: false,
@@ -421,7 +423,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.merchantList = res.data;
-          this.merchantId = this.merchantList[0].id;
+          this.merchantId = "ALL";
           this.productList();
         } else {
           this.$error({
@@ -473,6 +475,7 @@ export default {
     xiangqingList(e) {
       this.providerId = e.providerId;
       this.productId = e.productId;
+      this.detailMerchantId = e.merchantId;
       this.xiangqingFun();
     },
     xiangqingFun() {
@@ -480,7 +483,7 @@ export default {
         pageNo: this.pageNo,
         pageSize: 10,
         providerId: this.providerId,
-        merchantId: this.merchantId,
+        merchantId: this.detailMerchantId,
         productId: this.productId,
         dateStart: this.dateStart,
         dateEnd: this.dateEnd,
@@ -503,7 +506,7 @@ export default {
           this.data3.forEach(function(i) {
             i.merchantAmount = that.accurate_div(i.merchantAmount, 100);
           });
-          this.storeIdList(this.merchantId);
+          this.storeIdList(this.detailMerchantId);
         } else {
           this.$error({
             title: "温馨提示",

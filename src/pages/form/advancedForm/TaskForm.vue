@@ -68,7 +68,7 @@
       </a-col>
     </a-row>
     <a-form-item v-if="showSubmit">
-      <a-button htmlType="submit" >Submit</a-button>
+      <a-button type="primary" >Submit</a-button>
     </a-form-item>
   </a-form>
 </template>
