@@ -258,7 +258,7 @@ const columns2 = [
   },
   {
     title: "数量",
-    dataIndex: "totalNum"
+    dataIndex: "useNum"
   },
   {
     title: "结算金额",
