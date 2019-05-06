@@ -18,7 +18,7 @@
               </a-col>
               <a-col :md="12" :sm="24">
                 <a-form-item label="选择日期" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-range-picker @change="timeChange" :defaultValue="[moment(yestoday[0], 'YYYY-MM-DD'), moment(yestoday[1], 'YYYY-MM-DD')]" />
+                  <a-range-picker @change="timeChange" :defaultValue="[moment(today[0], 'YYYY-MM-DD'), moment(today[1], 'YYYY-MM-DD')]" />
                 </a-form-item>
               </a-col>
 
@@ -263,6 +263,7 @@ export default {
       REJECTNUM: 0,
       id: "",
       yestoday: this.timeForMat(1),
+      today: this.timeForMat(0),
       providerList: JSON.parse(sessionStorage.getItem("LoginDate")).providerList,
       activityType:'BARGAIN'
     };

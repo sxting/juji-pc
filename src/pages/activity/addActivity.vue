@@ -41,6 +41,11 @@
         <a-form-item label="活动日期" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="dateValue" @change="timeChange" :placeholder="['开始','结束']" />
         </a-form-item>
+        <a-form-item label="整点开始时间" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+          <a-time-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :defaultValue="moment('00', 'HH')" format="HH" @openChange="handleOpenChange"  @change="hoursChange" :open="open" :value="hoursValue">
+            <a-button slot="addon" slot-scope="panel" size="small" type="primary" @click="handleClose">确定</a-button>
+          </a-time-picker>
+        </a-form-item>
         <a-form-item :wrapperCol="{span: 10, offset: 7}">
           <a-button style="margin-right:20px" v-if="status !== 'STARTED'" @click="submit">保存并发布</a-button>
           <a-button @click="quxiao">取消</a-button>
@@ -100,10 +105,13 @@ export default {
       activityId: "",
       status: "",
       dateValue: null,
+      hoursValue: null,
+      hoursStart: '00',
       skillCoin:'钱',
       activityPrice:0,
       activityPoint:0,
-      activityStock:0
+      activityStock:0,
+      open:false
     };
   },
   created() {
@@ -121,6 +129,14 @@ export default {
     }
   },
   methods: {
+    handleOpenChange(open){
+      console.log('open', open);
+      this.open = open
+    },
+    handleClose(e){
+      console.log(e);
+      this.open = false
+    },
     skillCoinFun(){
       if(this.skillCoin==='钱'){
         this.activityPoint = 0;
@@ -165,10 +181,18 @@ export default {
       this.activityList.splice(e, 1);
     },
     timeChange(dates, dateStrings) {
+      console.log(dates);
+      console.log(dateStrings);
       this.dateValue = dates;
       this.dateStart = dateStrings[0];
       this.dateEnd = dateStrings[1];
     },
+    hoursChange(time,timeString){
+      console.log(time);
+      console.log(timeString);
+      this.hoursValue = time;
+      this.hoursStart = timeString;
+    }, 
     bargainCountFun(e, item) {
       item.bargainCount = e;
     },
@@ -176,6 +200,7 @@ export default {
       item.bargainAmount = e;
     },
     submit() {
+      console.log('startTime:' + this.dateStart + " " + this.hoursStart + ":00:00");
       let seckillRull = [
         {
           activityPrice:0,
@@ -220,7 +245,7 @@ export default {
         providerId: this.providerId,
         activityId: this.activityId,
         rules: rules,
-        startTime: this.dateStart + " 00:00:00",
+        startTime: this.dateStart + " " + this.hoursStart + ":00:00",
         timeLimit: this.timeLimit || 24,
         timeLimitUnit: "HOUR"
       };
@@ -357,6 +382,8 @@ export default {
             this.moment(res.data.startTime, "YYYY-MM-DD"),
             this.moment(res.data.endTime, "YYYY-MM-DD")
           ];
+          console.log(this.moment(res.data.startTime, "HH"));
+          this.hoursValue = this.moment(res.data.startTime, "YYYY-MM-DD HH:mm:ss");
           this.dateStart = res.data.startTime;
           this.dateEnd = res.data.endTime;
           this.productId = res.data.productId;

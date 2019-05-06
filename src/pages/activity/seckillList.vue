@@ -18,7 +18,7 @@
               </a-col>
               <a-col :md="12" :sm="24">
                 <a-form-item label="选择日期" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-range-picker @change="timeChange" :defaultValue="[moment(yestoday[0], 'YYYY-MM-DD'), moment(yestoday[1], 'YYYY-MM-DD')]" />
+                  <a-range-picker @change="timeChange" :defaultValue="[moment(today[0], 'YYYY-MM-DD'), moment(today[1], 'YYYY-MM-DD')]" />
                 </a-form-item>
               </a-col>
 
@@ -60,12 +60,12 @@
             <a @click="chakan(record)" v-if="status ==='STARTED' || status ==='ENDED'">查看详情</a>
             <a-divider v-if="status ==='STARTED'" type="vertical" />
             <a @click="chakan(record)" v-if="status ==='READY'">编辑</a>
-            <a-divider v-if="status ==='READY'" type="vertical" />
-            
-             <a-popconfirm title="是否确认？" v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="startFun(record)">
+            <!-- 测试可用 -->
+            <!-- <a-divider v-if="status ==='READY'" type="vertical" /> -->
+             <!-- <a-popconfirm title="是否确认？" v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="startFun(record)">
                 <a-icon slot="icon" type="question-circle-o" style="color: red" />
                 <a  class="ant-dropdown-link">立即开始</a>
-              </a-popconfirm>
+              </a-popconfirm> -->
             <a-popconfirm title="是否确认？" v-if="status ==='STARTED'" okText="确认" cancelText="否" @confirm="stopFun(record)">
                 <a-icon slot="icon" type="question-circle-o" style="color: red" />
                 <a  class="ant-dropdown-link">结束活动</a>
@@ -263,6 +263,7 @@ export default {
       REJECTNUM: 0,
       id: "",
       yestoday: this.timeForMat(1),
+      today: this.timeForMat(0),
       providerList: JSON.parse(sessionStorage.getItem("LoginDate")).providerList,
       activityType:'SEC_KILL'
     };
