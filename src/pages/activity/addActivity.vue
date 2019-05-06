@@ -200,7 +200,7 @@ export default {
       item.bargainAmount = e;
     },
     submit() {
-      console.log('startTime:' + this.dateStart + " " + this.hoursStart + ":00:00");
+      console.log('startTime:' + this.dateStart + this.dateStart.length > 11? '' : ' ' + this.hoursStart + ":00:00");
       let seckillRull = [
         {
           activityPrice:0,
@@ -238,14 +238,15 @@ export default {
           }
         ];
       }
+      let hoursStart = this.dateStart.length > 11? '' : ' ' + this.hoursStart + ":00:00";
       let data = {
         activityType: this.activityType,
-        endTime: this.dateEnd + " 23:59:59",
+        endTime: this.dateEnd.length>11?this.dateEnd: this.dateEnd+ " 23:59:59",
         productId: this.productId,
         providerId: this.providerId,
         activityId: this.activityId,
         rules: rules,
-        startTime: this.dateStart + " " + this.hoursStart + ":00:00",
+        startTime: this.dateStart + hoursStart,
         timeLimit: this.timeLimit || 24,
         timeLimitUnit: "HOUR"
       };
