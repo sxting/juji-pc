@@ -5,7 +5,7 @@
         <a-form-item label="商品名称" help="请选择参与活动的商品，一旦发布，活动期间该商品不可修改" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-button v-if="!productRadio" type="primary" @click="checkProduct">选择商品</a-button>
           <span v-else>
-            <span>{{productRadio.productName}}    售价:{{productRadio.price/100}}元    原价:{{productRadio.originalPrice/100}}元   底价:{{productRadio.costPrice/100}}元</span>
+            <span>{{productRadio.productName}} 售价:{{productRadio.price/100}}元 原价:{{productRadio.originalPrice/100}}元 底价:{{productRadio.costPrice/100}}元</span>
             <a-button type="primary" :disabled="status === 'STARTED' ||status === 'ENDED'||status === 'READY'" v-if="productRadio" @click="delProduct">删除商品</a-button>
           </span>
         </a-form-item>
@@ -26,13 +26,13 @@
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" :max="24" v-model="splicedPrice" /> 元
         </a-form-item>
         <a-form-item label="秒杀价" v-else :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-radio-group v-model="skillCoin"  @change="skillCoinFun">
+          <a-radio-group v-model="skillCoin" :disabled="status === 'STARTED' ||status === 'ENDED'"  @change="skillCoinFun">
             <a-radio :value="'钱'">钱</a-radio>
-            <a-radio :value="'桔子'">钱+桔子</a-radio>
+            <a-radio :value="'桔子'" v-show="!((status === 'STARTED' ||status === 'ENDED')&&activityPoint==0)">钱+桔子</a-radio>
           </a-radio-group>
           <div>
-            <a-input-number :min="0" :value="activityPrice" @change="priceChange($event)" :max="99999.99"  style="width:200px;margin-right:10px;"  placeholder="请输入钱数" /><span>元</span>
-            <a-input-number :min="0" :value="activityPoint" v-if="skillCoin==='桔子'" @change="pointChange($event)" :max="99999" style="width:200px" placeholder="请输入桔子数量" /><span v-if="skillCoin==='桔子'">桔子</span>
+            <a-input-number :min="0" :value="activityPrice" :disabled="status === 'STARTED' ||status === 'ENDED'" @change="priceChange($event)" :max="99999.99"  style="width:200px;margin-right:10px;"  placeholder="请输入钱数" /><span>元</span>
+            <a-input-number :min="0" :value="activityPoint" :disabled="status === 'STARTED' ||status === 'ENDED'" v-if="skillCoin==='桔子'" @change="pointChange($event)" :max="99999" style="width:200px" placeholder="请输入桔子数量" /><span v-if="skillCoin==='桔子'">桔子</span>
           </div>
         </a-form-item>
         <a-form-item label="活动库存" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
@@ -40,6 +40,11 @@
         </a-form-item>
         <a-form-item label="活动日期" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="dateValue" @change="timeChange" :placeholder="['开始','结束']" />
+        </a-form-item>
+        <a-form-item label="整点开始时间" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+          <a-time-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :defaultValue="moment('00', 'HH')" format="HH" @openChange="handleOpenChange"  @change="hoursChange" :open="open" :value="hoursValue">
+            <a-button slot="addon" slot-scope="panel" size="small" type="primary" @click="handleClose">确定</a-button>
+          </a-time-picker>
         </a-form-item>
         <a-form-item :wrapperCol="{span: 10, offset: 7}">
           <a-button style="margin-right:20px" v-if="status !== 'STARTED'" @click="submit">保存并发布</a-button>
@@ -63,7 +68,7 @@
 
 </template>
 <script>
-import moment from 'moment'
+import moment from "moment";
 import { Modal } from "ant-design-vue";
 var num = 0;
 export default {
@@ -100,10 +105,13 @@ export default {
       activityId: "",
       status: "",
       dateValue: null,
+      hoursValue: null,
+      hoursStart: '00',
       skillCoin:'钱',
       activityPrice:0,
       activityPoint:0,
-      activityStock:0
+      activityStock:0,
+      open:false
     };
   },
   created() {
@@ -121,6 +129,14 @@ export default {
     }
   },
   methods: {
+    handleOpenChange(open){
+      console.log('open', open);
+      this.open = open
+    },
+    handleClose(e){
+      console.log(e);
+      this.open = false
+    },
     skillCoinFun(){
       if(this.skillCoin==='钱'){
         this.activityPoint = 0;
@@ -134,14 +150,14 @@ export default {
     },
     disabledDate(current) {
       // Can not select days before today and today
-      return current && current < moment().endOf('day');
+      return current && current < moment().endOf("day");
     },
     addActivityList(index) {
       if (this.activityList.length > 4) {
         this.$error({
-            title: "温馨提示",
-            content: '最多新增五组'
-          });
+          title: "温馨提示",
+          content: "最多新增五组"
+        });
       } else {
         num++;
         this.activityList.push({
@@ -162,13 +178,21 @@ export default {
     },
     delActivityList(e) {
       num--;
-      this.activityList.splice(e,1);
+      this.activityList.splice(e, 1);
     },
     timeChange(dates, dateStrings) {
+      console.log(dates);
+      console.log(dateStrings);
       this.dateValue = dates;
       this.dateStart = dateStrings[0];
       this.dateEnd = dateStrings[1];
     },
+    hoursChange(time,timeString){
+      console.log(time);
+      console.log(timeString);
+      this.hoursValue = time;
+      this.hoursStart = timeString;
+    }, 
     bargainCountFun(e, item) {
       item.bargainCount = e;
     },
@@ -176,6 +200,7 @@ export default {
       item.bargainAmount = e;
     },
     submit() {
+      console.log('startTime:' + this.dateStart + " " + this.hoursStart + ":00:00");
       let seckillRull = [
         {
           activityPrice:0,
@@ -220,7 +245,7 @@ export default {
         providerId: this.providerId,
         activityId: this.activityId,
         rules: rules,
-        startTime: this.dateStart + " 00:00:00",
+        startTime: this.dateStart + " " + this.hoursStart + ":00:00",
         timeLimit: this.timeLimit || 24,
         timeLimitUnit: "HOUR"
       };
@@ -245,7 +270,7 @@ export default {
           this.$router.push({
             path: path,
             query: {
-              providerId: this.providerId,
+              providerId: this.providerId
             }
           });
         } else {
@@ -278,7 +303,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.productList = res.data.list;
-          this.countTotal =res.data.countTotal
+          this.countTotal = res.data.countTotal;
         } else {
           this.$error({
             title: "温馨提示",
@@ -293,19 +318,22 @@ export default {
       this.$router.push({
         path: this.activityType === "BARGAIN" ? path : path2,
         query: {
-          providerId: this.providerId,
+          providerId: this.providerId
         }
       });
     },
     onSearch(e) {
       this.productName = e;
-      this.
-      this.productListFun()
+      this.productListFun();
     },
     radioChange(e) {
+      this.productName = '';
+      this.productListFun();
       this.visible = false;
     },
     handleCancel() {
+      this.productName = '';
+      this.productListFun();
       this.visible = false;
     },
     checkProduct() {
@@ -327,20 +355,35 @@ export default {
       }).then(res => {
         if (res.success) {
           this.timeLimit = res.data.timeLimit;
+          
           this.productRadio = {
-            productName :res.data.productName,
+            productName: res.data.productName,
             originalPrice: res.data.originalPrice,
             costPrice: res.data.costPrice,
             price: res.data.salesPrice
           };
-          this.activityList = res.data.rules;
-          this.activityList.forEach(function(i) {
-            i.bargainAmount = that.accurate_div(i.bargainAmount, 100);
-          });
+          if (this.activityType === "BARGAIN") {
+            this.activityList = res.data.rules;
+            this.activityList.forEach(function(i) {
+              i.bargainAmount = that.accurate_div(i.bargainAmount, 100);
+            });
+          }else if(this.activityType === 'SPLICED'){
+            this.splicedPrice = that.accurate_div(res.data.rules[0].splicedPrice, 100);
+          }else if(this.activityType === 'SEC_KILL'){
+            this.activityPrice = that.accurate_div(res.data.rules[0].activityPrice, 100);
+            this.activityPoint = res.data.rules[0].activityPoint;
+            if(res.data.rules[0].activityPoint>0){
+              this.skillCoin = '桔子';
+            }
+            this.activityStock = res.data.rules[0].activityStock;
+          }
+
           this.dateValue = [
             this.moment(res.data.startTime, "YYYY-MM-DD"),
             this.moment(res.data.endTime, "YYYY-MM-DD")
           ];
+          console.log(this.moment(res.data.startTime, "HH"));
+          this.hoursValue = this.moment(res.data.startTime, "YYYY-MM-DD HH:mm:ss");
           this.dateStart = res.data.startTime;
           this.dateEnd = res.data.endTime;
           this.productId = res.data.productId;

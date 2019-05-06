@@ -3,7 +3,7 @@
     <div :class="['logo', theme]">
       <router-link to="/dashboard/workplace">
         <img src="static/img/vue-antd-logo.png">
-        <h1>{{systemName}} {{systemVersion}}</h1>
+        <h1>{{systemName}}</h1>
       </router-link>
     </div>
     <i-menu :theme="theme" :collapsed="collapsed" :menuData="menuData" @select="onSelect"/>
