@@ -273,8 +273,8 @@ export default {
       sessionStorage.getItem("LoginDate")
     ).providerList;
     this.providerId = this.$route.query.providerId?this.$route.query.providerId:this.providerList[0].providerId;
-    this.dateStart = this.yestoday[0];
-    this.dateEnd = this.yestoday[1];
+    this.dateStart = this.today[0];
+    this.dateEnd = this.today[1];
     this.activityList();
   },
   mounted() {},

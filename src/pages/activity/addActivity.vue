@@ -9,7 +9,7 @@
             <a-button type="primary" :disabled="status === 'STARTED' ||status === 'ENDED'||status === 'READY'" v-if="productRadio" @click="delProduct">删除商品</a-button>
           </span>
         </a-form-item>
-        <a-form-item label="活动限时" help="可设定活动时长，活动限时不能超过24小时，不填默认选择24小时" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+        <a-form-item label="活动限时" v-if="activityType === 'BARGAIN'||activityType === 'SPLICED'" help="可设定活动时长，活动限时不能超过24小时，不填默认选择24小时" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" v-model="timeLimit" :max="24" /> 时
         </a-form-item>
         <a-form-item label="砍价力度" v-if="activityType === 'BARGAIN'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
@@ -35,16 +35,23 @@
             <a-input-number :min="0" :value="activityPoint" :disabled="status === 'STARTED' ||status === 'ENDED'" v-if="skillCoin==='桔子'" @change="pointChange($event)" :max="99999" style="width:200px" placeholder="请输入桔子数量" /><span v-if="skillCoin==='桔子'">桔子</span>
           </div>
         </a-form-item>
-        <a-form-item label="活动库存" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" :max="24" v-model="activityStock" /> 件
-        </a-form-item>
-        <a-form-item label="活动日期" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="活动日期" v-if="activityType === 'BARGAIN'||activityType === 'SPLICED'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="dateValue" @change="timeChange" :placeholder="['开始','结束']" />
         </a-form-item>
-        <a-form-item label="整点开始时间" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-time-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :defaultValue="moment('00', 'HH')" format="HH" @openChange="handleOpenChange"  @change="hoursChange" :open="open" :value="hoursValue">
-            <a-button slot="addon" slot-scope="panel" size="small" type="primary" @click="handleClose">确定</a-button>
+        <a-form-item label="秒杀开始时间" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+          <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="moment(startDateValue, 'YYYY-MM-DD')" :defaultValue="moment(startDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" @change="startDateChange"/>
+          <a-time-picker style="margin-left: 10px;" :disabled="status === 'STARTED' ||status === 'ENDED'" :value="moment(startHoursValue, 'YYYY-MM-DD HH:mm:ss')" :defaultValue="moment(startHoursValue, 'YYYY-MM-DD HH:mm:ss')" format="HH" @openChange="handleOpenChange1"  :open="open1"  @change="startHoursChange">
+            <!-- <a-button slot="addon" size="small" type="primary" @click="handleClose">确定</a-button> -->
           </a-time-picker>
+        </a-form-item>
+        <a-form-item label="秒杀结束时间" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+          <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="moment(endDateValue, 'YYYY-MM-DD')" :defaultValue="moment(endDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" @change="endDateChange"/>
+          <a-time-picker style="margin-left: 10px;" :disabled="status === 'STARTED' ||status === 'ENDED'" :value="moment(endHoursValue, 'YYYY-MM-DD HH:mm:ss')" :defaultValue="moment(endHoursValue, 'YYYY-MM-DD HH:mm:ss')" format="HH" @openChange="handleOpenChange2"  @change="endHoursChange" :open="open2">
+            <!-- <a-button slot="addon" size="small" type="primary" @click="handleClose">确定</a-button> -->
+          </a-time-picker>
+        </a-form-item>
+        <a-form-item label="秒杀库存" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+          <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" :max="24" v-model="activityStock" /> 件
         </a-form-item>
         <a-form-item :wrapperCol="{span: 10, offset: 7}">
           <a-button style="margin-right:20px" v-if="status !== 'STARTED'" @click="submit">保存并发布</a-button>
@@ -105,13 +112,19 @@ export default {
       activityId: "",
       status: "",
       dateValue: null,
-      hoursValue: null,
+      startHoursValue: '00',
+      endHoursValue: '00',
       hoursStart: '00',
+      hoursEnd: '00',
       skillCoin:'钱',
       activityPrice:0,
       activityPoint:0,
       activityStock:0,
-      open:false
+      startDateValue: this.timeForMat(-1)[0],
+      endDateValue: this.timeForMat(-1)[0],
+      today: this.timeForMat(0),
+      open1:false,
+      open2:false
     };
   },
   created() {
@@ -129,13 +142,18 @@ export default {
     }
   },
   methods: {
-    handleOpenChange(open){
+    handleOpenChange1(open){
       console.log('open', open);
-      this.open = open
+      this.open1 = open;
+    },
+    handleOpenChange2(open){
+      console.log('open', open);
+      this.open2 = open;
     },
     handleClose(e){
       console.log(e);
-      this.open = false
+      this.open1 = false;
+      this.open2 = false;
     },
     skillCoinFun(){
       if(this.skillCoin==='钱'){
@@ -187,12 +205,32 @@ export default {
       this.dateStart = dateStrings[0];
       this.dateEnd = dateStrings[1];
     },
-    hoursChange(time,timeString){
+    startDateChange(time,dateString){
+      console.log(time);
+      console.log(dateString);
+      this.startDateValue = time;
+      this.dateStart = dateString;
+    },
+    endDateChange(time,dateString){
+      console.log(time);
+      console.log(dateString);
+      this.endDateValue = time;
+      this.dateEnd = dateString;
+    },
+    startHoursChange(time,timeString){
       console.log(time);
       console.log(timeString);
-      this.hoursValue = time;
+      this.startHoursValue = time;
       this.hoursStart = timeString;
+      this.open1 = false;
     }, 
+    endHoursChange(time,timeString){
+      console.log(time);
+      console.log(timeString);
+      this.endHoursValue = time;
+      this.hoursEnd = timeString;
+      this.open2 = false;
+    },
     bargainCountFun(e, item) {
       item.bargainCount = e;
     },
@@ -200,7 +238,8 @@ export default {
       item.bargainAmount = e;
     },
     submit() {
-      console.log('startTime:' + this.dateStart + this.dateStart.length > 11? '' : ' ' + this.hoursStart + ":00:00");
+      // console.log('startTime:' + this.dateStart + this.dateStart.length > 11? '' : ' ' + this.hoursStart + ":00:00");
+      // console.log('endTime:' + this.dateEnd + this.dateEnd.length > 11? '' : ' ' + this.hoursEnd + ":00:00");
       let seckillRull = [
         {
           activityPrice:0,
@@ -238,18 +277,38 @@ export default {
           }
         ];
       }
-      let hoursStart = this.dateStart.length > 11? '' : ' ' + this.hoursStart + ":00:00";
-      let data = {
-        activityType: this.activityType,
-        endTime: this.dateEnd.length>11?this.dateEnd: this.dateEnd+ " 23:59:59",
-        productId: this.productId,
-        providerId: this.providerId,
-        activityId: this.activityId,
-        rules: rules,
-        startTime: this.dateStart + hoursStart,
-        timeLimit: this.timeLimit || 24,
-        timeLimitUnit: "HOUR"
-      };
+      // let hoursStart = this.dateStart.length > 11? '' : ' ' + this.hoursStart + ":00:00";
+      // let hoursEnd = this.dateEnd.length > 11? '' : ' ' + this.hoursEnd + ":00:00";
+      let data = null,hoursStart =null,hoursEnd = null;
+      if(this.activityType === "BARGAIN"||this.activityType === "SPLICED"){
+        hoursStart = this.dateStart.length > 11? '' : " 00:00:00";
+        hoursEnd = this.dateEnd.length > 11? '' : " 23:59:59";
+        data = {
+          activityType: this.activityType,
+          productId: this.productId,
+          providerId: this.providerId,
+          activityId: this.activityId,
+          rules: rules,
+          startTime: this.dateStart + hoursStart,
+          endTime: this.dateEnd + hoursEnd,
+          timeLimit: this.timeLimit || 24,
+          timeLimitUnit: "HOUR"
+        };
+      }else{
+        hoursStart = ' ' + this.hoursStart + ":00:00";
+        hoursEnd = ' ' + this.hoursEnd + ":00:00";
+        data = {
+          activityType: this.activityType,
+          productId: this.productId,
+          providerId: this.providerId,
+          activityId: this.activityId,
+          rules: rules,
+          startTime: this.startDateValue + hoursStart,
+          endTime: this.endDateValue + hoursEnd,
+          timeLimit: this.timeLimit || 24,
+          timeLimitUnit: "HOUR"
+        };
+      }
       if (!data.activityId || this.status === "ENDED") delete data.activityId;
       let url = "/endpoint/activity/operate/create.json";
       let url2 = "/endpoint/activity/operate/modify.json";
@@ -314,10 +373,16 @@ export default {
       });
     },
     quxiao() {
-      let path = "/activity/kanjiaList";
-      let path2 = "/activity/pintuanList";
+      let path = '';
+      if(this.activityType === "BARGAIN"){
+        path = "/activity/kanjiaList";
+      }else if(this.activityType === "SPLICED"){
+        path = "/activity/pintuanList";
+      }else{
+        path = "/activity/seckillList";
+      }
       this.$router.push({
-        path: this.activityType === "BARGAIN" ? path : path2,
+        path: path,
         query: {
           providerId: this.providerId
         }
@@ -383,8 +448,14 @@ export default {
             this.moment(res.data.startTime, "YYYY-MM-DD"),
             this.moment(res.data.endTime, "YYYY-MM-DD")
           ];
-          console.log(this.moment(res.data.startTime, "HH"));
-          this.hoursValue = this.moment(res.data.startTime, "YYYY-MM-DD HH:mm:ss");
+          // this.startHoursValue = this.moment(res.data.startTime, "YYYY-MM-DD HH:mm:ss");
+          // this.endHoursValue = this.moment(res.data.endTime, "YYYY-MM-DD HH:mm:ss");
+          // this.startDateValue = this.moment(res.data.startTime,"YYYY-MM-DD");
+          // this.endDateValue = this.moment(res.data.startTime,"YYYY-MM-DD");
+          this.startHoursValue = res.data.startTime;
+          this.endHoursValue = res.data.endTime;
+          this.startDateValue = res.data.startTime;
+          this.endDateValue = res.data.endTime;
           this.dateStart = res.data.startTime;
           this.dateEnd = res.data.endTime;
           this.productId = res.data.productId;

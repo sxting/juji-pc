@@ -51,6 +51,8 @@
       <a-table :columns="columns" :dataSource="data2" :pagination="false" :locale="{emptyText: '暂无数据'}">
         <span slot="action" slot-scope="text, record">
           <a @click="orderListfun(record)">查看详情</a>
+          <a-divider v-if="record.status=='PAID'" type="vertical" />
+          <a v-if="record.status=='PAID'">退款</a>
         </span>
       </a-table>
        <div style="margin-top:20px;">
