@@ -52,7 +52,7 @@
         <span slot="action" slot-scope="text, record">
           <a @click="orderListfun(record)">查看详情</a>
           <a-divider v-if="record.status=='PAID'" type="vertical" />
-          <a v-if="record.status=='PAID'">退款</a>
+          <a v-if="record.status=='PAID'" @click="refund(record)">退款</a>
         </span>
       </a-table>
        <div style="margin-top:20px;">
@@ -371,6 +371,37 @@ export default {
           });
         }
       });
+    },
+    refund(e){
+      var orderId = e.orderId;
+      let that = this;
+      this.$confirm({
+        title: '提示',
+        content: '确认将该笔订单退款吗？',
+        onOk() {
+          that.$axios({
+            url: "/endpoint/order/refund.json",
+            method: "get",
+            processData: false,
+            params: {
+              orderId: orderId
+            }
+          }).then(res => {
+            console.log(res);
+            if (res.success) {
+              //刷新页面
+              that.merchantListFun(that.providerId);
+            } else {
+              that.$error({
+                title: "温馨提示",
+                content: res.errorInfo
+              });
+            }
+          });
+        },
+        onCancel() {},
+      });
+      
     },
     orderListfun(e) {
       this.orderFun(e.orderId);
