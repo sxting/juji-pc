@@ -208,14 +208,12 @@ export default {
     startDateChange(time,dateString){
       console.log(time);
       console.log(dateString);
-      this.startDateValue = time;
-      this.dateStart = dateString;
+      this.startDateValue = dateString;
     },
     endDateChange(time,dateString){
       console.log(time);
       console.log(dateString);
-      this.endDateValue = time;
-      this.dateEnd = dateString;
+      this.endDateValue = dateString;
     },
     startHoursChange(time,timeString){
       console.log(time);
@@ -238,8 +236,8 @@ export default {
       item.bargainAmount = e;
     },
     submit() {
-      // console.log('startTime:' + this.dateStart + this.dateStart.length > 11? '' : ' ' + this.hoursStart + ":00:00");
-      // console.log('endTime:' + this.dateEnd + this.dateEnd.length > 11? '' : ' ' + this.hoursEnd + ":00:00");
+      console.log(this.startDateValue);
+      console.log(this.endDateValue);
       let seckillRull = [
         {
           activityPrice:0,
