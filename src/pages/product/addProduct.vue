@@ -144,6 +144,30 @@
           已选择 {{allShopsNumber}} 家门店
           <span class="buttons" @click="checkStord">选择门店</span>
         </a-form-item>
+        <a-form-item label="活动主题" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
+          <a-checkbox-group :defaultValue="subject" @change="onSubjectChange" :style="{ paddingTop: '8px' }">
+            <a-row>
+              <a-col :span="12"><a-checkbox value="新品抢鲜">新品抢鲜</a-checkbox></a-col>
+              <a-col :span="12"><a-checkbox value="好店礼券">好店礼券</a-checkbox></a-col>
+            </a-row>
+          </a-checkbox-group>
+        </a-form-item>
+        <a-form-item label="精选推荐" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+          <a-switch checkedChildren="开" unCheckedChildren="关" :defaultChecked="recommend" @change="onRecommendChange" />
+        </a-form-item>
+        <a-form-item label="分享文字" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.shareText" :required="false">
+          <a-textarea type="text" class="desc_textarea" placeholder="请输入分享文案，不填写则为系统默认文案"></a-textarea>
+        </a-form-item>
+        <a-form-item label="分享图片" help="分享图片推荐尺寸420*336，推荐比例5:4，不传则为商品详情页截图" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
+          <div class="clearfix">
+            <a-upload listType="picture-card" :fileList="fileList4" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @change="handleChange4($event)">
+              <div v-if="fileList4.length < 1">
+                <a-icon type="plus" />
+                <div class="ant-upload-text">上传图片</div>
+              </div>
+            </a-upload>
+          </div>
+        </a-form-item>
         <a-form-item :wrapperCol="{span: 10, offset: 7}" v-if="unAuditCount>0">
           <span style="color: #f5222d;">商品正在审核中，无法修改</span>
         </a-form-item>
@@ -151,7 +175,7 @@
           <a-button type="primary" v-if="!unAuditCount" @click="submit">提交</a-button>
           <a-button type="primary" v-if="unAuditCount>0" disabled @click="submit">提交</a-button>
         </a-form-item>
-        
+
       </a-form>
       <!--门店v-if="showStoreSelect"-->
 
@@ -184,6 +208,7 @@ export default {
         "表单页用于向用户收集或验证信息，基础表单常见于数据项较少的表单场景。",
       biaoqian: "其他",
       previewVisible: false,
+      previewShareImgVisible: false,
       productType: "PRODUCT",
       previewImage: "",
       checkAll: true,
@@ -193,6 +218,7 @@ export default {
       fileList1: [],
       fileList2: [],
       fileList3: [],
+      fileList4: [], //分享图片
       cityStoreList: [], // 数据格式转换过的门店列表
       selectStoresIds: "", //选中的门店
       storesChangeNum: 0, //选中门店的个数
@@ -218,7 +244,10 @@ export default {
       checkedList: [],
       selectedItems:[],
       productId: sessionStorage.getItem("PROCIDERID") || "",
-      unAuditCount: 0
+      unAuditCount: 0,
+      subject: [], // 活动主题； 字符串 逗号分隔
+      recommend: true, //是否推荐； 0，1
+      shareText: '' //分享文字
     };
   },
   created() {
@@ -262,6 +291,12 @@ export default {
     },
     checkStord() {
       this.visible = true;
+    },
+    onRecommendChange(event) {
+      this.recommend = event;
+    },
+    onSubjectChange(event) {
+      this.subject = event;
     },
     onChange(event) {
       console.log(event);
@@ -444,7 +479,11 @@ export default {
               stock: values.repository.stock,
               tag: this.biaoqian,
               type: this.productType,
-              productId: this.productId
+              productId: this.productId,
+              subject: this.subject.join(','),
+              recommend: this.recommend ? 1 : 0,
+              shareText: values.repository.shareText,
+              shareImg: this.fileList4[0] ? this.fileList4[0].response : '',
             };
             if (this.productId) {
               this.checkdataFun(data);
@@ -525,6 +564,9 @@ export default {
     },
     handleChange3({ fileList }, ind) {
       this.picXQ[ind].fileList = fileList;
+    },
+    handleChange4({ fileList }) {
+      this.fileList4 = fileList;
     },
     handleCancel(e) {
       this.visible = false;
@@ -650,10 +692,13 @@ export default {
                 costPrice: Number(this.accurate_div(res.data.costPrice, 100)),
                 productName: res.data.productName,
                 stock: res.data.stock,
-                merchantId: res.data.merchantId
+                merchantId: res.data.merchantId,
+                shareText: res.data.shareText
               }
             });
           });
+          this.subject = res.data.subject.split(',');
+          this.recommend = res.data.recommend ? true : false
           let storeIdArr = [];
           res.data.productStores.forEach(function(i) {
             storeIdArr.push(i.storeId);
@@ -665,6 +710,14 @@ export default {
               name: res.data.picId,
               status: "done",
               url: this.picUrl(res.data.picId)
+            }
+          ];
+          this.fileList4 = [
+            {
+              uid: "-1",
+              name: res.data.shareImg,
+              status: "done",
+              url: this.picUrl(res.data.shareImg)
             }
           ];
           this.buyerNotes = [];
@@ -732,7 +785,7 @@ export default {
   }
 };
 </script>
-  
+
 <style lang="less" scoped>
 @import "./addProduct.less";
 </style>
