@@ -61,11 +61,11 @@
             <a-divider v-if="status ==='STARTED'" type="vertical" />
             <a @click="chakan(record)" v-if="status ==='READY'">编辑</a>
             <!-- 测试可用 -->
-            <!-- <a-divider v-if="status ==='READY'" type="vertical" /> -->
-             <!-- <a-popconfirm title="是否确认？" v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="startFun(record)">
+            <a-divider v-if="status ==='READY'" type="vertical" />
+             <a-popconfirm title="是否确认？" v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="startFun(record)">
                 <a-icon slot="icon" type="question-circle-o" style="color: red" />
                 <a  class="ant-dropdown-link">立即开始</a>
-              </a-popconfirm> -->
+              </a-popconfirm>
             <a-popconfirm title="是否确认？" v-if="status ==='STARTED'" okText="确认" cancelText="否" @confirm="stopFun(record)">
                 <a-icon slot="icon" type="question-circle-o" style="color: red" />
                 <a  class="ant-dropdown-link">结束活动</a>
