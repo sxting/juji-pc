@@ -63,7 +63,7 @@
           </span>
         </a-table>
         <div style="margin-top:20px;">
-          <a-pagination style="float:right" @change="paginationChange" :current="pageNo" :pageSize="10" :total="countTotal" />
+          <a-pagination style="float:right" @change="paginationChange1" :current="pageNo1" :pageSize="10" :total="countTotal1" />
         </div>
       </div>
     </div>
@@ -107,7 +107,7 @@
           </span>
         </a-table>
         <div style="margin-top:20px;">
-          <a-pagination style="float:right" @change="paginationChange" :current="pageNo" :pageSize="10" :total="countTotal" />
+          <a-pagination style="float:right" @change="paginationChange2" :current="pageNo2" :pageSize="10" :total="countTotal2" />
         </div>
       </div>
     </div>
@@ -297,12 +297,14 @@ export default {
       data3: [],
       dateStart: "",
       dateEnd: "",
-      pageNo: 1,
+      pageNo1: 1,
+      pageNo2: 1,
       providerId: "",
       merchantList: [],
       merchantId: "ALL",
       detailMerchantId: "",
-      countTotal: 1,
+      countTotal1: 1,
+      countTotal2: 1,
       voucherCode: "",
       changeBoo: false,
       storeId: "ALL",
@@ -338,7 +340,7 @@ export default {
   methods: {
     excelFun() {
       let data = {
-        pageNo: this.pageNo,
+        pageNo: this.pageNo1,
         pageSize: 10,
         providerId: this.providerId,
         merchantId: this.merchantId,
@@ -348,7 +350,7 @@ export default {
       let param = "";
       let apiUrl =
         axios.defaults.baseURL + "/endpoint/settle/reportListExcel.download";
-      if (data.pageNo) param += "&pageNo=" + this.pageNo;
+      if (data.pageNo1) param += "&pageNo=" + this.pageNo1;
       if (data.providerId) param += "&providerId=" + this.providerId;
       if (data.merchantId) param += "&merchantId=" + this.merchantId;
       if (data.dateStart) param += "&dateStart=" + this.dateStart;
@@ -363,9 +365,14 @@ export default {
     toggleAdvanced() {
       this.advanced = !this.advanced;
     },
-    paginationChange(e) {
-      this.pageNo = e;
+    paginationChange1(e) {
+      console.log(e);
+      this.pageNo1 = e;
       this.productList();
+    },
+    paginationChange2(e) {
+      this.pageNo2 = e;
+      this.xiangqingFun();
     },
     handleCancel() {
       this.visible = false;
@@ -436,7 +443,7 @@ export default {
     },
     productList() {
       let data = {
-        pageNo: this.pageNo,
+        pageNo: this.pageNo1,
         pageSize: 10,
         providerId: this.providerId,
         merchantId: this.merchantId,
@@ -463,7 +470,7 @@ export default {
             i.salerAmount = that.accurate_div(i.salerAmount * 1, 100);
             i.managerAmount = that.accurate_div(i.managerAmount * 1, 100);
           });
-          this.countTotal = res.data.countTotal;
+          this.countTotal1 = res.data.countTotal;
         } else {
           this.$error({
             title: "温馨提示",
@@ -481,7 +488,7 @@ export default {
     },
     xiangqingFun() {
       let data = {
-        pageNo: this.pageNo,
+        pageNo: this.pageNo2,
         pageSize: 10,
         providerId: this.providerId,
         merchantId: this.detailMerchantId,
@@ -508,6 +515,7 @@ export default {
             i.merchantAmount = that.accurate_div(i.merchantAmount, 100);
           });
           this.storeIdList(this.detailMerchantId);
+          this.countTotal2 = res.data.countTotal;
         } else {
           this.$error({
             title: "温馨提示",
