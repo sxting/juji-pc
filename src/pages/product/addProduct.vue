@@ -153,7 +153,7 @@
           </a-checkbox-group>
         </a-form-item>
         <a-form-item label="精选推荐" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-switch checkedChildren="开" unCheckedChildren="关" :defaultChecked="recommend" @change="onRecommendChange" />
+          <a-switch checkedChildren="开" unCheckedChildren="关" v-model="recommend" @change="onRecommendChange" />
         </a-form-item>
         <a-form-item label="分享文字" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.shareText" :required="false">
           <a-textarea type="text" class="desc_textarea" placeholder="请输入分享文案，不填写则为系统默认文案"></a-textarea>
@@ -698,7 +698,8 @@ export default {
             });
           });
           this.subject = res.data.subject ? res.data.subject.split(',') : [];
-          this.recommend = res.data.recommend ? true : false
+          this.recommend = res.data.recommend ? true : false;
+          console.log(this.recommend);
           let storeIdArr = [];
           res.data.productStores.forEach(function(i) {
             storeIdArr.push(i.storeId);
