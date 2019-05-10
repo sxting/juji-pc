@@ -697,7 +697,7 @@ export default {
               }
             });
           });
-          this.subject = res.data.subject.split(',');
+          this.subject = res.data.subject ? res.data.subject.split(',') : [];
           this.recommend = res.data.recommend ? true : false
           let storeIdArr = [];
           res.data.productStores.forEach(function(i) {
@@ -712,14 +712,14 @@ export default {
               url: this.picUrl(res.data.picId)
             }
           ];
-          this.fileList4 = [
+          this.fileList4 = res.data.shareImg ? [
             {
               uid: "-1",
               name: res.data.shareImg,
               status: "done",
               url: this.picUrl(res.data.shareImg)
             }
-          ];
+          ] : [];
           this.buyerNotes = [];
           this.picXQ = [];
           let noteArr = JSON.parse(res.data.note);
