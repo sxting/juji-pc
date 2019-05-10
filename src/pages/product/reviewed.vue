@@ -155,6 +155,23 @@
       <a-form-item label="所属商家" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
         {{productInfo.merchantName}}
       </a-form-item>
+
+      <a-form-item label="活动主题" v-if="productInfo.subject" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+        {{productInfo.subject}}
+      </a-form-item>
+      <a-form-item label="精选推荐" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+        {{productInfo.recommend ? '是' : '否'}}
+      </a-form-item>
+      <a-form-item label="分享文字" v-if="productInfo.shareText" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+        {{productInfo.shareText}}
+      </a-form-item>
+      <a-form-item label="分享图片" v-if="productInfo.shareImg" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+        <div class="clearfix">
+          <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:false}" :fileList="fileList4">
+          </a-upload>
+        </div>
+      </a-form-item>
+
       <a-form-item label="审核结果" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
         <a-radio-group v-model="tongguo">
           <a-radio value="0" v-if="status!=='REJECT'">通过</a-radio>
@@ -271,6 +288,7 @@ export default {
       ], //图片详情
       fileList2: [],
       fileList1: [],
+      fileList4: [],
       pageNo: 1,
       butongguo: "",
       providerId: "ALL",
@@ -392,6 +410,14 @@ export default {
               name: res.data.picId,
               status: "done",
               url: this.picUrl(res.data.picId)
+            }
+          ];
+          this.fileList4 = [
+            {
+              uid: "-1",
+              name: res.data.shareImg,
+              status: "done",
+              url: this.picUrl(res.data.shareImg)
             }
           ];
           this.buyerNotes = [];

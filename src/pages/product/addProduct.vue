@@ -145,9 +145,9 @@
           <span class="buttons" @click="checkStord">选择门店</span>
         </a-form-item>
         <a-form-item label="活动主题" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
-          <a-checkbox-group :defaultValue="subject" @change="onSubjectChange" :style="{ paddingTop: '8px' }">
+          <a-checkbox-group v-model="subject" @change="onSubjectChange" :style="{ paddingTop: '8px' }">
             <a-row>
-              <a-col :span="12"><a-checkbox value="新品抢鲜">新品抢鲜</a-checkbox></a-col>
+              <a-col :span="12"><a-checkbox value="新品抢鲜" defaultChecked>新品抢鲜</a-checkbox></a-col>
               <a-col :span="12"><a-checkbox value="好店礼券">好店礼券</a-checkbox></a-col>
             </a-row>
           </a-checkbox-group>
