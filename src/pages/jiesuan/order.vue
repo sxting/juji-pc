@@ -33,7 +33,7 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="所属商家" fieldDecoratorId="repository.merchantId" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="全部商家" :defaultValue="ALL" @change="merchantChange">
+                <a-select placeholder="全部商家" :defaultValue="'ALL'" @change="merchantChange">
                   <a-select-option :key="'ALL'">全部商家</a-select-option>
                   <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                 </a-select>
@@ -401,7 +401,7 @@ export default {
         },
         onCancel() {},
       });
-      
+
     },
     orderListfun(e) {
       this.orderFun(e.orderId);
