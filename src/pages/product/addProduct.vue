@@ -19,6 +19,34 @@
         <a-form-item label="商品名称" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" fieldDecoratorId="repository.productName" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入商品名称', whitespace: true}]}" :required="true">
           <a-input placeholder="请输入商品名称，限1-40字" />
         </a-form-item>
+
+        <a-form-item label="商品规格" :labelCol="{span: 7}"  :wrapperCol="{span: 16}" :required="true">
+          <div>
+            <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
+              <template v-for="col in ['name', 'originp', 'currentp', 'jifen', 'costp', 'stock']" :slot="col" slot-scope="text, record, index">
+                <div :key="col">
+                  <a-input
+                    v-if="true"
+                    style="margin: -5px 0"
+                    :value="text"
+                    @change="e => handleChange(e.target.value, record.key, col)"
+                  />
+                  <template v-else>{{text}}</template>
+                </div>
+              </template>
+              <template slot="operation" slot-scope="text, record">
+                <a-popconfirm
+                  v-if="guigeDataSource.length > 1"
+                  title="确定删除?"
+                  @confirm="() => onDelete(record.key)">
+                  <a href="javascript:;">删除</a>
+                </a-popconfirm>
+              </template>
+            </a-table>
+            <a-button class="editable-add-btn fr" @click="handleAdd">增加</a-button>
+          </div>
+        </a-form-item>
+
         <a-form-item label="底价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.costPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
           <a-input-number style="width:100%" :min="0" :max="99999.99" placeholder="请输入商品底价" :disabled="productId?true:false" />
         </a-form-item>
@@ -212,7 +240,50 @@ export default {
       productType: "PRODUCT",
       previewImage: "",
       checkAll: true,
-      // plainOptions,
+      guigeDataSource: [
+        {
+        key: '0',
+        name: '默认规格',
+        originp: '',
+        currentp: '',
+        jifen: '',
+        costp: '',
+        stock: ''
+        }
+      ],
+      guigeColumns: [
+        {
+          title: '规格名称',
+          dataIndex: 'name',
+          width: '20%',
+          scopedSlots: { customRender: 'name' },
+        }, {
+          title: '原价',
+          dataIndex: 'originp',
+          scopedSlots: { customRender: 'originp' },
+        }, {
+          title: '售价',
+          dataIndex: 'currentp',
+          scopedSlots: { customRender: 'currentp' },
+        }, {
+          title: '桔子积分',
+          dataIndex: 'jifen',
+          scopedSlots: { customRender: 'jifen' },
+        }, {
+          title: '底价',
+          dataIndex: 'costp',
+          scopedSlots: { customRender: 'costp' },
+        }, {
+          title: '库存',
+          dataIndex: 'stock',
+          scopedSlots: { customRender: 'stock' },
+        }, {
+          title: '操作',
+          dataIndex: 'operation',
+          scopedSlots: { customRender: 'operation' },
+        }
+      ],
+      count: 1,
       buyerNotes: [{ title: "", details: [{ item: "" }] }], //购买须知
       picXQ: [{ fileList: [], picIds: "" }], //图片详情
       fileList1: [],
@@ -266,6 +337,33 @@ export default {
     }
   },
   methods: {
+    handleChange (value, key, column) {
+      const newData = [...this.guigeDataSource]
+      const target = newData.filter(item => key === item.key)[0]
+      if (target) {
+        target[column] = value
+        this.guigeDataSource = newData
+      }
+    },
+    onDelete (key) {
+      const guigeDataSource = [...this.guigeDataSource]
+      this.guigeDataSource = guigeDataSource.filter(item => item.key !== key)
+    },
+    handleAdd () {
+      const { count, guigeDataSource } = this;
+      const newData = {
+        key: count,
+        name: '',
+        originp: '',
+        currentp: '',
+        jifen: '',
+        costp: '',
+        stock: ''
+      }
+      this.guigeDataSource = [...guigeDataSource, newData]
+      this.count = count + 1
+    },
+
     jifenFun(){
       this.price = 0;
     },
@@ -384,6 +482,7 @@ export default {
       }
     },
     submit(e) {
+      console.dir(this.guigeDataSource);
       e.preventDefault();
       let data,
         picXQArr = [],
@@ -789,5 +888,9 @@ export default {
 
 <style lang="less" scoped>
 @import "./addProduct.less";
+.fr {
+  float: right;
+  margin-top: 10px;
+}
 </style>
 

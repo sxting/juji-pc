@@ -2,17 +2,59 @@
   <div>
     <a-card :body-style="{padding: '24px 32px'}" :bordered="false">
       <a-form :autoFormCreate="(form) => {this.form = form;}">
-        <a-form-item label="商品名称" help="请选择参与活动的商品，一旦发布，活动期间该商品不可修改" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="商品名称" help="请选择参与活动的商品，一旦发布，活动期间该商品不可修改" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-button v-if="!productRadio" type="primary" @click="checkProduct">选择商品</a-button>
           <span v-else>
             <span>{{productRadio.productName}} 售价:{{productRadio.price/100}}元 原价:{{productRadio.originalPrice/100}}元 底价:{{productRadio.costPrice/100}}元</span>
             <a-button type="primary" :disabled="status === 'STARTED' ||status === 'ENDED'||status === 'READY'" v-if="productRadio" @click="delProduct">删除商品</a-button>
           </span>
         </a-form-item>
-        <a-form-item label="活动限时" v-if="activityType === 'BARGAIN'||activityType === 'SPLICED'" help="可设定活动时长，活动限时不能超过24小时，不填默认选择24小时" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+
+        <a-form-item v-if="!productRadio" label="商品规格" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
+          <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
+            <template v-for="(col, i) in colArr" :slot="col" slot-scope="text, record, index">
+              <div :key="col" v-if="col == 'kanjiap'">
+                <div v-for="(item,i) in text" :key="i" class="disflex" :class="{mt15: i>0}">
+                  <span class="nowrap">{{i>0?'再':''}}需 </span>
+                  <a-input-number :min="1" :step="1" @change="bargainCountFun($event,item)" :value="item.bargainCount" :disabled="status === 'STARTED' ||status === 'ENDED'" :max="24" style="margin: -5px 0; width: 50px;" /> <span class="nowrap">刀，砍掉</span>
+                  <a-input-number :min="0" :step="1" @change="bargainAmountFun($event,item)" :value="item.bargainAmount" :disabled="status === 'STARTED' ||status === 'ENDED'" :max="99999" style="margin: -5px 0; width: 70px;" /> 元
+                  <a-button type="primary" :disabled="status === 'STARTED' ||status === 'ENDED'" v-if="i ===0" @click="addActivityList1(i, text)" style="margin: -5px 0; padding: 0 10px; margin-left: 5px;">新增</a-button>
+                  <a-button type="primary" :disabled="status === 'STARTED' ||status === 'ENDED'" v-else @click="delActivityList1(i, text)" style="margin: -5px 0; padding: 0 10px; margin-left: 5px;">删除</a-button>
+                </div>
+              </div>
+              <div :key="col" v-else-if="col == 'miaoshap'" class="disflex">
+                <a-input
+                  style="margin: -5px 0; width: 70px;"
+                  :value="text.price"
+                  @change="e => handleChange2(e.target.value, record.key, col)"
+                />  <span class="nowrap">元 +</span>
+                <a-input
+                  style="margin: -5px 0; width: 70px;"
+                  :value="text.juzi"
+                  @change="e => handleChange3(e.target.value, record.key, col)"
+                /> <span class="nowrap">桔子</span>
+              </div>
+              <div :key="col" v-else>
+                <div class="disflex" v-if="guigeColumns[i].editable">
+                  <a-input
+                    style="margin: -5px 0; width: 70px;"
+                    :value="text"
+                    @change="e => handleChange1(e.target.value, record.key, col)"
+                  />
+                  <span v-if="guigeColumns[i].rate"> % </span>
+                  <span class="w40" v-if="i == 5">{{record.salesp}}</span>
+                  <span class="w40" v-if="i == 6">{{record.managep}}</span>
+                </div>
+                <template v-else>{{text}}</template>
+              </div>
+            </template>
+          </a-table>
+        </a-form-item>
+
+        <a-form-item label="活动限时" v-if="activityType === 'BARGAIN'||activityType === 'SPLICED'" help="可设定活动时长，活动限时不能超过24小时，不填默认选择24小时" :labelCol="{span: 3}" :wrapperCol="{span: 21}">
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" v-model="timeLimit" :max="24" /> 时
         </a-form-item>
-        <a-form-item label="砍价力度" v-if="activityType === 'BARGAIN'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="砍价力度" v-if="activityType === 'BARGAIN'" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <div v-for="(item,index) in activityList" :key="index">
             {{index>0?'再':''}}需
             <a-input-number :min="1" :step="1" @change="bargainCountFun($event,item)" :value="item.bargainCount" :disabled="status === 'STARTED' ||status === 'ENDED'" :max="24" /> 刀， 砍掉
@@ -22,10 +64,10 @@
           </div>
 
         </a-form-item>
-        <a-form-item label="拼团价" v-else-if="activityType === 'SPLICED'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="拼团价" v-else-if="activityType === 'SPLICED'" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" v-model="splicedPrice" /> 元
         </a-form-item>
-        <a-form-item label="秒杀价" v-else :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="秒杀价" v-else :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-radio-group v-model="skillCoin" :disabled="status === 'STARTED' ||status === 'ENDED'"  @change="skillCoinFun">
             <a-radio :value="'钱'">钱</a-radio>
             <a-radio :value="'桔子'" v-show="!((status === 'STARTED' ||status === 'ENDED')&&activityPoint==0)">钱+桔子</a-radio>
@@ -35,25 +77,25 @@
             <a-input-number :min="0" :value="activityPoint" :disabled="status === 'STARTED' ||status === 'ENDED'" v-if="skillCoin==='桔子'" @change="pointChange($event)" :max="99999" style="width:200px" placeholder="请输入桔子数量" /><span v-if="skillCoin==='桔子'">桔子</span>
           </div>
         </a-form-item>
-        <a-form-item label="活动日期" v-if="activityType === 'BARGAIN'||activityType === 'SPLICED'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="活动日期" v-if="activityType === 'BARGAIN'||activityType === 'SPLICED'" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="dateValue" @change="timeChange" :placeholder="['开始','结束']" />
         </a-form-item>
-        <a-form-item label="秒杀开始时间" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="秒杀开始时间" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="moment(startDateValue, 'YYYY-MM-DD')" :defaultValue="moment(startDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" @change="startDateChange"/>
           <a-time-picker style="margin-left: 10px;" :disabled="status === 'STARTED' ||status === 'ENDED'" :value="moment(startHoursValue, 'YYYY-MM-DD HH:mm:ss')" :defaultValue="moment(startHoursValue, 'YYYY-MM-DD HH:mm:ss')" format="HH" @openChange="handleOpenChange1"  :open="open1"  @change="startHoursChange">
             <!-- <a-button slot="addon" size="small" type="primary" @click="handleClose">确定</a-button> -->
           </a-time-picker>
         </a-form-item>
-        <a-form-item label="秒杀结束时间" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="秒杀结束时间" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="moment(endDateValue, 'YYYY-MM-DD')" :defaultValue="moment(endDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" @change="endDateChange"/>
           <a-time-picker style="margin-left: 10px;" :disabled="status === 'STARTED' ||status === 'ENDED'" :value="moment(endHoursValue, 'YYYY-MM-DD HH:mm:ss')" :defaultValue="moment(endHoursValue, 'YYYY-MM-DD HH:mm:ss')" format="HH" @openChange="handleOpenChange2"  @change="endHoursChange" :open="open2">
             <!-- <a-button slot="addon" size="small" type="primary" @click="handleClose">确定</a-button> -->
           </a-time-picker>
         </a-form-item>
-        <a-form-item label="秒杀库存" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="秒杀库存" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" :max="24" v-model="activityStock" /> 件
         </a-form-item>
-        <a-form-item :wrapperCol="{span: 10, offset: 7}">
+        <a-form-item :wrapperCol="{span: 21, offset: 3}">
           <a-button style="margin-right:20px" v-if="status !== 'STARTED'" @click="submit">保存并发布</a-button>
           <a-button @click="quxiao">取消</a-button>
 
@@ -78,10 +120,216 @@
 import moment from "moment";
 import { Modal } from "ant-design-vue";
 var num = 0;
+
+const guigeColumns1 = [
+  {
+    title: '规格名称',
+    dataIndex: 'name',
+    scopedSlots: { customRender: 'name' },
+  }, {
+    title: '原价(元)',
+    dataIndex: 'originp',
+    scopedSlots: { customRender: 'originp' },
+  }, {
+    title: '售价(元)',
+    dataIndex: 'currentp',
+    scopedSlots: { customRender: 'currentp' },
+  }, {
+    title: '底价(元)',
+    dataIndex: 'costp',
+    scopedSlots: { customRender: 'costp' },
+  }, {
+    title: '拼团价(元)',
+    dataIndex: 'pintuanp',
+    scopedSlots: { customRender: 'pintuanp' },
+    editable: true
+  }, {
+    title: '销售返利(%/元)',
+    dataIndex: 'salesRate',
+    scopedSlots: { customRender: 'salesRate' },
+    editable: true,
+    rate: true
+  }, {
+    title: '管理佣金(%/元)',
+    dataIndex: 'manageRate',
+    scopedSlots: { customRender: 'manageRate' },
+    editable: true,
+    rate: true
+  }, {
+    title: '平台抽佣',
+    dataIndex: 'platform',
+    scopedSlots: { customRender: 'platform' },
+  }, {
+    title: '代理商分佣(元)',
+    dataIndex: 'provider',
+    scopedSlots: { customRender: 'provider' },
+  }
+]
+const guigeDataSource1 = [
+  {
+    key: '0',
+    name: '白色大号',
+    originp: '99',
+    currentp: '49',
+    costp: '19',
+    pintuanp: '0',
+    salesRate: '0',
+    manageRate: '0',
+    platform: '0',
+    provider: '0',
+    salesp: '0',
+    managep: '0'
+  },
+  {
+    key: '1',
+    name: '白色小号',
+    originp: '993',
+    currentp: '493',
+    costp: '193',
+    pintuanp: '0',
+    salesRate: '0',
+    manageRate: '0',
+    platform: '0',
+    provider: '0',
+    salesp: '0',
+    managep: '0'
+  }
+]
+
+const guigeColumns2 = [
+  {
+    title: '规格名称',
+    dataIndex: 'name',
+    scopedSlots: { customRender: 'name' },
+  }, {
+    title: '原价(元)',
+    dataIndex: 'originp',
+    scopedSlots: { customRender: 'originp' },
+  }, {
+    title: '售价(元)',
+    dataIndex: 'currentp',
+    scopedSlots: { customRender: 'currentp' },
+  }, {
+    title: '底价(元)',
+    dataIndex: 'costp',
+    scopedSlots: { customRender: 'costp' },
+  }, {
+    title: '砍价力度',
+    dataIndex: 'kanjiap',
+    scopedSlots: { customRender: 'kanjiap' },
+  }, {
+    title: '销售返利(%/元)',
+    dataIndex: 'salesRate',
+    scopedSlots: { customRender: 'salesRate' },
+    editable: true,
+    rate: true
+  }, {
+    title: '管理佣金(%/元)',
+    dataIndex: 'manageRate',
+    scopedSlots: { customRender: 'manageRate' },
+    editable: true,
+    rate: true
+  }
+]
+const guigeDataSource2 = [
+  {
+    key: '0',
+    name: '白色大号',
+    originp: '99',
+    currentp: '49',
+    costp: '19',
+    kanjiap: [
+      {
+        bargainAmount: "", //砍价金额
+        bargainCount: "", //砍价次数
+        bargainStage: num, //砍价规则顺序
+        initiatorBargainCount: 1, //发起者砍价次数
+        participantBargainCount: 1 //参与者砍价次数
+      }
+    ],
+    salesRate: '0',
+    manageRate: '0',
+    salesp: '0',
+    managep: '0'
+  }
+]
+
+const guigeColumns3 = [
+  {
+    title: '规格名称',
+    dataIndex: 'name',
+    scopedSlots: { customRender: 'name' },
+  }, {
+    title: '原价(元)',
+    dataIndex: 'originp',
+    scopedSlots: { customRender: 'originp' },
+  }, {
+    title: '售价(元)',
+    dataIndex: 'currentp',
+    scopedSlots: { customRender: 'currentp' },
+  }, {
+    title: '底价(元)',
+    dataIndex: 'costp',
+    scopedSlots: { customRender: 'costp' },
+  }, {
+    title: '秒杀价',
+    dataIndex: 'miaoshap',
+    scopedSlots: { customRender: 'miaoshap' },
+    editable: true
+  }, {
+    title: '销售返利(%/元)',
+    dataIndex: 'salesRate',
+    scopedSlots: { customRender: 'salesRate' },
+    editable: true,
+    rate: true
+  }, {
+    title: '管理佣金(%/元)',
+    dataIndex: 'manageRate',
+    scopedSlots: { customRender: 'manageRate' },
+    editable: true,
+    rate: true
+  }, {
+    title: '商品库存',
+    dataIndex: 'stock1',
+    scopedSlots: { customRender: 'stock1' },
+  }, {
+    title: '秒杀库存',
+    dataIndex: 'stock2',
+    scopedSlots: { customRender: 'stock2' },
+    editable: true,
+  }
+]
+const guigeDataSource3 = [
+  {
+    key: '0',
+    name: '白色大号',
+    originp: '99',
+    currentp: '49',
+    costp: '19',
+    miaoshap: {
+      price: '0',
+      juzi: '0'
+    },
+    salesRate: '0',
+    manageRate: '0',
+    salesp: '0',
+    managep: '0',
+    stock1: '0',
+    stock2: '0'
+  }
+]
+
+const colArr1 = ['name', 'originp', 'currentp', 'costp', 'pintuanp', 'salesRate', 'manageRate', 'platform', 'provider']
+const colArr2 = ['name', 'originp', 'currentp', 'costp', 'kanjiap', 'salesRate', 'manageRate']
+const colArr3 = ['name', 'originp', 'currentp', 'costp', 'miaoshap', 'salesRate', 'manageRate', 'stock1', 'stock2']
+
 export default {
   name: "addActivity",
   data() {
     return {
+      guigeColumns: guigeColumns1,
+      guigeDataSource: guigeDataSource1,
+      colArr: colArr1,
       radioStyle: {
         display: "block",
         height: "30px",
@@ -132,6 +380,19 @@ export default {
     this.activityType = this.$route.query.activityType;
     this.activityId = this.$route.query.activityId;
     this.status = this.$route.query.status;
+    if(this.activityType === 'SPLICED') {
+      this.guigeColumns = guigeColumns1;
+      this.guigeDataSource = guigeDataSource1;
+      this.colArr = colArr1;
+    } else if(this.activityType === 'BARGAIN') {
+      this.guigeColumns = guigeColumns2;
+      this.guigeDataSource = guigeDataSource2;
+      this.colArr = colArr2;
+    } else if(this.activityType === 'SEC_KILL') {
+      this.guigeColumns = guigeColumns3;
+      this.guigeDataSource = guigeDataSource3;
+      this.colArr = colArr3;
+    };
     if (this.activityId) this.detailFun();
     this.productListFun();
   },
@@ -142,6 +403,33 @@ export default {
     }
   },
   methods: {
+    handleChange1 (value, key, column) {
+      const newData = [...this.guigeDataSource]
+      const target = newData.filter(item => key === item.key)[0];
+      if (target) {
+        target[column] = value
+        this.guigeDataSource = newData
+      }
+      console.log(this.guigeDataSource)
+    },
+    handleChange2 (value, key, column) {
+      const newData = [...this.guigeDataSource]
+      const target = newData.filter(item => key === item.key)[0];
+      if (target) {
+        target[column].price = value;
+        this.guigeDataSource = newData
+      }
+      console.log(this.guigeDataSource)
+    },
+    handleChange3 (value, key, column) {
+      const newData = [...this.guigeDataSource]
+      const target = newData.filter(item => key === item.key)[0];
+      if (target) {
+        target[column].juzi = value;
+        this.guigeDataSource = newData
+      }
+      console.log(this.guigeDataSource)
+    },
     handleOpenChange1(open){
       console.log('open', open);
       this.open1 = open;
@@ -170,6 +458,23 @@ export default {
       // Can not select days before today and today
       return current && current < moment().endOf("day");
     },
+    addActivityList1(index, list) {
+      if (list.length > 4) {
+        this.$error({
+          title: "温馨提示",
+          content: "最多新增五组"
+        });
+      } else {
+        num++;
+        list.push({
+          bargainAmount: 0, //砍价金额
+          bargainCount: 0, //砍价次数
+          bargainStage: num, //砍价规则顺序
+          initiatorBargainCount: 1, //发起者砍价次数
+          participantBargainCount: 1 //参与者砍价次数
+        });
+      }
+    },
     addActivityList(index) {
       if (this.activityList.length > 4) {
         this.$error({
@@ -193,6 +498,10 @@ export default {
     },
     delProduct() {
       this.productRadio = "";
+    },
+    delActivityList1(e, list) {
+      num--;
+      list.splice(e, 1);
     },
     delActivityList(e) {
       num--;
@@ -221,7 +530,7 @@ export default {
       this.startHoursValue = time;
       this.hoursStart = timeString;
       this.open1 = false;
-    }, 
+    },
     endHoursChange(time,timeString){
       console.log(time);
       console.log(timeString);
@@ -419,7 +728,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.timeLimit = res.data.timeLimit;
-          
+
           this.productRadio = {
             productName: res.data.productName,
             originalPrice: res.data.originalPrice,
@@ -468,11 +777,27 @@ export default {
   }
 };
 </script>
-  
+
 <style lang="less" scoped>
 .radioBox {
   height: 300px;
   overflow-y: auto;
+}
+.disflex {
+  display: flex;
+}
+.nowrap {
+  white-space: nowrap;
+}
+.w40 {
+  width: 40px;
+  margin-left: 10px;
+}
+.mt15 {
+  margin-top: 15px;
+}
+a-input {
+  width: 70px;
 }
 </style>
 

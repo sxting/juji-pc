@@ -60,6 +60,25 @@
             </a-form-item>
           </a-card>
           <a-card title="分佣设置" style="margin-top:20px">
+
+            <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
+              <template v-for="(col, i) in ['name', 'originp', 'currentp', 'costp', 'sharedp', 'salesRate', 'manageRate', 'platform', 'provider']" :slot="col" slot-scope="text, record, index">
+                <div :key="col">
+                  <div class="disflex" v-if="guigeColumns[i].editable">
+                    <a-input
+                    style="margin: -5px 0"
+                    :value="text"
+                    @change="e => handleChange(e.target.value, record.key, col)"
+                    />
+                    <span v-if="guigeColumns[i].rate"> % </span>
+                    <span class="w40" v-if="i == 5">{{record.salesp}}</span>
+                    <span class="w40" v-if="i == 6">{{record.managep}}</span>
+                  </div>
+                  <template v-else>{{text}}</template>
+                </div>
+              </template>
+            </a-table>
+
             <a-form-item label="销售返利" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
               <a-input-number v-model="salesRateStr" :min="5" style="margin-right:5px;" :max="100" @blur="salesRateStrFun($event)" />%
               <span style="margin-left:20px;">{{salesRateStrAmount/100}}元</span>
@@ -73,7 +92,7 @@
                   <span><span style="margin-right:20px;">{{item.rate}}%</span> {{item.estimateAmount/100}}元</span>
                 </a-form-item>
             </div>
-            
+
           </a-card>
           <a-card title="推广素材" style="margin-top:20px">
             <a-form-item label="推广文案" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
@@ -152,6 +171,81 @@ for (let i = 0; i < 100; i++) {
   });
 }
 
+const guigeColumns = [
+  {
+    title: '规格名称',
+    dataIndex: 'name',
+    scopedSlots: { customRender: 'name' },
+  }, {
+    title: '原价(元)',
+    dataIndex: 'originp',
+    scopedSlots: { customRender: 'originp' },
+  }, {
+    title: '售价(元)',
+    dataIndex: 'currentp',
+    scopedSlots: { customRender: 'currentp' },
+  }, {
+    title: '底价(元)',
+    dataIndex: 'costp',
+    scopedSlots: { customRender: 'costp' },
+  }, {
+    title: '分享价(元)',
+    dataIndex: 'sharedp',
+    scopedSlots: { customRender: 'sharedp' },
+    editable: true
+  }, {
+    title: '销售返利(%/元)',
+    dataIndex: 'salesRate',
+    scopedSlots: { customRender: 'salesRate' },
+    editable: true,
+    rate: true
+  }, {
+    title: '管理佣金(%/元)',
+    dataIndex: 'manageRate',
+    scopedSlots: { customRender: 'manageRate' },
+    editable: true,
+    rate: true
+  }, {
+    title: '平台抽佣',
+    dataIndex: 'platform',
+    scopedSlots: { customRender: 'platform' },
+  }, {
+    title: '代理商分佣(元)',
+    dataIndex: 'provider',
+    scopedSlots: { customRender: 'provider' },
+  }
+]
+const guigeDataSource = [
+  {
+    key: '0',
+    name: '白色大号',
+    originp: '99',
+    currentp: '49',
+    costp: '19',
+    sharedp: '0',
+    salesRate: '0',
+    manageRate: '0',
+    platform: '0',
+    provider: '0',
+    salesp: '0',
+    managep: '0'
+  },
+  {
+    key: '1',
+    name: '白色小号',
+    originp: '993',
+    currentp: '493',
+    costp: '193',
+    sharedp: '0',
+    salesRate: '0',
+    manageRate: '0',
+    platform: '0',
+    provider: '0',
+    salesp: '0',
+    managep: '0'
+  }
+]
+
 export default {
   name: "Fenxiao",
   components: {
@@ -161,6 +255,8 @@ export default {
     return {
       columns: columns,
       dataSource: dataSource,
+      guigeColumns: guigeColumns,
+      guigeDataSource: guigeDataSource,
       selectedRowKeys: [],
       selectedRows: [],
       data2: data2,
@@ -182,14 +278,13 @@ export default {
       effective: '0',
       salesRateStrAmount:0,
       manageRateStrAmount:0,
-      
     };
   },
   created() {
     this.providerList = JSON.parse(
       sessionStorage.getItem("LoginDate")
     ).providerList;
-    // this.providerId = this.providerList[0].providerId;
+    this.providerId = this.providerList[0].providerId;
     this.$nextTick(() => {
       this.form.setFieldsValue({
         repository: {
@@ -202,6 +297,15 @@ export default {
   },
   mounted() {},
   methods: {
+    handleChange (value, key, column) {
+      const newData = [...this.guigeDataSource]
+      const target = newData.filter(item => key === item.key)[0];
+      if (target) {
+        target[column] = value
+        this.guigeDataSource = newData
+      }
+      console.log(this.guigeDataSource)
+    },
     stopFX() {
       let data = {
         productId: this.productId
@@ -504,6 +608,15 @@ export default {
 
 .operator {
   margin-bottom: 18px;
+}
+
+.disflex {
+  display: flex;
+}
+
+.w40 {
+  width: 40px;
+  margin-left: 10px;
 }
 
 @media screen and (max-width: 900px) {
