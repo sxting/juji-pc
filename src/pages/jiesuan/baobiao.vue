@@ -481,6 +481,8 @@ export default {
     },
     //描述:某个商品结算列表
     xiangqingList(e) {
+      this.pageNo1 = 1;
+      this.pageNo2 = 1;
       this.providerId = e.providerId;
       this.productId = e.productId;
       this.detailMerchantId = e.merchantId;
