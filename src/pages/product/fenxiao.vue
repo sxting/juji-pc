@@ -284,7 +284,7 @@ export default {
     this.providerList = JSON.parse(
       sessionStorage.getItem("LoginDate")
     ).providerList;
-    this.providerId = this.providerList[0].providerId;
+    // this.providerId = this.providerList[0].providerId;
     this.$nextTick(() => {
       this.form.setFieldsValue({
         repository: {

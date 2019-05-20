@@ -561,8 +561,6 @@ export default {
                 stock: parseFloat(item.stock)
               }
             });
-            console.log(productSkus);
-            console.log('else')
             data = {
               productSkus: productSkus,
               cutOffDays: values.repository.cutOffDays, //核销截止日期
