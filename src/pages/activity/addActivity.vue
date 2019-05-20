@@ -39,14 +39,14 @@
           <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="dateValue" @change="timeChange" :placeholder="['开始','结束']" />
         </a-form-item>
         <a-form-item label="秒杀开始时间" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="moment(startDateValue, 'YYYY-MM-DD')" :defaultValue="moment(startDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" @change="startDateChange"/>
-          <a-time-picker style="margin-left: 10px;" :disabled="status === 'STARTED' ||status === 'ENDED'" :value="moment(startHoursValue, 'YYYY-MM-DD HH:mm:ss')" :defaultValue="moment(startHoursValue, 'YYYY-MM-DD HH:mm:ss')" format="HH" @openChange="handleOpenChange1"  :open="open1"  @change="startHoursChange">
+          <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="moment(startDateValue, 'YYYY-MM-DD')" :defaultValue="moment(startDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" :allowClear="false" @change="startDateChange"/>
+          <a-time-picker style="margin-left: 10px;" :disabled="status === 'STARTED' ||status === 'ENDED'" :value="moment(startHoursValue, 'YYYY-MM-DD HH:mm:ss')" :defaultValue="moment(startHoursValue, 'YYYY-MM-DD HH:mm:ss')" format="HH" :allowEmpty="false" @openChange="handleOpenChange1"  :open="open1"  @change="startHoursChange">
             <!-- <a-button slot="addon" size="small" type="primary" @click="handleClose">确定</a-button> -->
           </a-time-picker>
         </a-form-item>
         <a-form-item label="秒杀结束时间" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="moment(endDateValue, 'YYYY-MM-DD')" :defaultValue="moment(endDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" @change="endDateChange"/>
-          <a-time-picker style="margin-left: 10px;" :disabled="status === 'STARTED' ||status === 'ENDED'" :value="moment(endHoursValue, 'YYYY-MM-DD HH:mm:ss')" :defaultValue="moment(endHoursValue, 'YYYY-MM-DD HH:mm:ss')" format="HH" @openChange="handleOpenChange2"  @change="endHoursChange" :open="open2">
+          <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="moment(endDateValue, 'YYYY-MM-DD')" :defaultValue="moment(endDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" :allowClear="false" @change="endDateChange"/>
+          <a-time-picker style="margin-left: 10px;" :disabled="status === 'STARTED' ||status === 'ENDED'" :value="moment(endHoursValue, 'YYYY-MM-DD HH:mm:ss')" :defaultValue="moment(endHoursValue, 'YYYY-MM-DD HH:mm:ss')" format="HH" :allowEmpty="false" @openChange="handleOpenChange2"  @change="endHoursChange" :open="open2">
             <!-- <a-button slot="addon" size="small" type="primary" @click="handleClose">确定</a-button> -->
           </a-time-picker>
         </a-form-item>
@@ -221,7 +221,7 @@ export default {
       this.startHoursValue = time;
       this.hoursStart = timeString;
       this.open1 = false;
-    }, 
+    },
     endHoursChange(time,timeString){
       console.log(time);
       console.log(timeString);
@@ -419,7 +419,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.timeLimit = res.data.timeLimit;
-          
+
           this.productRadio = {
             productName: res.data.productName,
             originalPrice: res.data.originalPrice,
@@ -468,7 +468,7 @@ export default {
   }
 };
 </script>
-  
+
 <style lang="less" scoped>
 .radioBox {
   height: 300px;
