@@ -2,12 +2,14 @@
   <div>
     <a-card :body-style="{padding: '24px 32px'}" :bordered="false">
       <a-form :autoFormCreate="(form) => {this.form = form;}">
+        <!--
         <a-form-item label="商品类型" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="productType" :style="{ marginBottom: '8px' }">
             <a-radio-button value="PRODUCT">普通商品</a-radio-button>
             <a-radio-button value="POINT">积分商品</a-radio-button>
           </a-radio-group>
         </a-form-item>
+        -->
         <a-form-item label="商品标签" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="biaoqian">
             <a-radio :value="'美食饮品'">美食饮品</a-radio>
@@ -47,6 +49,7 @@
           </div>
         </a-form-item>
 
+        <!--
         <a-form-item label="底价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.costPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
           <a-input-number style="width:100%" :min="0" :max="99999.99" placeholder="请输入商品底价" :disabled="productId?true:false" />
         </a-form-item>
@@ -66,6 +69,8 @@
             <a-input-number :min="0" @change="priceChange($event)" :max="99999.99" v-if="jifen === '桔子+钱'" :value="price"  style="width:200px"  placeholder="请输入钱数" />
           </div>
         </a-form-item>
+        -->
+
         <a-form-item label="商品首图" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <div class="clearfix">
             <a-upload listType="picture-card" :fileList="fileList1" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @change="handleChange1($event)">
@@ -139,9 +144,11 @@
             </div>
           </div>
         </a-form-item>
+        <!--
         <a-form-item label="库存" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.stock" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入使用库存'}]}" :required="true">
           <a-input-number :min="1" :max="99999" />
         </a-form-item>
+        -->
         <a-form-item label="使用有效期" :labelCol="{span: 7}" help="自购买之日起开始计算时间" :wrapperCol="{span: 10}" fieldDecoratorId="repository.cutOffDays" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入使用有效期'}]}" :required="true">
           <a-input-number :min="1" :step="1" :max="30" />
         </a-form-item>
@@ -242,13 +249,13 @@ export default {
       checkAll: true,
       guigeDataSource: [
         {
-        key: '0',
-        name: '默认规格',
-        originp: '',
-        currentp: '',
-        jifen: '',
-        costp: '',
-        stock: ''
+          key: '0',
+          name: '默认规格',
+          originp: '0',
+          currentp: '0',
+          jifen: '0',
+          costp: '0',
+          stock: '0'
         }
       ],
       guigeColumns: [
@@ -482,13 +489,12 @@ export default {
       }
     },
     submit(e) {
-      console.dir(this.guigeDataSource);
+      // console.dir(this.guigeDataSource);
       e.preventDefault();
       let data,
         picXQArr = [],
         note = [],
         storeIdArr = [];
-      console.log(this.picXQ);
       this.picXQ.forEach(function(i) {
         let pic = [];
         i.fileList.forEach(function(m) {
@@ -520,6 +526,7 @@ export default {
       }
       this.form.validateFields((err, values) => {
         if (err) {
+          console.log(err);
         } else {
           if (this.fileList1.length < 1) {
             this.$error({
@@ -536,20 +543,28 @@ export default {
               title: "温馨提示",
               content: "请选择试用门店"
             });
-          } else if (
-            (this.productType === "POINT" &&
-              this.jifen === "桔子兑换" &&
-              !this.point) ||
-            (this.productType === "POINT" &&
-              this.jifen === "桔子+钱" &&
-              (!this.point || !this.price))
-          ) {
-            this.$error({
-              title: "温馨提示",
-              content: "请输入售价"
-            });
           } else {
+            let productSkus = [];
+            let productType = 'PRODUCT';
+            this.guigeDataSource.forEach(function(item, index) {
+              if(parseFloat(item.jifen)) {
+                productType = 'POINT'
+              }
+              productSkus[index] = {
+                costPrice: parseFloat(item.costp) * 100,
+                originalPrice: parseFloat(item.originp) * 100,
+                point: parseFloat(item.jifen),
+                price: parseFloat(item.currentp) * 100,
+                productName: values.repository.productName,
+                skuName: item.name,
+                status: 'NORMAL',
+                stock: parseFloat(item.stock)
+              }
+            });
+            console.log(productSkus);
+            console.log('else')
             data = {
+              productSkus: productSkus,
               cutOffDays: values.repository.cutOffDays, //核销截止日期
               description: JSON.stringify(picXQArr),
               idx: values.repository.idx,
@@ -559,31 +574,32 @@ export default {
               merchantId: values.repository.merchantId,
               merchantName: this.merchantName,
               note: JSON.stringify(note),
-              costPrice: this.accurate_mul(values.repository.costPrice, 100),
-              originalPrice: this.accurate_mul(
-                values.repository.originalPrice,
-                100
-              ),
+              // costPrice: this.accurate_mul(values.repository.costPrice, 100),
+              // originalPrice: this.accurate_mul(
+              //   values.repository.originalPrice,
+              //   100
+              // ),
               picId: this.fileList1[0].response
                 ? this.fileList1[0].response
                 : this.fileList1[0].name,
               picIds: picIds,
-              point: this.productType === "POINT" ? this.point : 0,
-              price: this.price?this.accurate_mul(this.price, 100):0,
+              // point: this.productType === "POINT" ? this.point : 0,
+              // price: this.price?this.accurate_mul(this.price, 100):0,
               productName: values.repository.productName,
               productStores: storeIdArr,
               providerId: this.providerId,
               providerName: values.repository.providerName,
               putAway: 1,
-              stock: values.repository.stock,
+              // stock: values.repository.stock,
               tag: this.biaoqian,
-              type: this.productType,
+              type: productType,
               productId: this.productId,
               subject: this.subject.join(','),
               recommend: this.recommend ? 1 : 0,
               shareText: values.repository.shareText,
               shareImg: this.fileList4[0] ? this.fileList4[0].response : '',
             };
+            console.log(data);
             if (this.productId) {
               this.checkdataFun(data);
             } else {
@@ -768,9 +784,23 @@ export default {
           this.unAuditCount = res.data.unAuditCount;
           this.productType = res.data.type;
           this.biaoqian = res.data.tag;
-          this.price = Number(this.accurate_div(res.data.price, 100));
-          console.log(this.price)
-          this.point = res.data.point;
+
+          let guigeDataSource = [];
+          res.data.productSkus.forEach(function(item, index) {
+            guigeDataSource[index] = {
+              key: index,
+              name: item.skuName,
+              originp: item.originalPrice/100,
+              currentp: item.price/100,
+              jifen: item.point,
+              costp: item.costPrice/100,
+              stock: item.stock
+            };
+          })
+          this.guigeDataSource = guigeDataSource;
+
+          // this.price = Number(this.accurate_div(res.data.price, 100));
+          // this.point = res.data.point;
           this.jifen = res.data.type === "PRODUCT" ? res.data.price? "桔子+钱": "桔子兑换" :"桔子兑换";
           this.limitMaxNum =
             res.data.limitMaxNum > 0 ? res.data.limitMaxNum : "";
@@ -787,10 +817,10 @@ export default {
               repository: {
                 cutOffDays: res.data.cutOffDays,
                 idx: res.data.idx,
-                originalPrice: Number(this.accurate_div(res.data.originalPrice, 100)),
-                costPrice: Number(this.accurate_div(res.data.costPrice, 100)),
+                // originalPrice: Number(this.accurate_div(res.data.originalPrice, 100)),
+                // costPrice: Number(this.accurate_div(res.data.costPrice, 100)),
                 productName: res.data.productName,
-                stock: res.data.stock,
+                // stock: res.data.stock,
                 merchantId: res.data.merchantId,
                 shareText: res.data.shareText
               }
@@ -798,7 +828,6 @@ export default {
           });
           this.subject = res.data.subject ? res.data.subject.split(',') : [];
           this.recommend = res.data.recommend ? true : false;
-          console.log(this.recommend);
           let storeIdArr = [];
           res.data.productStores.forEach(function(i) {
             storeIdArr.push(i.storeId);

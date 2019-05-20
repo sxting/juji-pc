@@ -291,17 +291,7 @@ const guigeColumns = [
     scopedSlots: { customRender: 'stock' },
   }
 ]
-const guigeDataSource = [
-  {
-    key: '0',
-    name: '白色小号',
-    originp: '0',
-    currentp: '0',
-    jifen: '0',
-    costp: '0',
-    stock: '0'
-  }
-]
+const guigeDataSource = []
 
 export default {
   name: "Reviewed",
@@ -313,7 +303,7 @@ export default {
       showTable: true,
       columns: columns,
       guigeColumns: guigeColumns,
-      guigeDataSource: guigeDataSource,
+      guigeDataSource: [],
       data: data,
       tongguo: "0",
       buyerNotes: [
@@ -450,6 +440,21 @@ export default {
         if (res.success) {
           this.productInfo = res.data;
           this.showTable = false;
+
+          let guigeDataSource = [];
+          res.data.productSkuAudits.forEach(function(item, index) {
+            guigeDataSource[index] = {
+              key: index,
+              name: item.skuName,
+              originp: item.originalPrice/100,
+              currentp: item.price/100,
+              jifen: item.point,
+              costp: item.costPrice/100,
+              stock: item.stock
+            }
+          });
+          this.guigeDataSource = guigeDataSource;
+
           this.fileList1 = [
             {
               uid: "-1",
