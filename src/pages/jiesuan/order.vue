@@ -88,6 +88,7 @@
           <thead>
             <tr>
               <td>商品名称</td>
+              <td>商品规格</td>
               <td>核销状态</td>
               <td>核销时间</td>
               <td>核销门店</td>
@@ -97,6 +98,7 @@
           <tbody>
             <tr v-for="(item,index) in vouchersList" :key="index">
               <td>{{item.productName}}</td>
+              <td>{{item.skuName}}</td>
               <td>{{item.voucherStatusName}}</td>
               <td>{{item.useTime}}</td>
               <td>{{item.useStoreName}}</td>

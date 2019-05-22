@@ -10,7 +10,7 @@
           </span>
         </a-form-item>
 
-        <a-form-item v-if="!productRadio" label="商品规格" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
+        <a-form-item v-if="productRadio" label="商品规格" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
             <template v-for="(col, i) in colArr" :slot="col" slot-scope="text, record, index">
               <div :key="col" v-if="col == 'kanjiap'">

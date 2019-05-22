@@ -61,7 +61,7 @@
             <a-divider v-if="status ==='STARTED'" type="vertical" />
             <a @click="chakan(record)" v-if="status ==='READY'">编辑</a>
             <a-divider v-if="status ==='READY'" type="vertical" />
-            
+
              <a-popconfirm title="是否确认？" v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="startFun(record)">
                 <a-icon slot="icon" type="question-circle-o" style="color: red" />
                 <a  class="ant-dropdown-link">立即开始</a>
@@ -263,7 +263,7 @@ export default {
       REJECTNUM: 0,
       id: "",
       yestoday: this.timeForMat(1),
-      today: this.timeForMat(0),
+      today: this.timeForMat(30),
       providerList: JSON.parse(sessionStorage.getItem("LoginDate")).providerList,
       activityType:'BARGAIN'
     };
