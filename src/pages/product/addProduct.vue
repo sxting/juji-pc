@@ -255,7 +255,9 @@ export default {
           currentp: '0',
           jifen: '0',
           costp: '0',
-          stock: '0'
+          stock: '0',
+          skuId: '',
+          id: ''
         }
       ],
       guigeColumns: [
@@ -558,7 +560,9 @@ export default {
                 productName: values.repository.productName,
                 skuName: item.name,
                 status: 'NORMAL',
-                stock: parseFloat(item.stock)
+                stock: parseFloat(item.stock),
+                skuId: item.skuId,
+                id: item.id
               }
             });
             data = {
@@ -792,7 +796,9 @@ export default {
               currentp: item.price/100,
               jifen: item.point,
               costp: item.costPrice/100,
-              stock: item.stock
+              stock: item.stock,
+              skuId: item.skuId,
+              id: item.id
             };
           })
           this.guigeDataSource = guigeDataSource;
