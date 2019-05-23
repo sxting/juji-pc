@@ -235,13 +235,13 @@ const guigeDataSource2 = [
   {
     key: '0',
     name: '白色大号',
-    originp: '99',
-    currentp: '49',
-    costp: '19',
+    originp: '0',
+    currentp: '0',
+    costp: '0',
     kanjiap: [
       {
-        bargainAmount: "", //砍价金额
-        bargainCount: "", //砍价次数
+        bargainAmount: "0", //砍价金额
+        bargainCount: "0", //砍价次数
         bargainStage: num, //砍价规则顺序
         initiatorBargainCount: 1, //发起者砍价次数
         participantBargainCount: 1 //参与者砍价次数
