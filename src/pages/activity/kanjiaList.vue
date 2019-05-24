@@ -193,20 +193,24 @@
 import StandardTable from "../../components/table/StandardTable";
 const columns = [
   {
+    title: "所属运营商",
+    dataIndex: "providerName"
+  },
+  {
     title: "商品名称",
     dataIndex: "productName"
   },
   {
-    title: "商品原价",
-    dataIndex: "originalPrice"
+    title: "活动开始时间",
+    dataIndex: "startTime"
   },
   {
-    title: "商品底价",
-    dataIndex: "costPrice"
+    title: "活动结束时间",
+    dataIndex: "endTime"
   },
   {
-    title: "活动起止时间",
-    dataIndex: "time"
+    title: "底价(元)",
+    dataIndex: "activityPrice"
   },
   {
     title: "操作",
@@ -263,7 +267,7 @@ export default {
       REJECTNUM: 0,
       id: "",
       yestoday: this.timeForMat(1),
-      today: this.timeForMat(30),
+      today: this.timeForMat(7),
       providerList: JSON.parse(sessionStorage.getItem("LoginDate")).providerList,
       activityType:'BARGAIN'
     };
@@ -458,9 +462,7 @@ export default {
         if (res.success) {
           this.data = res.data.elements;
           this.data.forEach(function(i) {
-            i.originalPrice = that.accurate_div(i.originalPrice, 100);
-            i.costPrice = that.accurate_div(i.costPrice, 100);
-            i.time = i.startTime + "-" + i.endTime;
+            i.activityPrice = that.accurate_div(i.activityPrice, 100);
           });
         } else {
           this.$error({

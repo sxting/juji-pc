@@ -5,7 +5,7 @@
         <a-form-item label="商品名称" help="请选择参与活动的商品，一旦发布，活动期间该商品不可修改" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-button v-if="!productRadio" type="primary" @click="checkProduct">选择商品</a-button>
           <span v-else>
-            <span>{{productRadio.productName}} 售价:{{productRadio.price/100}}元 原价:{{productRadio.originalPrice/100}}元 底价:{{productRadio.costPrice/100}}元</span>
+            <span>{{productRadio.productName}} <!--售价:{{productRadio.price/100}}元 原价:{{productRadio.originalPrice/100}}元 底价:{{productRadio.costPrice/100}}元--></span>
             <a-button type="primary" :disabled="status === 'STARTED' ||status === 'ENDED'||status === 'READY'" v-if="productRadio" @click="delProduct">删除商品</a-button>
           </span>
         </a-form-item>
@@ -24,11 +24,13 @@
               </div>
               <div :key="col" v-else-if="col == 'miaoshap'" class="disflex">
                 <a-input
+                  :disabled="status === 'STARTED' ||status === 'ENDED'"
                   style="margin: -5px 0; width: 70px;"
                   :value="text.price"
                   @change="e => handleChange2(e.target.value, record.key, col)"
                 />  <span class="nowrap">元 +</span>
                 <a-input
+                  :disabled="status === 'STARTED' ||status === 'ENDED'"
                   style="margin: -5px 0; width: 70px;"
                   :value="text.juzi"
                   @change="e => handleChange3(e.target.value, record.key, col)"
@@ -37,6 +39,7 @@
               <div :key="col" v-else>
                 <div class="disflex" v-if="guigeColumns[i].editable">
                   <a-input
+                    :disabled="status === 'STARTED' ||status === 'ENDED'"
                     style="margin: -5px 0; width: 70px;"
                     :value="text"
                     @change="e => handleChange1(e.target.value, record.key, col)"
@@ -54,6 +57,7 @@
         <a-form-item label="活动限时" v-if="activityType === 'BARGAIN'||activityType === 'SPLICED'" help="可设定活动时长，活动限时不能超过24小时，不填默认选择24小时" :labelCol="{span: 3}" :wrapperCol="{span: 21}">
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" v-model="timeLimit" :max="24" /> 时
         </a-form-item>
+        <!--
         <a-form-item label="砍价力度" v-if="activityType === 'BARGAIN'" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <div v-for="(item,index) in activityList" :key="index">
             {{index>0?'再':''}}需
@@ -62,7 +66,6 @@
             <a-button type="primary" :disabled="status === 'STARTED' ||status === 'ENDED'" v-if="index ===0" @click="addActivityList(index)">新增</a-button>
             <a-button type="primary" :disabled="status === 'STARTED' ||status === 'ENDED'" v-else @click="delActivityList(index)">删除</a-button>
           </div>
-
         </a-form-item>
         <a-form-item label="拼团价" v-else-if="activityType === 'SPLICED'" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" v-model="splicedPrice" /> 元
@@ -76,7 +79,7 @@
             <a-input-number :min="0" :value="activityPrice" :disabled="status === 'STARTED' ||status === 'ENDED'" @change="priceChange($event)" :max="99999.99"  style="width:200px;margin-right:10px;"  placeholder="请输入钱数" /><span>元</span>
             <a-input-number :min="0" :value="activityPoint" :disabled="status === 'STARTED' ||status === 'ENDED'" v-if="skillCoin==='桔子'" @change="pointChange($event)" :max="99999" style="width:200px" placeholder="请输入桔子数量" /><span v-if="skillCoin==='桔子'">桔子</span>
           </div>
-        </a-form-item>
+        </a-form-item>-->
         <a-form-item label="活动日期" v-if="activityType === 'BARGAIN'||activityType === 'SPLICED'" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="dateValue" @change="timeChange" :placeholder="['开始','结束']" />
         </a-form-item>
@@ -92,9 +95,9 @@
             <!-- <a-button slot="addon" size="small" type="primary" @click="handleClose">确定</a-button> -->
           </a-time-picker>
         </a-form-item>
-        <a-form-item label="秒杀库存" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
+        <!--<a-form-item label="秒杀库存" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 3}" :wrapperCol="{span: 21}" :required="true">
           <a-input-number :min="0" :disabled="status === 'STARTED' ||status === 'ENDED'" :step="1" :max="24" v-model="activityStock" /> 件
-        </a-form-item>
+        </a-form-item>-->
         <a-form-item :wrapperCol="{span: 21, offset: 3}">
           <a-button style="margin-right:20px" v-if="status !== 'STARTED'" @click="submit">保存并发布</a-button>
           <a-button @click="quxiao">取消</a-button>
@@ -143,27 +146,28 @@ const guigeColumns1 = [
     dataIndex: 'pintuanp',
     scopedSlots: { customRender: 'pintuanp' },
     editable: true
-  }, {
-    title: '销售返利(%/元)',
-    dataIndex: 'salesRate',
-    scopedSlots: { customRender: 'salesRate' },
-    editable: true,
-    rate: true
-  }, {
-    title: '管理佣金(%/元)',
-    dataIndex: 'manageRate',
-    scopedSlots: { customRender: 'manageRate' },
-    editable: true,
-    rate: true
-  }, {
-    title: '平台抽佣',
-    dataIndex: 'platform',
-    scopedSlots: { customRender: 'platform' },
-  }, {
-    title: '代理商分佣(元)',
-    dataIndex: 'provider',
-    scopedSlots: { customRender: 'provider' },
   }
+  // , {
+  //   title: '销售返利(%/元)',
+  //   dataIndex: 'salesRate',
+  //   scopedSlots: { customRender: 'salesRate' },
+  //   editable: true,
+  //   rate: true
+  // }, {
+  //   title: '管理佣金(%/元)',
+  //   dataIndex: 'manageRate',
+  //   scopedSlots: { customRender: 'manageRate' },
+  //   editable: true,
+  //   rate: true
+  // }, {
+  //   title: '平台抽佣',
+  //   dataIndex: 'platform',
+  //   scopedSlots: { customRender: 'platform' },
+  // }, {
+  //   title: '代理商分佣(元)',
+  //   dataIndex: 'provider',
+  //   scopedSlots: { customRender: 'provider' },
+  // }
 ]
 const guigeDataSource1 = [
   {
@@ -172,20 +176,6 @@ const guigeDataSource1 = [
     originp: '99',
     currentp: '49',
     costp: '19',
-    pintuanp: '0',
-    salesRate: '0',
-    manageRate: '0',
-    platform: '0',
-    provider: '0',
-    salesp: '0',
-    managep: '0'
-  },
-  {
-    key: '1',
-    name: '白色小号',
-    originp: '993',
-    currentp: '493',
-    costp: '193',
     pintuanp: '0',
     salesRate: '0',
     manageRate: '0',
@@ -217,19 +207,20 @@ const guigeColumns2 = [
     title: '砍价力度',
     dataIndex: 'kanjiap',
     scopedSlots: { customRender: 'kanjiap' },
-  }, {
-    title: '销售返利(%/元)',
-    dataIndex: 'salesRate',
-    scopedSlots: { customRender: 'salesRate' },
-    editable: true,
-    rate: true
-  }, {
-    title: '管理佣金(%/元)',
-    dataIndex: 'manageRate',
-    scopedSlots: { customRender: 'manageRate' },
-    editable: true,
-    rate: true
   }
+  // , {
+  //   title: '销售返利(%/元)',
+  //   dataIndex: 'salesRate',
+  //   scopedSlots: { customRender: 'salesRate' },
+  //   editable: true,
+  //   rate: true
+  // }, {
+  //   title: '管理佣金(%/元)',
+  //   dataIndex: 'manageRate',
+  //   scopedSlots: { customRender: 'manageRate' },
+  //   editable: true,
+  //   rate: true
+  // }
 ]
 const guigeDataSource2 = [
   {
@@ -277,18 +268,6 @@ const guigeColumns3 = [
     scopedSlots: { customRender: 'miaoshap' },
     editable: true
   }, {
-    title: '销售返利(%/元)',
-    dataIndex: 'salesRate',
-    scopedSlots: { customRender: 'salesRate' },
-    editable: true,
-    rate: true
-  }, {
-    title: '管理佣金(%/元)',
-    dataIndex: 'manageRate',
-    scopedSlots: { customRender: 'manageRate' },
-    editable: true,
-    rate: true
-  }, {
     title: '商品库存',
     dataIndex: 'stock1',
     scopedSlots: { customRender: 'stock1' },
@@ -298,6 +277,19 @@ const guigeColumns3 = [
     scopedSlots: { customRender: 'stock2' },
     editable: true,
   }
+  // {
+  //   title: '销售返利(%/元)',
+  //   dataIndex: 'salesRate',
+  //   scopedSlots: { customRender: 'salesRate' },
+  //   editable: true,
+  //   rate: true
+  // }, {
+  //   title: '管理佣金(%/元)',
+  //   dataIndex: 'manageRate',
+  //   scopedSlots: { customRender: 'manageRate' },
+  //   editable: true,
+  //   rate: true
+  // },
 ]
 const guigeDataSource3 = [
   {
@@ -312,16 +304,16 @@ const guigeDataSource3 = [
     },
     salesRate: '0',
     manageRate: '0',
-    salesp: '0',
-    managep: '0',
     stock1: '0',
-    stock2: '0'
+    stock2: '0',
+    salesp: '',
+    managep: '',
   }
 ]
 
 const colArr1 = ['name', 'originp', 'currentp', 'costp', 'pintuanp', 'salesRate', 'manageRate', 'platform', 'provider']
 const colArr2 = ['name', 'originp', 'currentp', 'costp', 'kanjiap', 'salesRate', 'manageRate']
-const colArr3 = ['name', 'originp', 'currentp', 'costp', 'miaoshap', 'salesRate', 'manageRate', 'stock1', 'stock2']
+const colArr3 = ['name', 'originp', 'currentp', 'costp', 'miaoshap', 'stock1', 'stock2', 'salesRate', 'manageRate']
 
 export default {
   name: "addActivity",
@@ -545,47 +537,58 @@ export default {
       item.bargainAmount = e;
     },
     submit() {
-      console.log(this.startDateValue);
-      console.log(this.endDateValue);
-      let seckillRull = [
-        {
-          activityPrice:0,
-          activityPoint:0,
-          activityStock:0
-        }
-      ];
       let that = this;
-      let activityList2 = [];
-      this.activityList.forEach(function(i) {
-        activityList2.push(i);
-      });
-      activityList2.forEach(element => {
-        element.bargainAmount = that.accurate_mul(element.bargainAmount, 100);
-      });
+      // let activityList2 = [];
+      // this.activityList.forEach(function(i) {
+      //   activityList2.push(i);
+      // });
+      // activityList2.forEach(element => {
+      //   element.bargainAmount = that.accurate_mul(element.bargainAmount, 100);
+      // });
       this.productId = this.productRadio.productId;
 
-      let rules = null;
+      let rules = [];
       if(this.activityType === "BARGAIN"){
-        rules = activityList2;
+        // rules = activityList2;
+        this.guigeDataSource.forEach(function(item1, index1) {
+          item1.kanjiap.forEach(function(item2, index2){
+            rules.push({
+              bargainAmount: that.accurate_mul(item2.bargainAmount, 100),
+              bargainCount: item2.bargainCount,
+              bargainStage: index2, //砍价规则顺序
+              initiatorBargainCount: 1,
+              participantBargainCount: 1,
+              skuId: item1.skuId
+            })
+          })
+        })
       }else if(this.activityType === "SPLICED"){
-        rules = [
-          {
+        this.guigeDataSource.forEach(function(item, index) {
+          rules[index] = {
             enableMock: 0, //模拟成团
             splicedPeopleCount: 2, //拼团人数
-            splicedPrice: this.accurate_mul(this.splicedPrice, 100) //拼团金额
+            splicedPrice: parseFloat(item.pintuanp) * 100 + "",  //拼团金额
+            skuId: item.skuId,
           }
-        ];
+        })
       }else if(this.activityType === "SEC_KILL"){
-        rules = [
-          {
-            activityPrice:this.accurate_mul(this.activityPrice, 100),
-            activityPoint:this.activityPoint,
-            activityStock:this.activityStock
+        this.guigeDataSource.forEach(function(item, index) {
+          if(parseFloat(item.miaoshap.juzi)) {
+            rules[index] = {
+              activityPrice: parseFloat(item.miaoshap.price) * 100 + "",
+              activityPoint: parseFloat(item.miaoshap.juzi) + "",
+              activityStock: item.stock2,
+              skuId: item.skuId,
+            }
+          } else {
+            rules[index] = {
+              activityPrice: parseFloat(item.miaoshap.price) * 100 + "",
+              activityStock: item.stock2,
+              skuId: item.skuId,
+            }
           }
-        ];
+        })
       }
-      // let hoursStart = this.dateStart.length > 11? '' : ' ' + this.hoursStart + ":00:00";
-      // let hoursEnd = this.dateEnd.length > 11? '' : ' ' + this.hoursEnd + ":00:00";
       let data = null,hoursStart =null,hoursEnd = null;
       if(this.activityType === "BARGAIN"||this.activityType === "SPLICED"){
         hoursStart = this.dateStart.length > 11? '' : " 00:00:00";
@@ -619,6 +622,7 @@ export default {
       if (!data.activityId || this.status === "ENDED") delete data.activityId;
       let url = "/endpoint/activity/operate/create.json";
       let url2 = "/endpoint/activity/operate/modify.json";
+      console.log(JSON.stringify(data));
       this.$axios({
         url: !this.activityId || this.status === "ENDED" ? url : url2,
         method: "post",
@@ -703,6 +707,73 @@ export default {
       this.productName = '';
       this.productListFun();
       this.visible = false;
+      console.log(this.productRadio);
+      let guigeDataSource = [];
+      if(this.activityType === 'SPLICED') {
+        this.productRadio.productSkus.forEach(function(item, index) {
+          guigeDataSource[index] = {
+            key: index,
+            name: item.skuName,
+            originp: item.originalPrice/100,
+            currentp: item.price/100,
+            costp: item.costPrice/100,
+            pintuanp: '0',
+            salesRate: '0',
+            manageRate: '0',
+            platform: '0',
+            provider: '0',
+            salesp: '0',
+            managep: '0',
+            skuId: item.skuId
+          }
+        })
+      } else if(this.activityType === 'BARGAIN') {
+        this.productRadio.productSkus.forEach(function(item, index) {
+          guigeDataSource[index] = {
+            key: index,
+            name: item.skuName,
+            originp: item.originalPrice/100,
+            currentp: item.price/100,
+            costp: item.costPrice/100,
+            kanjiap: [
+              {
+                bargainAmount: "0", //砍价金额
+                bargainCount: "0", //砍价次数
+                bargainStage: num, //砍价规则顺序
+                initiatorBargainCount: 1, //发起者砍价次数
+                participantBargainCount: 1 //参与者砍价次数
+              }
+            ],
+            salesRate: '0',
+            manageRate: '0',
+            salesp: '0',
+            managep: '0',
+            skuId: item.skuId
+          }
+        })
+      } else if(this.activityType === 'SEC_KILL') {
+        this.productRadio.productSkus.forEach(function(item, index) {
+          guigeDataSource[index] = {
+            key: index,
+            name: item.skuName,
+            originp: item.originalPrice/100,
+            currentp: item.price/100,
+            costp: item.costPrice/100,
+            miaoshap: {
+              price: '0',
+              juzi: '0'
+            },
+            salesRate: '0',
+            manageRate: '0',
+            stock1: item.stock,
+            stock2: '0',
+            salesp: '',
+            managep: '',
+            skuId: item.skuId
+          }
+        })
+      };
+      this.guigeDataSource = guigeDataSource;
     },
     handleCancel() {
       this.productName = '';
@@ -735,30 +806,83 @@ export default {
             costPrice: res.data.costPrice,
             price: res.data.salesPrice
           };
+          let guigeDataSource = [];
           if (this.activityType === "BARGAIN") {
-            this.activityList = res.data.rules;
-            this.activityList.forEach(function(i) {
-              i.bargainAmount = that.accurate_div(i.bargainAmount, 100);
-            });
+            // this.activityList = res.data.rules;
+            // this.activityList.forEach(function(i) {
+            //   i.bargainAmount = that.accurate_div(i.bargainAmount, 100);
+            // });
+            res.data.rules.forEach(function(item, index) {
+              guigeDataSource[index] = {
+                key: index,
+                name: item.skuName,
+                originp: item.originalPrice/100,
+                currentp: item.price/100,
+                costp: item.costPrice/100,
+                kanjiap: [],
+                salesRate: '0',
+                manageRate: '0',
+                salesp: '0',
+                managep: '0',
+                skuId: item.skuId
+              }
+              item.rules.forEach(function(item2, index2){
+                guigeDataSource[index].kanjiap[index2] = {
+                  bargainAmount: item2.bargainAmount/100, //砍价金额
+                  bargainCount: item2.bargainCount, //砍价次数
+                  bargainStage: item2.bargainStage, //砍价规则顺序
+                  initiatorBargainCount: 1, //发起者砍价次数
+                  participantBargainCount: 1 //参与者砍价次数
+                }
+              })
+            })
           }else if(this.activityType === 'SPLICED'){
-            this.splicedPrice = that.accurate_div(res.data.rules[0].splicedPrice, 100);
+            res.data.rules.forEach(function(item, index) {
+              guigeDataSource[index] = {
+                key: index,
+                name: item.skuName,
+                originp: item.originalPrice/100,
+                currentp: item.price/100,
+                costp: item.costPrice/100,
+                pintuanp: item.rules[0].splicedPrice/100,
+                salesRate: '0',
+                manageRate: '0',
+                platform: '0',
+                provider: '0',
+                salesp: '0',
+                managep: '0',
+                skuId: item.skuId
+              }
+            })
           }else if(this.activityType === 'SEC_KILL'){
-            this.activityPrice = that.accurate_div(res.data.rules[0].activityPrice, 100);
-            this.activityPoint = res.data.rules[0].activityPoint;
-            if(res.data.rules[0].activityPoint>0){
-              this.skillCoin = '桔子';
-            }
-            this.activityStock = res.data.rules[0].activityStock;
+            res.data.rules.forEach(function(item, index) {
+              guigeDataSource[index] = {
+                key: index,
+                name: item.skuName,
+                originp: item.originalPrice/100,
+                currentp: item.price/100,
+                costp: item.costPrice/100,
+                miaoshap: {
+                  price: item.rules[0].activityPrice/100,
+                  juzi: item.rules[0].activityPoint ? item.rules[0].activityPoint : 0
+                },
+                stock1: item.rules[0].balanceStock,
+                stock2: item.rules[0].activityStock,
+                salesRate: '0',
+                manageRate: '0',
+                salesp: '',
+                managep: '',
+                skuId: item.skuId,
+              }
+            });
           }
+          // console.log(guigeDataSource);
+          this.guigeDataSource = guigeDataSource;
 
           this.dateValue = [
             this.moment(res.data.startTime, "YYYY-MM-DD"),
             this.moment(res.data.endTime, "YYYY-MM-DD")
           ];
-          // this.startHoursValue = this.moment(res.data.startTime, "YYYY-MM-DD HH:mm:ss");
-          // this.endHoursValue = this.moment(res.data.endTime, "YYYY-MM-DD HH:mm:ss");
-          // this.startDateValue = this.moment(res.data.startTime,"YYYY-MM-DD");
-          // this.endDateValue = this.moment(res.data.startTime,"YYYY-MM-DD");
           this.startHoursValue = res.data.startTime;
           this.endHoursValue = res.data.endTime;
           this.startDateValue = res.data.startTime;
