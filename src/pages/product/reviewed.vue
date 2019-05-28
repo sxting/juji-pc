@@ -261,6 +261,43 @@ const columns2 = [
     }
   }
 ];
+const columns3 = [
+  {
+    title: "提交时间",
+    dataIndex: "dateCreated"
+  },
+  {
+    title: "所属运营商",
+    dataIndex: "providerName"
+  },
+  {
+    title: "商品类型",
+    dataIndex: "typeName"
+  },
+  {
+    title: "商品名称",
+    dataIndex: "productName"
+  },
+  {
+    title: "所需桔子",
+    dataIndex: "point"
+  },
+  {
+    title: "售价",
+    dataIndex: "price"
+  },
+  {
+    title: "审核未通过原因",
+    dataIndex: "rejectReason"
+  },
+  {
+    title: "操作",
+    key: "action",
+    scopedSlots: {
+      customRender: "action"
+    }
+  }
+];
 const data = [];
 const dataSource = [];
 
@@ -455,6 +492,11 @@ export default {
           });
           this.guigeDataSource = guigeDataSource;
 
+          if(res.data.auditStatus === 'REJECT') {
+            this.tongguo = '1';
+            this.butongguo = res.data.rejectReason;
+          }
+
           this.fileList1 = [
             {
               uid: "-1",
@@ -552,6 +594,7 @@ export default {
     tabsFun(e) {
       this.status = e;
       if(this.status  === 'PASS') this.columns = columns2;
+      else if(this.status  === 'REJECT') this.columns = columns3;
       else this.columns = columns;
       this.reviewedList();
     },

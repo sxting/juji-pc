@@ -466,9 +466,10 @@ export default {
         if (res.success) {
           this.data = res.data.elements;
           this.data.forEach(function(i) {
-            i.activityPrice = that.accurate_div(i.activityPrice, 100) + '元';
             if(i.activityPoint) {
-              i.activityPrice = that.accurate_div(i.activityPrice, 100) + '元' + i.activityPoint + '桔子';
+              i.activityPrice = that.accurate_div(i.activityPrice, 100) + '元 + ' + i.activityPoint + '桔子';
+            } else {
+              i.activityPrice = that.accurate_div(i.activityPrice, 100) + '元';
             }
           });
         } else {

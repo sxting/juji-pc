@@ -28,12 +28,14 @@
                   style="margin: -5px 0; width: 70px;"
                   :value="text.price"
                   @change="e => handleChange2(e.target.value, record.key, col)"
+                  @blur="e => handleBlur2(e.target.value, record.key, col)"
                 />  <span class="nowrap">元 +</span>
                 <a-input
                   :disabled="status === 'STARTED' ||status === 'ENDED'"
                   style="margin: -5px 0; width: 70px;"
                   :value="text.juzi"
                   @change="e => handleChange3(e.target.value, record.key, col)"
+                  @blur="e => handleBlur3(e.target.value, record.key, col)"
                 /> <span class="nowrap">桔子</span>
               </div>
               <div :key="col" v-else>
@@ -43,6 +45,7 @@
                     style="margin: -5px 0; width: 70px;"
                     :value="text"
                     @change="e => handleChange1(e.target.value, record.key, col)"
+                    @blur="e => handleBlur1(e.target.value, record.key, col)"
                   />
                   <span v-if="guigeColumns[i].rate"> % </span>
                   <span class="w40" v-if="i == 5">{{record.salesp}}</span>
@@ -146,20 +149,20 @@ const guigeColumns1 = [
     dataIndex: 'pintuanp',
     scopedSlots: { customRender: 'pintuanp' },
     editable: true
+  }, {
+    title: '销售返利(%/元)',
+    dataIndex: 'salesRate',
+    scopedSlots: { customRender: 'salesRate' },
+    editable: true,
+    rate: true
+  }, {
+    title: '管理佣金(%/元)',
+    dataIndex: 'manageRate',
+    scopedSlots: { customRender: 'manageRate' },
+    editable: true,
+    rate: true
   }
   // , {
-  //   title: '销售返利(%/元)',
-  //   dataIndex: 'salesRate',
-  //   scopedSlots: { customRender: 'salesRate' },
-  //   editable: true,
-  //   rate: true
-  // }, {
-  //   title: '管理佣金(%/元)',
-  //   dataIndex: 'manageRate',
-  //   scopedSlots: { customRender: 'manageRate' },
-  //   editable: true,
-  //   rate: true
-  // }, {
   //   title: '平台抽佣',
   //   dataIndex: 'platform',
   //   scopedSlots: { customRender: 'platform' },
@@ -208,19 +211,19 @@ const guigeColumns2 = [
     dataIndex: 'kanjiap',
     scopedSlots: { customRender: 'kanjiap' },
   }
-  // , {
-  //   title: '销售返利(%/元)',
-  //   dataIndex: 'salesRate',
-  //   scopedSlots: { customRender: 'salesRate' },
-  //   editable: true,
-  //   rate: true
-  // }, {
-  //   title: '管理佣金(%/元)',
-  //   dataIndex: 'manageRate',
-  //   scopedSlots: { customRender: 'manageRate' },
-  //   editable: true,
-  //   rate: true
-  // }
+  , {
+    title: '销售返利(%/元)',
+    dataIndex: 'salesRate',
+    scopedSlots: { customRender: 'salesRate' },
+    editable: true,
+    rate: true
+  }, {
+    title: '管理佣金(%/元)',
+    dataIndex: 'manageRate',
+    scopedSlots: { customRender: 'manageRate' },
+    editable: true,
+    rate: true
+  }
 ]
 const guigeDataSource2 = [
   {
@@ -268,6 +271,18 @@ const guigeColumns3 = [
     scopedSlots: { customRender: 'miaoshap' },
     editable: true
   }, {
+    title: '销售返利(%/元)',
+    dataIndex: 'salesRate',
+    scopedSlots: { customRender: 'salesRate' },
+    editable: true,
+    rate: true
+  }, {
+    title: '管理佣金(%/元)',
+    dataIndex: 'manageRate',
+    scopedSlots: { customRender: 'manageRate' },
+    editable: true,
+    rate: true
+  },{
     title: '商品库存',
     dataIndex: 'stock1',
     scopedSlots: { customRender: 'stock1' },
@@ -277,19 +292,7 @@ const guigeColumns3 = [
     scopedSlots: { customRender: 'stock2' },
     editable: true,
   }
-  // {
-  //   title: '销售返利(%/元)',
-  //   dataIndex: 'salesRate',
-  //   scopedSlots: { customRender: 'salesRate' },
-  //   editable: true,
-  //   rate: true
-  // }, {
-  //   title: '管理佣金(%/元)',
-  //   dataIndex: 'manageRate',
-  //   scopedSlots: { customRender: 'manageRate' },
-  //   editable: true,
-  //   rate: true
-  // },
+
 ]
 const guigeDataSource3 = [
   {
@@ -313,7 +316,7 @@ const guigeDataSource3 = [
 
 const colArr1 = ['name', 'originp', 'currentp', 'costp', 'pintuanp', 'salesRate', 'manageRate', 'platform', 'provider']
 const colArr2 = ['name', 'originp', 'currentp', 'costp', 'kanjiap', 'salesRate', 'manageRate']
-const colArr3 = ['name', 'originp', 'currentp', 'costp', 'miaoshap', 'stock1', 'stock2', 'salesRate', 'manageRate']
+const colArr3 = ['name', 'originp', 'currentp', 'costp', 'miaoshap', 'salesRate', 'manageRate', 'stock1', 'stock2']
 
 export default {
   name: "addActivity",
@@ -402,7 +405,17 @@ export default {
         target[column] = value
         this.guigeDataSource = newData
       }
-      console.log(this.guigeDataSource)
+    },
+    handleBlur1(value, key, column) {
+      const newData = [...this.guigeDataSource]
+      const target = newData.filter(item => key === item.key)[0];
+      if(column == 'salesRate' || column == 'manageRate') {
+        if(/^[0-9]*$/.test(value)) {
+          this.fenyongFun(target)
+        } else {
+          console.log('数据格式错误');
+        }
+      }
     },
     handleChange2 (value, key, column) {
       const newData = [...this.guigeDataSource]
@@ -411,7 +424,17 @@ export default {
         target[column].price = value;
         this.guigeDataSource = newData
       }
-      console.log(this.guigeDataSource)
+    },
+    handleBlur2(value, key, column) {
+      const newData = [...this.guigeDataSource]
+      const target = newData.filter(item => key === item.key)[0];
+      if(column == 'salesRate' || column == 'manageRate') {
+        if(/^[0-9]*$/.test(value)) {
+          this.fenyongFun(target)
+        } else {
+          console.log('数据格式错误');
+        }
+      }
     },
     handleChange3 (value, key, column) {
       const newData = [...this.guigeDataSource]
@@ -420,7 +443,17 @@ export default {
         target[column].juzi = value;
         this.guigeDataSource = newData
       }
-      console.log(this.guigeDataSource)
+    },
+    handleBlur3(value, key, column) {
+      const newData = [...this.guigeDataSource]
+      const target = newData.filter(item => key === item.key)[0];
+      if(column == 'salesRate' || column == 'manageRate') {
+        if(/^[0-9]*$/.test(value)) {
+          this.fenyongFun(target)
+        } else {
+          console.log('数据格式错误');
+        }
+      }
     },
     handleOpenChange1(open){
       console.log('open', open);
@@ -538,13 +571,6 @@ export default {
     },
     submit() {
       let that = this;
-      // let activityList2 = [];
-      // this.activityList.forEach(function(i) {
-      //   activityList2.push(i);
-      // });
-      // activityList2.forEach(element => {
-      //   element.bargainAmount = that.accurate_mul(element.bargainAmount, 100);
-      // });
       this.productId = this.productRadio.productId;
 
       let rules = [];
@@ -558,7 +584,9 @@ export default {
               bargainStage: index2, //砍价规则顺序
               initiatorBargainCount: 1,
               participantBargainCount: 1,
-              skuId: item1.skuId
+              skuId: item1.skuId,
+              manageRateStr: item1.manageRate,
+              saleRateStr: item1.salesRate
             })
           })
         })
@@ -569,6 +597,8 @@ export default {
             splicedPeopleCount: 2, //拼团人数
             splicedPrice: parseFloat(item.pintuanp) * 100 + "",  //拼团金额
             skuId: item.skuId,
+            manageRateStr: item.manageRate,
+            saleRateStr: item.salesRate
           }
         })
       }else if(this.activityType === "SEC_KILL"){
@@ -579,12 +609,16 @@ export default {
               activityPoint: parseFloat(item.miaoshap.juzi) + "",
               activityStock: item.stock2,
               skuId: item.skuId,
+              manageRateStr: item.manageRate,
+              saleRateStr: item.salesRate
             }
           } else {
             rules[index] = {
               activityPrice: parseFloat(item.miaoshap.price) * 100 + "",
               activityStock: item.stock2,
               skuId: item.skuId,
+              manageRateStr: item.manageRate,
+              saleRateStr: item.salesRate
             }
           }
         })
@@ -808,10 +842,6 @@ export default {
           };
           let guigeDataSource = [];
           if (this.activityType === "BARGAIN") {
-            // this.activityList = res.data.rules;
-            // this.activityList.forEach(function(i) {
-            //   i.bargainAmount = that.accurate_div(i.bargainAmount, 100);
-            // });
             res.data.rules.forEach(function(item, index) {
               guigeDataSource[index] = {
                 key: index,
@@ -820,10 +850,10 @@ export default {
                 currentp: item.price/100,
                 costp: item.costPrice/100,
                 kanjiap: [],
-                salesRate: '0',
-                manageRate: '0',
-                salesp: '0',
-                managep: '0',
+                salesRate: item.rules[0].saleRateStr,
+                manageRate: item.rules[0].manageRateStr,
+                salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
+                managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
                 skuId: item.skuId
               }
               item.rules.forEach(function(item2, index2){
@@ -845,12 +875,12 @@ export default {
                 currentp: item.price/100,
                 costp: item.costPrice/100,
                 pintuanp: item.rules[0].splicedPrice/100,
-                salesRate: '0',
-                manageRate: '0',
+                salesRate: item.rules[0].saleRateStr,
+                manageRate: item.rules[0].manageRateStr,
                 platform: '0',
                 provider: '0',
-                salesp: '0',
-                managep: '0',
+                salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
+                managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
                 skuId: item.skuId
               }
             })
@@ -868,10 +898,10 @@ export default {
                 },
                 stock1: item.rules[0].balanceStock,
                 stock2: item.rules[0].activityStock,
-                salesRate: '0',
-                manageRate: '0',
-                salesp: '',
-                managep: '',
+                salesRate: item.rules[0].saleRateStr,
+                manageRate: item.rules[0].manageRateStr,
+                salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
+                managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
                 skuId: item.skuId,
               }
             });
@@ -897,7 +927,49 @@ export default {
           });
         }
       });
-    }
+    },
+    fenyongFun(item) {
+      let data = {
+        productId: this.productRadio.productId,
+        manageRateStr: item.manageRate,
+        salesRateStr: item.salesRate,
+        skuId: item.skuId
+      };
+      let that = this;
+      this.$axios({
+        url: "/endpoint/distributor/product/calculateEstimateSettlement.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          res.data.forEach(function(i) {
+            if (i.settlementType === "MERCHANT") i.boolean = true;
+            that.guigeDataSource.forEach(function(item2, index) {
+              if(item.skuId == item2.skuId) {
+                if (i.settlementType === "DISTRIBUTOR_SALES_REBATE"){
+                  i.name = "销售返利";
+                  i.boolean = true;
+                  item2.salesp = i.estimateAmount/100;
+                }
+                if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
+                  i.name = "管理佣金";
+                  i.boolean = true;
+                  item2.managep = i.estimateAmount/100;
+                }
+              }
+            })
+            // if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽佣"; //平台抽佣
+            // if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
+          });
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
   }
 };
 </script>

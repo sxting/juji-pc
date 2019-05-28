@@ -25,14 +25,19 @@
         <a-form-item label="商品规格" :labelCol="{span: 7}"  :wrapperCol="{span: 16}" :required="true">
           <div>
             <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
-              <template v-for="col in ['name', 'originp', 'currentp', 'jifen', 'costp', 'stock']" :slot="col" slot-scope="text, record, index">
+              <template v-for="(col, i) in ['name', 'originp', 'currentp', 'jifen', 'costp', 'stock', 'saleRate', 'manageRate']" :slot="col" slot-scope="text, record, index">
                 <div :key="col">
-                  <a-input
-                    v-if="true"
-                    style="margin: -5px 0"
-                    :value="text"
-                    @change="e => handleChange(e.target.value, record.key, col)"
-                  />
+                  <div v-if="true" class="disflex">
+                    <a-input
+                      style="margin: -5px 0"
+                      :value="text"
+                      @change="e => handleChange(e.target.value, record.key, col)"
+                      @blur="e => handleBlur(e.target.value, record.key, col)"
+                    />
+                    <span v-if="guigeColumns[i].rate">%</span>
+                    <span class="w40" v-if="i == 6">{{record.salesp}}</span>
+                    <span class="w40" v-if="i == 7">{{record.managep}}</span>
+                  </div>
                   <template v-else>{{text}}</template>
                 </div>
               </template>
@@ -48,28 +53,6 @@
             <a-button class="editable-add-btn fr" @click="handleAdd">增加</a-button>
           </div>
         </a-form-item>
-
-        <!--
-        <a-form-item label="底价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.costPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
-          <a-input-number style="width:100%" :min="0" :max="99999.99" placeholder="请输入商品底价" :disabled="productId?true:false" />
-        </a-form-item>
-        <a-form-item label="原价" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" fieldDecoratorId="repository.originalPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
-          <a-input-number style="width:100%" :min="0.01" :max="99999.99" placeholder="请输入商品原价" />
-        </a-form-item>
-        <a-form-item label="售价" :labelCol="{span: 7}" v-if="productType === 'PRODUCT'" :wrapperCol="{span: 10}" :required="true">
-          <a-input-number style="width:100%" :min="0" :max="99999.99" :value="price" @change="priceChange" placeholder="请输入商品售价" />
-        </a-form-item>
-        <a-form-item label="售价" :labelCol="{span: 7}" v-if="productType === 'POINT'" :wrapperCol="{span: 10}" :required="true">
-          <a-radio-group v-model="jifen"  @change="jifenFun">
-            <a-radio :value="'桔子兑换'">桔子兑换</a-radio>
-            <a-radio :value="'桔子+钱'">桔子+钱</a-radio>
-          </a-radio-group>
-          <div>
-            <a-input-number :min="0" :value="point" @change="pointChange($event)" :max="99999" style="width:200px;margin-right:10px;" placeholder="请输入桔子数量" />
-            <a-input-number :min="0" @change="priceChange($event)" :max="99999.99" v-if="jifen === '桔子+钱'" :value="price"  style="width:200px"  placeholder="请输入钱数" />
-          </div>
-        </a-form-item>
-        -->
 
         <a-form-item label="商品首图" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <div class="clearfix">
@@ -257,14 +240,18 @@ export default {
           costp: '0',
           stock: '0',
           skuId: '',
-          id: ''
+          id: '',
+          manageRate: '0',
+          saleRate: '0',
+          managep: '3',
+          salesp: '3'
         }
       ],
       guigeColumns: [
         {
           title: '规格名称',
           dataIndex: 'name',
-          width: '20%',
+          width: '15%',
           scopedSlots: { customRender: 'name' },
         }, {
           title: '原价',
@@ -287,6 +274,17 @@ export default {
           dataIndex: 'stock',
           scopedSlots: { customRender: 'stock' },
         }, {
+          title: "购物返利",
+          dataIndex: "saleRate",
+          scopedSlots: { customRender: 'saleRate' },
+          rate: true
+        },
+        {
+          title: "管理佣金",
+          dataIndex: "manageRate",
+          scopedSlots: { customRender: 'manageRate' },
+          rate: true
+        },{
           title: '操作',
           dataIndex: 'operation',
           scopedSlots: { customRender: 'operation' },
@@ -348,10 +346,21 @@ export default {
   methods: {
     handleChange (value, key, column) {
       const newData = [...this.guigeDataSource]
-      const target = newData.filter(item => key === item.key)[0]
+      const target = newData.filter(item => key === item.key)[0];
       if (target) {
         target[column] = value
         this.guigeDataSource = newData
+      }
+    },
+    handleBlur(value, key, column) {
+      const newData = [...this.guigeDataSource]
+      const target = newData.filter(item => key === item.key)[0];
+      if(column == 'saleRate' || column == 'manageRate') {
+        if(/^[0-9]*$/.test(value)) {
+          this.fenyongFun(target)
+        } else {
+          console.log('数据格式错误');
+        }
       }
     },
     onDelete (key) {
@@ -367,10 +376,13 @@ export default {
         currentp: '',
         jifen: '',
         costp: '',
-        stock: ''
+        stock: '',
+        manageRate: '',
+        saleRate: '',
       }
       this.guigeDataSource = [...guigeDataSource, newData]
-      this.count = count + 1
+      this.count = count + 1;
+      console.log(this.guigeDataSource);
     },
 
     jifenFun(){
@@ -562,7 +574,9 @@ export default {
                 status: 'NORMAL',
                 stock: parseFloat(item.stock),
                 skuId: item.skuId,
-                id: item.id
+                id: item.id,
+                manageRateStr: item.manageRate,
+                saleRateStr: item.saleRate
               }
             });
             data = {
@@ -786,6 +800,7 @@ export default {
           this.unAuditCount = res.data.unAuditCount;
           this.productType = res.data.type;
           this.biaoqian = res.data.tag;
+          this.count = res.data.productSkus.length;
 
           let guigeDataSource = [];
           res.data.productSkus.forEach(function(item, index) {
@@ -798,7 +813,11 @@ export default {
               costp: item.costPrice/100,
               stock: item.stock,
               skuId: item.skuId,
-              id: item.id
+              id: item.id,
+              manageRate: item.manageRateStr,
+              saleRate: item.saleRateStr,
+              salesp: item.salePrice ? item.salePrice/100 : 0,
+              managep: item.managePrice ? item.managePrice/100 : 0,
             };
           })
           this.guigeDataSource = guigeDataSource;
@@ -909,6 +928,49 @@ export default {
         }
       });
     },
+    fenyongFun(item) {
+      let data = {
+        providerId: this.providerId,
+        price: parseFloat(item.currentp) * 100,
+        costPrice: parseFloat(item.costp) * 100,
+        manageRateStr: item.manageRate,
+        salesRateStr: item.saleRate
+      };
+      let that = this;
+      this.$axios({
+        url: "/endpoint/distributor/product/preCalculateEstimateSettlement.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          res.data.forEach(function(i) {
+            // if (i.settlementType === "MERCHANT") i.boolean = true;
+            that.guigeDataSource.forEach(function(item2, index) {
+              if(item.skuId == item2.skuId) {
+                if (i.settlementType === "DISTRIBUTOR_SALES_REBATE"){
+                  i.name = "销售返利";
+                  i.boolean = true;
+                  item2.salesp = i.estimateAmount/100;
+                }
+                if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
+                  i.name = "管理佣金";
+                  i.boolean = true;
+                  item2.managep = i.estimateAmount/100;
+                }
+              }
+            })
+            // if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽佣"; //平台抽佣
+            // if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
+          });
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
     beforeUpload(file) {
       const isLt2M = file.size / 1024 / 1024 < 10;
       if (!isLt2M) {
@@ -924,6 +986,13 @@ export default {
 .fr {
   float: right;
   margin-top: 10px;
+}
+.disflex {
+  display: flex;
+}
+.w40 {
+  width: 40px;
+  margin-left: 10px;
 }
 </style>
 
