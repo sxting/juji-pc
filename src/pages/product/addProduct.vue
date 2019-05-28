@@ -243,8 +243,8 @@ export default {
           id: '',
           manageRate: '0',
           saleRate: '0',
-          managep: '3',
-          salesp: '3'
+          managep: '0',
+          salesp: '0'
         }
       ],
       guigeColumns: [
