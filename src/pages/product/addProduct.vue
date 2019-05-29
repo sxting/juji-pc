@@ -25,18 +25,14 @@
         <a-form-item label="商品规格" :labelCol="{span: 7}"  :wrapperCol="{span: 16}" :required="true">
           <div>
             <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
-              <template v-for="(col, i) in ['name', 'originp', 'currentp', 'jifen', 'costp', 'stock', 'saleRate', 'manageRate']" :slot="col" slot-scope="text, record, index">
+              <template v-for="(col, i) in ['name', 'originp', 'currentp', 'jifen', 'costp', 'stock']" :slot="col" slot-scope="text, record, index">
                 <div :key="col">
                   <div v-if="true" class="disflex">
                     <a-input
                       style="margin: -5px 0"
                       :value="text"
                       @change="e => handleChange(e.target.value, record.key, col)"
-                      @blur="e => handleBlur(e.target.value, record.key, col)"
                     />
-                    <span v-if="guigeColumns[i].rate">%</span>
-                    <span class="w40" v-if="i == 6">{{record.salesp}}</span>
-                    <span class="w40" v-if="i == 7">{{record.managep}}</span>
                   </div>
                   <template v-else>{{text}}</template>
                 </div>
@@ -251,7 +247,7 @@ export default {
         {
           title: '规格名称',
           dataIndex: 'name',
-          width: '15%',
+          width: '20%',
           scopedSlots: { customRender: 'name' },
         }, {
           title: '原价',
@@ -274,17 +270,6 @@ export default {
           dataIndex: 'stock',
           scopedSlots: { customRender: 'stock' },
         }, {
-          title: "购物返利",
-          dataIndex: "saleRate",
-          scopedSlots: { customRender: 'saleRate' },
-          rate: true
-        },
-        {
-          title: "管理佣金",
-          dataIndex: "manageRate",
-          scopedSlots: { customRender: 'manageRate' },
-          rate: true
-        },{
           title: '操作',
           dataIndex: 'operation',
           scopedSlots: { customRender: 'operation' },
@@ -575,8 +560,6 @@ export default {
                 stock: parseFloat(item.stock),
                 skuId: item.skuId,
                 id: item.id,
-                manageRateStr: item.manageRate,
-                saleRateStr: item.saleRate
               }
             });
             data = {
@@ -590,23 +573,15 @@ export default {
               merchantId: values.repository.merchantId,
               merchantName: this.merchantName,
               note: JSON.stringify(note),
-              // costPrice: this.accurate_mul(values.repository.costPrice, 100),
-              // originalPrice: this.accurate_mul(
-              //   values.repository.originalPrice,
-              //   100
-              // ),
               picId: this.fileList1[0].response
                 ? this.fileList1[0].response
                 : this.fileList1[0].name,
               picIds: picIds,
-              // point: this.productType === "POINT" ? this.point : 0,
-              // price: this.price?this.accurate_mul(this.price, 100):0,
               productName: values.repository.productName,
               productStores: storeIdArr,
               providerId: this.providerId,
               providerName: values.repository.providerName,
               putAway: 1,
-              // stock: values.repository.stock,
               tag: this.biaoqian,
               type: productType,
               productId: this.productId,
@@ -814,16 +789,10 @@ export default {
               stock: item.stock,
               skuId: item.skuId,
               id: item.id,
-              manageRate: item.manageRateStr,
-              saleRate: item.saleRateStr,
-              salesp: item.salePrice ? item.salePrice/100 : 0,
-              managep: item.managePrice ? item.managePrice/100 : 0,
             };
           })
           this.guigeDataSource = guigeDataSource;
 
-          // this.price = Number(this.accurate_div(res.data.price, 100));
-          // this.point = res.data.point;
           this.jifen = res.data.type === "PRODUCT" ? res.data.price? "桔子+钱": "桔子兑换" :"桔子兑换";
           this.limitMaxNum =
             res.data.limitMaxNum > 0 ? res.data.limitMaxNum : "";
@@ -840,10 +809,7 @@ export default {
               repository: {
                 cutOffDays: res.data.cutOffDays,
                 idx: res.data.idx,
-                // originalPrice: Number(this.accurate_div(res.data.originalPrice, 100)),
-                // costPrice: Number(this.accurate_div(res.data.costPrice, 100)),
                 productName: res.data.productName,
-                // stock: res.data.stock,
                 merchantId: res.data.merchantId,
                 shareText: res.data.shareText
               }
