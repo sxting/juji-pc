@@ -48,8 +48,8 @@
                     @blur="e => handleBlur1(e.target.value, record.key, col)"
                   />
                   <span v-if="guigeColumns[i].rate"> % </span>
-                  <span class="w40" v-if="i == 5">{{record.salesp}}</span>
-                  <span class="w40" v-if="i == 6">{{record.managep}}</span>
+                  <span class="w40" v-if="i == 6">{{record.salesp}}</span>
+                  <span class="w40" v-if="i == 7">{{record.managep}}</span>
                 </div>
                 <template v-else>{{text}}</template>
               </div>
@@ -141,6 +141,10 @@ const guigeColumns1 = [
     dataIndex: 'currentp',
     scopedSlots: { customRender: 'currentp' },
   }, {
+    title: '桔子积分',
+    dataIndex: 'point',
+    scopedSlots: { customRender: 'point' },
+  }, {
     title: '底价(元)',
     dataIndex: 'costp',
     scopedSlots: { customRender: 'costp' },
@@ -175,9 +179,10 @@ const guigeColumns1 = [
 const guigeDataSource1 = [
   {
     key: '0',
-    name: '白色大号',
+    name: '',
     originp: '99',
     currentp: '49',
+    point: '0',
     costp: '19',
     pintuanp: '0',
     salesRate: '0',
@@ -202,6 +207,10 @@ const guigeColumns2 = [
     title: '售价(元)',
     dataIndex: 'currentp',
     scopedSlots: { customRender: 'currentp' },
+  }, {
+    title: '桔子积分',
+    dataIndex: 'point',
+    scopedSlots: { customRender: 'point' },
   }, {
     title: '底价(元)',
     dataIndex: 'costp',
@@ -228,9 +237,10 @@ const guigeColumns2 = [
 const guigeDataSource2 = [
   {
     key: '0',
-    name: '白色大号',
+    name: '',
     originp: '0',
     currentp: '0',
+    point: '0',
     costp: '0',
     kanjiap: [
       {
@@ -261,6 +271,10 @@ const guigeColumns3 = [
     title: '售价(元)',
     dataIndex: 'currentp',
     scopedSlots: { customRender: 'currentp' },
+  }, {
+    title: '桔子积分',
+    dataIndex: 'point',
+    scopedSlots: { customRender: 'point' },
   }, {
     title: '底价(元)',
     dataIndex: 'costp',
@@ -297,10 +311,11 @@ const guigeColumns3 = [
 const guigeDataSource3 = [
   {
     key: '0',
-    name: '白色大号',
-    originp: '99',
-    currentp: '49',
-    costp: '19',
+    name: '',
+    originp: '0',
+    currentp: '0',
+    point: '0',
+    costp: '0',
     miaoshap: {
       price: '0',
       juzi: '0'
@@ -314,9 +329,9 @@ const guigeDataSource3 = [
   }
 ]
 
-const colArr1 = ['name', 'originp', 'currentp', 'costp', 'pintuanp', 'salesRate', 'manageRate', 'platform', 'provider']
-const colArr2 = ['name', 'originp', 'currentp', 'costp', 'kanjiap', 'salesRate', 'manageRate']
-const colArr3 = ['name', 'originp', 'currentp', 'costp', 'miaoshap', 'salesRate', 'manageRate', 'stock1', 'stock2']
+const colArr1 = ['name', 'originp', 'currentp', 'point', 'costp', 'pintuanp', 'salesRate', 'manageRate', 'platform', 'provider']
+const colArr2 = ['name', 'originp', 'currentp', 'point', 'costp', 'kanjiap', 'salesRate', 'manageRate']
+const colArr3 = ['name', 'originp', 'currentp', 'point', 'costp', 'miaoshap', 'salesRate', 'manageRate', 'stock1', 'stock2']
 
 export default {
   name: "addActivity",
@@ -750,6 +765,7 @@ export default {
             name: item.skuName,
             originp: item.originalPrice/100,
             currentp: item.price/100,
+            point: item.point,
             costp: item.costPrice/100,
             pintuanp: '0',
             salesRate: '0',
@@ -768,6 +784,7 @@ export default {
             name: item.skuName,
             originp: item.originalPrice/100,
             currentp: item.price/100,
+            point: item.point,
             costp: item.costPrice/100,
             kanjiap: [
               {
@@ -792,6 +809,7 @@ export default {
             name: item.skuName,
             originp: item.originalPrice/100,
             currentp: item.price/100,
+            point: item.point,
             costp: item.costPrice/100,
             miaoshap: {
               price: '0',
@@ -849,6 +867,7 @@ export default {
                 originp: item.originalPrice/100,
                 currentp: item.price/100,
                 costp: item.costPrice/100,
+                point: item.pointPrice,
                 kanjiap: [],
                 salesRate: item.rules[0].saleRateStr,
                 manageRate: item.rules[0].manageRateStr,
@@ -873,6 +892,7 @@ export default {
                 name: item.skuName,
                 originp: item.originalPrice/100,
                 currentp: item.price/100,
+                point: item.pointPrice,
                 costp: item.costPrice/100,
                 pintuanp: item.rules[0].splicedPrice/100,
                 salesRate: item.rules[0].saleRateStr,
@@ -891,6 +911,7 @@ export default {
                 name: item.skuName,
                 originp: item.originalPrice/100,
                 currentp: item.price/100,
+                point: item.pointPrice,
                 costp: item.costPrice/100,
                 miaoshap: {
                   price: item.rules[0].activityPrice/100,
