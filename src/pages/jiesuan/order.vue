@@ -33,7 +33,7 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="所属商家" fieldDecoratorId="repository.merchantId" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                <a-select placeholder="全部商家" :defaultValue="ALL" @change="merchantChange">
+                <a-select placeholder="全部商家" :defaultValue="'ALL'" @change="merchantChange">
                   <a-select-option :key="'ALL'">全部商家</a-select-option>
                   <a-select-option v-for="(item) in merchantList" :key="item.id">{{item.name}}</a-select-option>
                 </a-select>
@@ -88,6 +88,7 @@
           <thead>
             <tr>
               <td>商品名称</td>
+              <td>商品规格</td>
               <td>核销状态</td>
               <td>核销时间</td>
               <td>核销门店</td>
@@ -97,6 +98,7 @@
           <tbody>
             <tr v-for="(item,index) in vouchersList" :key="index">
               <td>{{item.productName}}</td>
+              <td>{{item.skuName}}</td>
               <td>{{item.voucherStatusName}}</td>
               <td>{{item.useTime}}</td>
               <td>{{item.useStoreName}}</td>
@@ -401,7 +403,7 @@ export default {
         },
         onCancel() {},
       });
-      
+
     },
     orderListfun(e) {
       this.orderFun(e.orderId);

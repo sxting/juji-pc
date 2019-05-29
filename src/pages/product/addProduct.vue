@@ -2,12 +2,14 @@
   <div>
     <a-card :body-style="{padding: '24px 32px'}" :bordered="false">
       <a-form :autoFormCreate="(form) => {this.form = form;}">
+        <!--
         <a-form-item label="商品类型" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="productType" :style="{ marginBottom: '8px' }">
             <a-radio-button value="PRODUCT">普通商品</a-radio-button>
             <a-radio-button value="POINT">积分商品</a-radio-button>
           </a-radio-group>
         </a-form-item>
+        -->
         <a-form-item label="商品标签" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="biaoqian">
             <a-radio :value="'美食饮品'">美食饮品</a-radio>
@@ -19,25 +21,35 @@
         <a-form-item label="商品名称" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" fieldDecoratorId="repository.productName" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入商品名称', whitespace: true}]}" :required="true">
           <a-input placeholder="请输入商品名称，限1-40字" />
         </a-form-item>
-        <a-form-item label="底价" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.costPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
-          <a-input-number style="width:100%" :min="0" :max="99999.99" placeholder="请输入商品底价" :disabled="productId?true:false" />
-        </a-form-item>
-        <a-form-item label="原价" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" fieldDecoratorId="repository.originalPrice" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入原价'}]}" :required="true">
-          <a-input-number style="width:100%" :min="0.01" :max="99999.99" placeholder="请输入商品原价" />
-        </a-form-item>
-        <a-form-item label="售价" :labelCol="{span: 7}" v-if="productType === 'PRODUCT'" :wrapperCol="{span: 10}" :required="true">
-          <a-input-number style="width:100%" :min="0" :max="99999.99" :value="price" @change="priceChange" placeholder="请输入商品售价" />
-        </a-form-item>
-        <a-form-item label="售价" :labelCol="{span: 7}" v-if="productType === 'POINT'" :wrapperCol="{span: 10}" :required="true">
-          <a-radio-group v-model="jifen"  @change="jifenFun">
-            <a-radio :value="'桔子兑换'">桔子兑换</a-radio>
-            <a-radio :value="'桔子+钱'">桔子+钱</a-radio>
-          </a-radio-group>
+
+        <a-form-item label="商品规格" :labelCol="{span: 7}"  :wrapperCol="{span: 16}" :required="true">
           <div>
-            <a-input-number :min="0" :value="point" @change="pointChange($event)" :max="99999" style="width:200px;margin-right:10px;" placeholder="请输入桔子数量" />
-            <a-input-number :min="0" @change="priceChange($event)" :max="99999.99" v-if="jifen === '桔子+钱'" :value="price"  style="width:200px"  placeholder="请输入钱数" />
+            <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
+              <template v-for="(col, i) in ['name', 'originp', 'currentp', 'jifen', 'costp', 'stock']" :slot="col" slot-scope="text, record, index">
+                <div :key="col">
+                  <div v-if="true" class="disflex">
+                    <a-input
+                      style="margin: -5px 0"
+                      :value="text"
+                      @change="e => handleChange(e.target.value, record.key, col)"
+                    />
+                  </div>
+                  <template v-else>{{text}}</template>
+                </div>
+              </template>
+              <template slot="operation" slot-scope="text, record">
+                <a-popconfirm
+                  v-if="guigeDataSource.length > 1"
+                  title="确定删除?"
+                  @confirm="() => onDelete(record.key)">
+                  <a href="javascript:;">删除</a>
+                </a-popconfirm>
+              </template>
+            </a-table>
+            <a-button class="editable-add-btn fr" @click="handleAdd">增加</a-button>
           </div>
         </a-form-item>
+
         <a-form-item label="商品首图" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <div class="clearfix">
             <a-upload listType="picture-card" :fileList="fileList1" :showUploadList="{showPreviewIcon:false,showRemoveIcon:true}" :beforeUpload="beforeUpload" :customRequest="nzCustomRequestFun" @change="handleChange1($event)">
@@ -111,9 +123,11 @@
             </div>
           </div>
         </a-form-item>
+        <!--
         <a-form-item label="库存" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.stock" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入使用库存'}]}" :required="true">
           <a-input-number :min="1" :max="99999" />
         </a-form-item>
+        -->
         <a-form-item label="使用有效期" :labelCol="{span: 7}" help="自购买之日起开始计算时间" :wrapperCol="{span: 10}" fieldDecoratorId="repository.cutOffDays" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入使用有效期'}]}" :required="true">
           <a-input-number :min="1" :step="1" :max="30" />
         </a-form-item>
@@ -212,7 +226,56 @@ export default {
       productType: "PRODUCT",
       previewImage: "",
       checkAll: true,
-      // plainOptions,
+      guigeDataSource: [
+        {
+          key: '0',
+          name: '默认规格',
+          originp: '0',
+          currentp: '0',
+          jifen: '0',
+          costp: '0',
+          stock: '0',
+          skuId: '',
+          id: '',
+          manageRate: '0',
+          saleRate: '0',
+          managep: '0',
+          salesp: '0'
+        }
+      ],
+      guigeColumns: [
+        {
+          title: '规格名称',
+          dataIndex: 'name',
+          width: '20%',
+          scopedSlots: { customRender: 'name' },
+        }, {
+          title: '原价',
+          dataIndex: 'originp',
+          scopedSlots: { customRender: 'originp' },
+        }, {
+          title: '售价',
+          dataIndex: 'currentp',
+          scopedSlots: { customRender: 'currentp' },
+        }, {
+          title: '桔子积分',
+          dataIndex: 'jifen',
+          scopedSlots: { customRender: 'jifen' },
+        }, {
+          title: '底价',
+          dataIndex: 'costp',
+          scopedSlots: { customRender: 'costp' },
+        }, {
+          title: '库存',
+          dataIndex: 'stock',
+          scopedSlots: { customRender: 'stock' },
+        }, {
+          title: '操作',
+          dataIndex: 'operation',
+          scopedSlots: { customRender: 'operation' },
+        }
+      ],
+      count: 1,
       buyerNotes: [{ title: "", details: [{ item: "" }] }], //购买须知
       picXQ: [{ fileList: [], picIds: "" }], //图片详情
       fileList1: [],
@@ -266,6 +329,47 @@ export default {
     }
   },
   methods: {
+    handleChange (value, key, column) {
+      const newData = [...this.guigeDataSource]
+      const target = newData.filter(item => key === item.key)[0];
+      if (target) {
+        target[column] = value
+        this.guigeDataSource = newData
+      }
+    },
+    handleBlur(value, key, column) {
+      const newData = [...this.guigeDataSource]
+      const target = newData.filter(item => key === item.key)[0];
+      if(column == 'saleRate' || column == 'manageRate') {
+        if(/^[0-9]*$/.test(value)) {
+          this.fenyongFun(target)
+        } else {
+          console.log('数据格式错误');
+        }
+      }
+    },
+    onDelete (key) {
+      const guigeDataSource = [...this.guigeDataSource]
+      this.guigeDataSource = guigeDataSource.filter(item => item.key !== key)
+    },
+    handleAdd () {
+      const { count, guigeDataSource } = this;
+      const newData = {
+        key: count,
+        name: '',
+        originp: '',
+        currentp: '',
+        jifen: '',
+        costp: '',
+        stock: '',
+        manageRate: '',
+        saleRate: '',
+      }
+      this.guigeDataSource = [...guigeDataSource, newData]
+      this.count = count + 1;
+      console.log(this.guigeDataSource);
+    },
+
     jifenFun(){
       this.price = 0;
     },
@@ -384,12 +488,12 @@ export default {
       }
     },
     submit(e) {
+      // console.dir(this.guigeDataSource);
       e.preventDefault();
       let data,
         picXQArr = [],
         note = [],
         storeIdArr = [];
-      console.log(this.picXQ);
       this.picXQ.forEach(function(i) {
         let pic = [];
         i.fileList.forEach(function(m) {
@@ -421,6 +525,7 @@ export default {
       }
       this.form.validateFields((err, values) => {
         if (err) {
+          console.log(err);
         } else {
           if (this.fileList1.length < 1) {
             this.$error({
@@ -437,20 +542,28 @@ export default {
               title: "温馨提示",
               content: "请选择试用门店"
             });
-          } else if (
-            (this.productType === "POINT" &&
-              this.jifen === "桔子兑换" &&
-              !this.point) ||
-            (this.productType === "POINT" &&
-              this.jifen === "桔子+钱" &&
-              (!this.point || !this.price))
-          ) {
-            this.$error({
-              title: "温馨提示",
-              content: "请输入售价"
-            });
           } else {
+            let productSkus = [];
+            let productType = 'PRODUCT';
+            this.guigeDataSource.forEach(function(item, index) {
+              if(parseFloat(item.jifen)) {
+                productType = 'POINT'
+              }
+              productSkus[index] = {
+                costPrice: parseFloat(item.costp) * 100,
+                originalPrice: parseFloat(item.originp) * 100,
+                point: parseFloat(item.jifen),
+                price: parseFloat(item.currentp) * 100,
+                productName: values.repository.productName,
+                skuName: item.name,
+                status: 'NORMAL',
+                stock: parseFloat(item.stock),
+                skuId: item.skuId,
+                id: item.id,
+              }
+            });
             data = {
+              productSkus: productSkus,
               cutOffDays: values.repository.cutOffDays, //核销截止日期
               description: JSON.stringify(picXQArr),
               idx: values.repository.idx,
@@ -460,31 +573,24 @@ export default {
               merchantId: values.repository.merchantId,
               merchantName: this.merchantName,
               note: JSON.stringify(note),
-              costPrice: this.accurate_mul(values.repository.costPrice, 100),
-              originalPrice: this.accurate_mul(
-                values.repository.originalPrice,
-                100
-              ),
               picId: this.fileList1[0].response
                 ? this.fileList1[0].response
                 : this.fileList1[0].name,
               picIds: picIds,
-              point: this.productType === "POINT" ? this.point : 0,
-              price: this.price?this.accurate_mul(this.price, 100):0,
               productName: values.repository.productName,
               productStores: storeIdArr,
               providerId: this.providerId,
               providerName: values.repository.providerName,
               putAway: 1,
-              stock: values.repository.stock,
               tag: this.biaoqian,
-              type: this.productType,
+              type: productType,
               productId: this.productId,
               subject: this.subject.join(','),
               recommend: this.recommend ? 1 : 0,
               shareText: values.repository.shareText,
               shareImg: this.fileList4[0] ? this.fileList4[0].response : '',
             };
+            console.log(data);
             if (this.productId) {
               this.checkdataFun(data);
             } else {
@@ -669,9 +775,24 @@ export default {
           this.unAuditCount = res.data.unAuditCount;
           this.productType = res.data.type;
           this.biaoqian = res.data.tag;
-          this.price = Number(this.accurate_div(res.data.price, 100));
-          console.log(this.price)
-          this.point = res.data.point;
+          this.count = res.data.productSkus.length;
+
+          let guigeDataSource = [];
+          res.data.productSkus.forEach(function(item, index) {
+            guigeDataSource[index] = {
+              key: index,
+              name: item.skuName,
+              originp: item.originalPrice/100,
+              currentp: item.price/100,
+              jifen: item.point,
+              costp: item.costPrice/100,
+              stock: item.stock,
+              skuId: item.skuId,
+              id: item.id,
+            };
+          })
+          this.guigeDataSource = guigeDataSource;
+
           this.jifen = res.data.type === "PRODUCT" ? res.data.price? "桔子+钱": "桔子兑换" :"桔子兑换";
           this.limitMaxNum =
             res.data.limitMaxNum > 0 ? res.data.limitMaxNum : "";
@@ -688,10 +809,7 @@ export default {
               repository: {
                 cutOffDays: res.data.cutOffDays,
                 idx: res.data.idx,
-                originalPrice: Number(this.accurate_div(res.data.originalPrice, 100)),
-                costPrice: Number(this.accurate_div(res.data.costPrice, 100)),
                 productName: res.data.productName,
-                stock: res.data.stock,
                 merchantId: res.data.merchantId,
                 shareText: res.data.shareText
               }
@@ -699,7 +817,6 @@ export default {
           });
           this.subject = res.data.subject ? res.data.subject.split(',') : [];
           this.recommend = res.data.recommend ? true : false;
-          console.log(this.recommend);
           let storeIdArr = [];
           res.data.productStores.forEach(function(i) {
             storeIdArr.push(i.storeId);
@@ -777,6 +894,49 @@ export default {
         }
       });
     },
+    fenyongFun(item) {
+      let data = {
+        providerId: this.providerId,
+        price: parseFloat(item.currentp) * 100,
+        costPrice: parseFloat(item.costp) * 100,
+        manageRateStr: item.manageRate,
+        salesRateStr: item.saleRate
+      };
+      let that = this;
+      this.$axios({
+        url: "/endpoint/distributor/product/preCalculateEstimateSettlement.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          res.data.forEach(function(i) {
+            // if (i.settlementType === "MERCHANT") i.boolean = true;
+            that.guigeDataSource.forEach(function(item2, index) {
+              if(item.skuId == item2.skuId) {
+                if (i.settlementType === "DISTRIBUTOR_SALES_REBATE"){
+                  i.name = "销售返利";
+                  i.boolean = true;
+                  item2.salesp = i.estimateAmount/100;
+                }
+                if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
+                  i.name = "管理佣金";
+                  i.boolean = true;
+                  item2.managep = i.estimateAmount/100;
+                }
+              }
+            })
+            // if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽佣"; //平台抽佣
+            // if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
+          });
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
     beforeUpload(file) {
       const isLt2M = file.size / 1024 / 1024 < 10;
       if (!isLt2M) {
@@ -789,5 +949,16 @@ export default {
 
 <style lang="less" scoped>
 @import "./addProduct.less";
+.fr {
+  float: right;
+  margin-top: 10px;
+}
+.disflex {
+  display: flex;
+}
+.w40 {
+  width: 40px;
+  margin-left: 10px;
+}
 </style>
 

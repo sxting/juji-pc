@@ -74,6 +74,11 @@
       <a-form-item label="商品名称" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
         {{productInfo.productName}}
       </a-form-item>
+
+      <a-form-item label="商品规格" :labelCol="{span: 7}"  :wrapperCol="{span: 16}">
+        <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false"></a-table>
+      </a-form-item>
+
       <a-form-item label="结算价" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
         {{productInfo.costPrice/100}}
       </a-form-item>
@@ -172,14 +177,14 @@
         </div>
       </a-form-item>
 
-      <a-form-item label="审核结果" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+      <a-form-item label="审核结果" :labelCol="{span: 7}" :wrapperCol="{span: 10}" v-if="productInfo.canAudit">
         <a-radio-group v-model="tongguo">
           <a-radio value="0" v-if="status!=='REJECT'">通过</a-radio>
           <a-radio value="1">不通过</a-radio>
         </a-radio-group>
         <a-input v-if="tongguo==='1'" type="text" maxlength="40" v-model="butongguo" @change="butongguoFun" class="juniu_input" placeholder="请填写不通过原因" />
       </a-form-item>
-      <a-form-item :wrapperCol="{span: 10, offset: 7}">
+      <a-form-item :wrapperCol="{span: 10, offset: 7}" v-if="productInfo.canAudit">
         <a-button type="primary" style="margin-right:20px" @click="reviewedSubmit">提交</a-button>
         <a-button type="primary" @click="quxiao">取消</a-button>
 
@@ -256,8 +261,74 @@ const columns2 = [
     }
   }
 ];
+const columns3 = [
+  {
+    title: "提交时间",
+    dataIndex: "dateCreated"
+  },
+  {
+    title: "所属运营商",
+    dataIndex: "providerName"
+  },
+  {
+    title: "商品类型",
+    dataIndex: "typeName"
+  },
+  {
+    title: "商品名称",
+    dataIndex: "productName"
+  },
+  {
+    title: "所需桔子",
+    dataIndex: "point"
+  },
+  {
+    title: "售价",
+    dataIndex: "price"
+  },
+  {
+    title: "审核未通过原因",
+    dataIndex: "rejectReason"
+  },
+  {
+    title: "操作",
+    key: "action",
+    scopedSlots: {
+      customRender: "action"
+    }
+  }
+];
 const data = [];
 const dataSource = [];
+
+const guigeColumns = [
+  {
+    title: '规格名称',
+    dataIndex: 'name',
+    scopedSlots: { customRender: 'name' },
+  }, {
+    title: '原价(元)',
+    dataIndex: 'originp',
+    scopedSlots: { customRender: 'originp' },
+  }, {
+    title: '售价(元)',
+    dataIndex: 'currentp',
+    scopedSlots: { customRender: 'currentp' },
+  }, {
+    title: '桔子积分',
+    dataIndex: 'jifen',
+    scopedSlots: { customRender: 'jifen' },
+  }, {
+    title: '底价(元)',
+    dataIndex: 'costp',
+    scopedSlots: { customRender: 'costp' },
+  }, {
+    title: '库存',
+    dataIndex: 'stock',
+    scopedSlots: { customRender: 'stock' },
+  }
+]
+const guigeDataSource = []
 
 export default {
   name: "Reviewed",
@@ -268,6 +339,8 @@ export default {
     return {
       showTable: true,
       columns: columns,
+      guigeColumns: guigeColumns,
+      guigeDataSource: [],
       data: data,
       tongguo: "0",
       buyerNotes: [
@@ -404,6 +477,26 @@ export default {
         if (res.success) {
           this.productInfo = res.data;
           this.showTable = false;
+
+          let guigeDataSource = [];
+          res.data.productSkuAudits.forEach(function(item, index) {
+            guigeDataSource[index] = {
+              key: index,
+              name: item.skuName,
+              originp: item.originalPrice/100,
+              currentp: item.price/100,
+              jifen: item.point,
+              costp: item.costPrice/100,
+              stock: item.stock
+            }
+          });
+          this.guigeDataSource = guigeDataSource;
+
+          if(res.data.auditStatus === 'REJECT') {
+            this.tongguo = '1';
+            this.butongguo = res.data.rejectReason;
+          }
+
           this.fileList1 = [
             {
               uid: "-1",
@@ -501,6 +594,7 @@ export default {
     tabsFun(e) {
       this.status = e;
       if(this.status  === 'PASS') this.columns = columns2;
+      else if(this.status  === 'REJECT') this.columns = columns3;
       else this.columns = columns;
       this.reviewedList();
     },
