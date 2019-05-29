@@ -287,6 +287,7 @@ export default {
     back() {
       this.providerId = '';
       this.effective = '0';
+      this.columns = columns1;
       this.showBoolean = true;
       this.productList();
     },
