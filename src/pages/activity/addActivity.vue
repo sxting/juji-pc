@@ -87,13 +87,13 @@
           <a-range-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="dateValue" @change="timeChange" :placeholder="['开始','结束']" />
         </a-form-item>
         <a-form-item label="秒杀开始时间" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="moment(startDateValue, 'YYYY-MM-DD')" :defaultValue="moment(startDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" :allowClear="false" @change="startDateChange"/>
+          <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate2" :value="moment(startDateValue, 'YYYY-MM-DD')" :defaultValue="moment(startDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" :allowClear="false" @change="startDateChange"/>
           <a-time-picker style="margin-left: 10px;" :disabled="status === 'STARTED' ||status === 'ENDED'" :value="moment(startHoursValue, 'YYYY-MM-DD HH:mm:ss')" :defaultValue="moment(startHoursValue, 'YYYY-MM-DD HH:mm:ss')" format="HH" :allowEmpty="false" @openChange="handleOpenChange1"  :open="open1"  @change="startHoursChange">
             <!-- <a-button slot="addon" size="small" type="primary" @click="handleClose">确定</a-button> -->
           </a-time-picker>
         </a-form-item>
         <a-form-item label="秒杀结束时间" v-if="activityType === 'SEC_KILL'" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate" :value="moment(endDateValue, 'YYYY-MM-DD')" :defaultValue="moment(endDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" :allowClear="false" @change="endDateChange"/>
+          <a-date-picker :disabled="status === 'STARTED' ||status === 'ENDED'" :disabledDate="disabledDate2" :value="moment(endDateValue, 'YYYY-MM-DD')" :defaultValue="moment(endDateValue, 'YYYY-MM-DD')" format="YYYY-MM-DD" :allowClear="false" @change="endDateChange"/>
           <a-time-picker style="margin-left: 10px;" :disabled="status === 'STARTED' ||status === 'ENDED'" :value="moment(endHoursValue, 'YYYY-MM-DD HH:mm:ss')" :defaultValue="moment(endHoursValue, 'YYYY-MM-DD HH:mm:ss')" format="HH" :allowEmpty="false" @openChange="handleOpenChange2"  @change="endHoursChange" :open="open2">
             <!-- <a-button slot="addon" size="small" type="primary" @click="handleClose">确定</a-button> -->
           </a-time-picker>
@@ -378,8 +378,8 @@ export default {
       activityPrice:0,
       activityPoint:0,
       activityStock:0,
-      startDateValue: this.timeForMat(-1)[0],
-      endDateValue: this.timeForMat(-1)[0],
+      startDateValue: this.timeForMat(0)[0],
+      endDateValue: this.timeForMat(0)[0],
       today: this.timeForMat(0),
       open1:false,
       open2:false
@@ -497,6 +497,10 @@ export default {
     disabledDate(current) {
       // Can not select days before today and today
       return current && current < moment().endOf("day");
+    },
+    disabledDate2(current) {
+      // Can not select days before today and today
+      return current && current < moment().startOf("day");
     },
     addActivityList1(index, list) {
       if (list.length > 4) {
