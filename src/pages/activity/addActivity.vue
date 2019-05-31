@@ -23,8 +23,7 @@
                 </div>
               </div>
               <div :key="col" v-else-if="col == 'miaoshap'" class="disflex">
-                <a-input
-                  :disabled="status === 'STARTED' ||status === 'ENDED'"
+                <a-input :disabled="status === 'STARTED' ||status === 'ENDED'"
                   style="margin: -5px 0; width: 70px;"
                   :value="text.price"
                   @change="e => handleChange2(e.target.value, record.key, col)"
@@ -305,7 +304,7 @@ const guigeColumns3 = [
     dataIndex: 'stock2',
     scopedSlots: { customRender: 'stock2' },
     editable: true,
-  }
+  } 
 
 ]
 const guigeDataSource3 = [
@@ -921,7 +920,7 @@ export default {
                   price: item.rules[0].activityPrice/100,
                   juzi: item.rules[0].activityPoint ? item.rules[0].activityPoint : 0
                 },
-                stock1: item.rules[0].balanceStock,
+                stock1: item.stock,
                 stock2: item.rules[0].activityStock,
                 salesRate: item.rules[0].saleRateStr,
                 manageRate: item.rules[0].manageRateStr,
