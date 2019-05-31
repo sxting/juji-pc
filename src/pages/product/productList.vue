@@ -8,7 +8,7 @@
         <a-col :md="8" :sm="24">
           <a-tabs @change="tabFun">
             <a-tab-pane tab="售卖中" key="1"></a-tab-pane>
-            <a-tab-pane tab="审核中" key="2"></a-tab-pane>
+            <!-- <a-tab-pane tab="审核中" key="2"></a-tab-pane> -->
             <a-tab-pane tab="已下架" key="0"></a-tab-pane>
           </a-tabs>
         </a-col>
@@ -333,11 +333,11 @@ export default {
           this.data2 = res.data.list;
           this.countTotal = res.data.countTotal;
           this.data2.forEach(function(i) {
-            if (i.auditStatusMap.auditStatus === "PASS")
+            if (i.auditStatusMap && i.auditStatusMap.auditStatus === "PASS")
               i.auditStatusMap.auditStatusName = "通过";
-            if (i.auditStatusMap.auditStatus === "INIT")
+            if (i.auditStatusMap && i.auditStatusMap.auditStatus === "INIT")
               i.auditStatusMap.auditStatusName = "待审核";
-            if (i.auditStatusMap.auditStatus === "REJECT")
+            if (i.auditStatusMap && i.auditStatusMap.auditStatus === "REJECT")
               i.auditStatusMap.auditStatusName = "拒绝";
 
             i.price = i.price / 100;

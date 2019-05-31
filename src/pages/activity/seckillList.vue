@@ -61,20 +61,22 @@
             <a-divider v-if="status ==='STARTED'" type="vertical" />
             <a @click="chakan(record)" v-if="status ==='READY'">编辑</a>
             <!-- 测试可用 -->
-            <a-divider v-if="status ==='READY'" type="vertical" />
-             <a-popconfirm title="是否确认？" v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="startFun(record)">
-                <a-icon slot="icon" type="question-circle-o" style="color: red" />
-                <a  class="ant-dropdown-link">立即开始</a>
-              </a-popconfirm>
+
+            <!--<a-divider v-if="status ==='READY'" type="vertical" />
+            <a-popconfirm title="是否确认？" v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="startFun(record)">
+              <a-icon slot="icon" type="question-circle-o" style="color: red" />
+              <a  class="ant-dropdown-link">立即开始</a>
+            </a-popconfirm>
+            -->
             <a-popconfirm title="是否确认？" v-if="status ==='STARTED'" okText="确认" cancelText="否" @confirm="stopFun(record)">
-                <a-icon slot="icon" type="question-circle-o" style="color: red" />
-                <a  class="ant-dropdown-link">结束活动</a>
-              </a-popconfirm>
+              <a-icon slot="icon" type="question-circle-o" style="color: red" />
+              <a  class="ant-dropdown-link">结束活动</a>
+            </a-popconfirm>
             <a-divider v-if="status ==='READY'" type="vertical" />
             <a-popconfirm title="是否确认？" v-if="status ==='READY'" okText="确认" cancelText="否" @confirm="delFun(record)">
                 <a-icon slot="icon" type="question-circle-o" style="color: red" />
                 <a  class="ant-dropdown-link">删除</a>
-              </a-popconfirm>
+            </a-popconfirm>
           </span>
         </a-table>
         <div style="margin-top:20px;">
@@ -193,20 +195,28 @@
 import StandardTable from "../../components/table/StandardTable";
 const columns = [
   {
+    title: "所属运营商",
+    dataIndex: "providerName"
+  },
+  {
     title: "商品名称",
     dataIndex: "productName"
   },
   {
-    title: "商品原价",
-    dataIndex: "originalPrice"
+    title: "秒杀开始时间",
+    dataIndex: "startTime"
   },
   {
-    title: "商品底价",
-    dataIndex: "costPrice"
+    title: "秒杀结束时间",
+    dataIndex: "endTime"
   },
   {
-    title: "活动起止时间",
-    dataIndex: "time"
+    title: "剩余库存",
+    dataIndex: "activityStock"
+  },
+  {
+    title: "秒杀价",
+    dataIndex: "activityPrice"
   },
   {
     title: "操作",
@@ -263,7 +273,7 @@ export default {
       REJECTNUM: 0,
       id: "",
       yestoday: this.timeForMat(1),
-      today: this.timeForMat(0),
+      today: this.timeForMat(7),
       providerList: JSON.parse(sessionStorage.getItem("LoginDate")).providerList,
       activityType:'SEC_KILL'
     };
@@ -458,9 +468,11 @@ export default {
         if (res.success) {
           this.data = res.data.elements;
           this.data.forEach(function(i) {
-            i.originalPrice = that.accurate_div(i.originalPrice, 100);
-            i.costPrice = that.accurate_div(i.costPrice, 100);
-            i.time = i.startTime + "-" + i.endTime;
+            if(i.activityPoint) {
+              i.activityPrice = that.accurate_div(i.activityPrice, 100) + '元 + ' + i.activityPoint + '桔子';
+            } else {
+              i.activityPrice = that.accurate_div(i.activityPrice, 100) + '元';
+            }
           });
         } else {
           this.$error({
