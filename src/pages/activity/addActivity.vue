@@ -969,7 +969,7 @@ export default {
       }
       if(this.activityType === 'BARGAIN'){
         var data = {
-          price:item.originp*100 - item.kanjiap[0].bargainAmount*100,
+          price:(item.originp*100 - item.kanjiap[0].bargainAmount*100).toFixed(0),
           costPrice: item.costp*100,
           manageRateStr: item.manageRate,
           salesRateStr: item.salesRate,
