@@ -425,7 +425,8 @@ export default {
       const target = newData.filter(item => key === item.key)[0];
       if(column == 'salesRate' || column == 'manageRate') {
         if(/^[0-9]*$/.test(value)) {
-          this.fenyongFun(target)
+          console.log("11111111111111")
+          this.fenyongFun(target,1)
         } else {
           console.log('数据格式错误');
         }
@@ -444,7 +445,8 @@ export default {
       const target = newData.filter(item => key === item.key)[0];
       if(column == 'salesRate' || column == 'manageRate') {
         if(/^[0-9]*$/.test(value)) {
-          this.fenyongFun(target)
+          console.log("222222222222222")
+          this.fenyongFun(target,2)
         } else {
           console.log('数据格式错误');
         }
@@ -463,7 +465,8 @@ export default {
       const target = newData.filter(item => key === item.key)[0];
       if(column == 'salesRate' || column == 'manageRate') {
         if(/^[0-9]*$/.test(value)) {
-          this.fenyongFun(target)
+          console.log("33333333333333")
+          this.fenyongFun(target,3)
         } else {
           console.log('数据格式错误');
         }
@@ -952,16 +955,39 @@ export default {
         }
       });
     },
-    fenyongFun(item) {
-      let data = {
-        productId: this.productRadio.productId,
-        manageRateStr: item.manageRate,
-        salesRateStr: item.salesRate,
-        skuId: item.skuId
-      };
+
+    fenyongFun(item,type) {//9999999999999
+      console.log(item);
+      if(this.activityType === 'SPLICED'){
+        var data = {
+          price:item.pintuanp*100,
+          costPrice: item.costp*100,
+          manageRateStr: item.manageRate,
+          salesRateStr: item.salesRate,
+          skuId: item.skuId
+        };
+      }
+      if(this.activityType === 'BARGAIN'){
+        var data = {
+          price:(item.originp*100 - item.kanjiap[0].bargainAmount*100).toFixed(0),
+          costPrice: item.costp*100,
+          manageRateStr: item.manageRate,
+          salesRateStr: item.salesRate,
+          skuId: item.skuId
+        };
+      }
+      if(this.activityType === 'SEC_KILL'){
+        var data = {
+          price:item.miaoshap.price*100,
+          costPrice: item.costp*100,
+          manageRateStr: item.manageRate,
+          salesRateStr: item.salesRate,
+          skuId: item.skuId
+        };
+      }
       let that = this;
       this.$axios({
-        url: "/endpoint/distributor/product/calculateEstimateSettlement.json",
+        url: "/endpoint/distributor/product/preCalculateEstimateSettlement.json",
         method: "get",
         processData: false,
         params: data
