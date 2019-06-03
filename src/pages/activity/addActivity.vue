@@ -304,7 +304,7 @@ const guigeColumns3 = [
     dataIndex: 'stock2',
     scopedSlots: { customRender: 'stock2' },
     editable: true,
-  } 
+  }
 
 ]
 const guigeDataSource3 = [
