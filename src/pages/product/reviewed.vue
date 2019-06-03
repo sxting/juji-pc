@@ -78,7 +78,7 @@
       <a-form-item label="商品规格" :labelCol="{span: 7}"  :wrapperCol="{span: 16}">
         <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false"></a-table>
       </a-form-item>
-
+      <!--
       <a-form-item label="结算价" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
         {{productInfo.costPrice/100}}
       </a-form-item>
@@ -94,6 +94,7 @@
           <span v-if="productInfo.price">+钱{{productInfo.price/100}}</span>
         </div>
       </a-form-item>
+      -->
       <a-form-item label="商品首图" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
         <div class="clearfix">
           <a-upload listType="picture-card" :showUploadList="{showPreviewIcon:false,showRemoveIcon:false}" :fileList="fileList1">
