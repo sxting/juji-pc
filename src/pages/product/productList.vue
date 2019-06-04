@@ -76,9 +76,10 @@
         <span slot="action" slot-scope="text, record">
           <a @click="bianji(record)">编辑</a>
           <a-divider v-if="putAway === '1'" type="vertical" />
-          <!--<a v-if="putAway === '1'" @click="xiajia(record)" class="ant-dropdown-link">
+          <a v-if="putAway === '1'" @click="xiajia(record)" class="ant-dropdown-link">
             下架
-          </a>-->
+          </a>
+          <a-divider v-if="putAway === '1'" type="vertical" />
           <a v-if="putAway === '1'" @click="showContro(record)" class="ant-dropdown-link">
             展示控制
           </a>
@@ -87,9 +88,6 @@
             v-model="visible1"
             @ok="handleOk1">
             <a-form>
-              <a-form-item label="上下架" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-                <a-switch checkedChildren="开" unCheckedChildren="关" v-model="sxj" @change="onSxjChange" />
-              </a-form-item>
               <a-form-item label="展示顺序" :labelCol="{span: 7}" help="第几位" :wrapperCol="{span: 10}" :required="false">
                 <a-input-number :min="0" :step="1" :max="99999" v-model="showIdx" />
               </a-form-item>
@@ -217,7 +215,6 @@ export default {
       providerList: [],
       visible1: false,
       productItem: {},
-      sxj: true,
       showIdx: '0',
       subject: [], // 活动主题； 字符串 逗号分隔
       recommend: true, //是否精选推荐； 0，1
@@ -278,9 +275,6 @@ export default {
       this.subject = e.subject ? e.subject.split(',') : [];
       this.recommend = e.recommend ? true : false;
     },
-    onSxjChange(event) {
-      this.sxj = event;
-    },
     onRecommendChange(event) {
       this.recommend = event;
     },
@@ -291,7 +285,6 @@ export default {
       let data = {
         idx: this.showIdx, //展示顺序
         productId: this.productItem.productId,
-        putAway: this.sxj ? 1 : 0, //上下架 1上架 0下架
         recommend: this.recommend ? 1 : 0, //精选推荐 1精选 0非精选
         subject: this.subject.join(',') //活动主题
       }
