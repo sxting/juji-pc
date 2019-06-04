@@ -83,29 +83,30 @@
           <a v-if="putAway === '1'" @click="showContro(record)" class="ant-dropdown-link">
             展示控制
           </a>
-          <a-modal
-            title="展示控制"
-            v-model="visible1"
-            @ok="handleOk1">
-            <a-form>
-              <a-form-item label="展示顺序" :labelCol="{span: 7}" help="第几位" :wrapperCol="{span: 10}" :required="false">
-                <a-input-number :min="0" :step="1" :max="99999" v-model="showIdx" />
-              </a-form-item>
-              <a-form-item label="活动主题" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
-                <a-checkbox-group v-model="subject" @change="onSubjectChange" :style="{ paddingTop: '8px' }">
-                  <a-row>
-                    <a-col :span="12"><a-checkbox value="新品抢鲜" defaultChecked>新品抢鲜</a-checkbox></a-col>
-                    <a-col :span="12"><a-checkbox value="好店礼券">好店礼券</a-checkbox></a-col>
-                  </a-row>
-                </a-checkbox-group>
-              </a-form-item>
-              <a-form-item label="精选推荐" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-                <a-switch checkedChildren="开" unCheckedChildren="关" v-model="recommend" @change="onRecommendChange" />
-              </a-form-item>
-            </a-form>
-          </a-modal>
+
         </span>
       </a-table>
+      <a-modal
+        title="展示控制"
+        v-model="visible1"
+        @ok="handleOk1">
+        <a-form>
+          <a-form-item label="展示顺序" :labelCol="{span: 7}" help="第几位" :wrapperCol="{span: 10}" :required="false">
+            <a-input-number :min="0" :step="1" :max="99999" v-model="showIdx" />
+          </a-form-item>
+          <a-form-item label="活动主题" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
+            <a-checkbox-group v-model="subject" @change="onSubjectChange" :style="{ paddingTop: '8px' }">
+              <a-row>
+                <a-col :span="12"><a-checkbox value="新品抢鲜" defaultChecked>新品抢鲜</a-checkbox></a-col>
+                <a-col :span="12"><a-checkbox value="好店礼券">好店礼券</a-checkbox></a-col>
+              </a-row>
+            </a-checkbox-group>
+          </a-form-item>
+          <a-form-item label="精选推荐" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+            <a-switch checkedChildren="开" unCheckedChildren="关" v-model="recommend" @change="onRecommendChange" />
+          </a-form-item>
+        </a-form>
+      </a-modal>
       <div style="margin-top:20px;">
         <a-pagination style="float:right" @change="onChange" :current="pageNo" :pageSize="10" :total="countTotal" />
       </div>
