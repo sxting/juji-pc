@@ -628,6 +628,7 @@ export default {
         processData: false,
         params: data
       }).then(res => {
+        console.log(res);
         if (res.success) {
           this.data2 = res.data.list;
           this.countTotal = res.data.totalRows;
