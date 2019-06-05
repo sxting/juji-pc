@@ -405,6 +405,7 @@ export default {
       } else {
         this.columns = columns2
       }
+      this.pageNo = 1;
       this.productList();
     },
     submit() {
@@ -629,7 +630,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.data2 = res.data.list;
-          this.countTotal = res.data.totalCount;
+          this.countTotal = res.data.totalRows;
           this.data2.forEach(function(i) {
             that.providerList.forEach(function(n) {
               if (n.providerId === i.providerId)
