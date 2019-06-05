@@ -627,9 +627,10 @@ export default {
         processData: false,
         params: data
       }).then(res => {
+        console.log(res);
         if (res.success) {
           this.data2 = res.data.list;
-          this.countTotal = res.data.totalCount;
+          this.countTotal = res.data.totalRows;
           this.data2.forEach(function(i) {
             that.providerList.forEach(function(n) {
               if (n.providerId === i.providerId)
