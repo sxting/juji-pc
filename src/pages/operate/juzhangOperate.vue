@@ -12,7 +12,8 @@
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item label="排序方式" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择" :defaultValue="'COMMISSION'" @change="merchantChange">
+                  <a-select placeholder="请选择" :defaultValue="'TIME'" @change="merchantChange">
+                    <a-select-option :key="'TIME'">申请时间</a-select-option>
                     <a-select-option :key="'COMMISSION'">返佣金额</a-select-option>
                     <a-select-option :key="'SUBORDINATE'">下级桔长数</a-select-option>
                     <a-select-option :key="'SHARE'">分享次数</a-select-option>
@@ -34,11 +35,35 @@
         <a-table :columns="columns" :dataSource="data" :pagination="false" :locale="{emptyText: '暂无数据'}">
           <span slot="action" slot-scope="text, record">
             <a @click="xiangqingList(record)">查看详情</a>
+            <a-divider v-if="!record.allowDistribute" type="vertical" />
+            <a v-if="!record.allowDistribute" @click="pass(record)">通过</a>
           </span>
         </a-table>
         <div style="margin-top:20px;">
           <a-pagination style="float:right" @change="paginationChange" :current="pageNo" :pageSize="10" :total="countTotal" />
         </div>
+        <a-modal
+        title="桔长详情"
+        v-model="visible1">
+          <template slot="footer">
+            <a-button key="back" @click="handleCancel1" :disabled="item.allowDistribute ? true : false">拒绝</a-button>
+            <a-button key="submit" type="primary" @click="handleOk1" :disabled="item.allowDistribute ? true : false">通过审核</a-button>
+          </template>
+          <div class="dis-flex">
+            <img class="img-avatar" :src="itemDetail.avatar" alt="">
+            <div class="c1 p-l20">
+              <div>{{itemDetail.nickName}}</div>
+              <div class="c2 f-s13">{{itemDetail.phone}}</div>
+              <div class="c2 f-s13">上级桔长：--</div>
+              <div class="pd-t20">
+                <p>性别: {{itemDetail.gender == 1 ? '男' : '女'}} &nbsp; &nbsp; 年龄: --</p>
+                <p>所在城市: --</p>
+                <p>职业: --</p>
+                <p>相关经验: --</p>
+              </div>
+            </div>
+          </div>
+        </a-modal>
       </div>
     </div>
   </a-card>
@@ -95,6 +120,9 @@ export default {
       sortType: "",
       dateStart:'',
       dateEnd:'',
+      visible1: false,
+      item: {},
+      itemDetail: {},
     };
   },
   created() {
@@ -107,6 +135,51 @@ export default {
     },
     xiangqingList(e) {
       console.log(e);
+      this.item = e;
+      this.visible1 = true;
+      this.$axios({
+        url: "/endpoint/statistic/distributorInfo.json",
+        method: "get",
+        processData: false,
+        params: {openId: e.openId}
+      }).then(res => {
+        if (res.success) {
+          this.itemDetail = res.data;
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+    handleCancel1() {
+      console.log(this.item);
+    },
+    handleOk1() {
+      this.pass(this.item);
+      this.visible1 = false;
+    },
+    pass(e) {
+      console.log(e);
+      this.$axios({
+        url: "/endpoint/statistic/pass.json",
+        method: "get",
+        processData: false,
+        params: {openid: e.openId}
+      }).then(res => {
+        if (res.success) {
+          this.$success({
+            content: "操作成功"
+          });
+          this.distributorSummaryList()
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
     },
     merchantChange(e) {
       this.sortType = e;
@@ -199,5 +272,28 @@ export default {
 }
 .existingGroups-table thead tr {
   background: #f2f2f2;
+}
+.dis-flex {
+  display: flex;
+}
+.img-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+.c1 {
+  color: #222222;
+}
+.c2 {
+  color: #777;
+}
+.p-l20 {
+  padding-left: 20px;
+}
+.pd-t20 {
+  padding-top: 20px;
+}
+.f-s13 {
+  font-size: 13px;
 }
 </style>
