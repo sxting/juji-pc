@@ -12,8 +12,8 @@
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item label="排序方式" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
-                  <a-select placeholder="请选择" :defaultValue="'TIME'" @change="merchantChange">
-                    <a-select-option :key="'TIME'">申请时间</a-select-option>
+                  <a-select placeholder="请选择" :defaultValue="'PASS'" @change="merchantChange">
+                    <a-select-option :key="'PASS'">申请时间</a-select-option>
                     <a-select-option :key="'COMMISSION'">返佣金额</a-select-option>
                     <a-select-option :key="'SUBORDINATE'">下级桔长数</a-select-option>
                     <a-select-option :key="'SHARE'">分享次数</a-select-option>
@@ -54,12 +54,13 @@
             <div class="c1 p-l20">
               <div>{{itemDetail.nickName}}</div>
               <div class="c2 f-s13">{{itemDetail.phone}}</div>
-              <div class="c2 f-s13">上级桔长：--</div>
+              <div class="c2 f-s13">上级桔长：{{itemDetail.parentNickName ? itemDetail.parentNickName : '暂无'}}</div>
               <div class="pd-t20">
-                <p>性别: {{itemDetail.gender == 1 ? '男' : '女'}} &nbsp; &nbsp; 年龄: --</p>
-                <p>所在城市: --</p>
-                <p>职业: --</p>
-                <p>相关经验: --</p>
+                <!-- &nbsp; &nbsp; 年龄: -- -->
+                <p>性别: {{itemDetail.gender == 1 ? '男' : '女'}} </p>
+                <p>所在城市: {{itemDetail.city ? itemDetail.city : '--'}}</p>
+                <p>职业: {{itemDetail.profession ? itemDetail.profession : '--'}}</p>
+                <p>相关经验: {{itemDetail.experience ? itemDetail.experience : '无相关经验'}}</p>
               </div>
             </div>
           </div>
@@ -117,7 +118,7 @@ export default {
       data: [],
       pageNo: 1,
       countTotal: 10,
-      sortType: "",
+      sortType: "PASS",
       dateStart:'',
       dateEnd:'',
       visible1: false,
@@ -154,7 +155,25 @@ export default {
       });
     },
     handleCancel1() {
-      console.log(this.item);
+      this.$axios({
+        url: "/endpoint/statistic/reject.json",
+        method: "get",
+        processData: false,
+        params: {openid: this.item.openId}
+      }).then(res => {
+        if (res.success) {
+          this.$success({
+            content: "操作成功"
+          });
+          this.visible1 = false;
+          this.distributorSummaryList()
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
     },
     handleOk1() {
       this.pass(this.item);
