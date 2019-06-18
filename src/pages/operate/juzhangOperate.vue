@@ -53,6 +53,7 @@
             <img class="img-avatar" :src="itemDetail.avatar" alt="">
             <div class="c1 p-l20">
               <div>{{itemDetail.nickName}}</div>
+              <div class="c2 f-s13">微信号: {{itemDetail.wechatId ? itemDetail.wechatId : '--'}}</div>
               <div class="c2 f-s13">{{itemDetail.phone}}</div>
               <div class="c2 f-s13">上级桔长：{{itemDetail.parentNickName ? itemDetail.parentNickName : '暂无'}}</div>
               <div class="pd-t20">
@@ -80,6 +81,10 @@ const columns = [
   {
     title: "桔长微信昵称",
     dataIndex: "nickName"
+  },
+  {
+    title: "申请时间",
+    dataIndex: "applyTime"
   },
   {
     title: "手机号",
