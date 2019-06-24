@@ -169,6 +169,9 @@
         <a-form-item label="精选推荐" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-switch checkedChildren="开" unCheckedChildren="关" v-model="recommend" @change="onRecommendChange" />
         </a-form-item>
+        <a-form-item label="会员专享" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+          <a-switch checkedChildren="开" unCheckedChildren="关" v-model="remember" @change="onRememberChange" />
+        </a-form-item>
         <a-form-item label="分享文字" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.shareText" :required="false">
           <a-textarea type="text" class="desc_textarea" placeholder="请输入分享文案，不填写则为系统默认文案"></a-textarea>
         </a-form-item>
@@ -310,7 +313,8 @@ export default {
       unAuditCount: 0,
       subject: [], // 活动主题； 字符串 逗号分隔
       recommend: true, //是否推荐； 0，1
-      shareText: '' //分享文字
+      shareText: '', //分享文字
+      remember: false
     };
   },
   created() {
@@ -398,6 +402,23 @@ export default {
     },
     onRecommendChange(event) {
       this.recommend = event;
+      if(this.recommend && this.remember) {
+        this.$error({
+          title: "温馨提示",
+          content: "“会员专享”和“精选推荐”不可以同时开启,但可以同时关闭"
+        });
+        this.remember = false;
+      }
+    },
+    onRememberChange(event) {
+      this.remember = event;
+      if(this.recommend && this.remember) {
+        this.$error({
+          title: "温馨提示",
+          content: "“会员专享”和“精选推荐”不可以同时开启,但可以同时关闭"
+        });
+        this.recommend = false;
+      }
     },
     onSubjectChange(event) {
       this.subject = event;

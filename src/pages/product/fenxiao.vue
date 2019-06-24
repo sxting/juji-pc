@@ -54,7 +54,7 @@
           <a-card title="分佣设置" style="margin-top:20px">
 
             <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
-              <template v-for="(col, i) in ['name', 'originp', 'currentp', 'costp', 'sharedp', 'salesRate', 'manageRate', 'platform', 'provider']" :slot="col" slot-scope="text, record, index">
+              <template v-for="(col, i) in ['name', 'originp', 'currentp', 'costp', 'memberp','sharedp', 'salesRate', 'manageRate', 'platform', 'provider']" :slot="col" slot-scope="text, record, index">
                 <div :key="col">
                   <div class="disflex" v-if="guigeColumns[i].editable">
                     <a-input
@@ -64,8 +64,8 @@
                     @blur="e => handleBlur(e.target.value, record.key, col)"
                     />
                     <span v-if="guigeColumns[i].rate"> % </span>
-                    <span class="w40" v-if="i == 5">{{record.salesp}}</span>
-                    <span class="w40" v-if="i == 6">{{record.managep}}</span>
+                    <span class="w40" v-if="i == 6">{{record.salesp}}</span>
+                    <span class="w40" v-if="i == 7">{{record.managep}}</span>
                   </div>
                   <template v-else>{{text}}</template>
                 </div>
@@ -203,6 +203,11 @@ const guigeColumns = [
     title: '底价(元)',
     dataIndex: 'costp',
     scopedSlots: { customRender: 'costp' },
+  }, {
+    title: '会员价(元)',
+    dataIndex: 'memberp',
+    scopedSlots: { customRender: 'memberp' },
+    editable: true
   }, {
     title: '分享价(元)',
     dataIndex: 'sharedp',
@@ -553,6 +558,7 @@ export default {
               originp: item1.originalPrice/100,
               currentp: item1.salePrice/100,
               costp: item1.costPrice/100,
+              memberp: 0,
               sharedp: item1.sharePrice ? item1.sharePrice/100 : 0,
               salesRate: item1.salesRateStr ? item1.salesRateStr : 0,
               manageRate: item1.manageRateStr ? item1.manageRateStr : 0,
