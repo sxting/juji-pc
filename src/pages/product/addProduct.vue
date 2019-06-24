@@ -22,6 +22,10 @@
           <a-input placeholder="请输入商品名称，限1-40字" />
         </a-form-item>
 
+        <a-form-item v-if="productId" label="商品id" :labelCol="{span: 7}"  :wrapperCol="{span: 10}">
+          {{productId}}
+        </a-form-item>
+
         <a-form-item label="商品规格" :labelCol="{span: 7}"  :wrapperCol="{span: 16}" :required="true">
           <div>
             <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
