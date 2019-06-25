@@ -26,6 +26,12 @@
           {{productId}}
         </a-form-item>
 
+        <a-form-item v-if="productId" label="商品小程序码" :labelCol="{span: 7}"  :wrapperCol="{span: 10}">
+           <img class="qrCode" :src="qrCode" alt="">
+           <!-- <a :href="qrCodeBig" download="qrCode.png" target="_blank">点击下载</a> -->
+           <a-button type="primary" @click="uploadImg">点击下载</a-button>
+        </a-form-item>
+
         <a-form-item label="商品规格" :labelCol="{span: 7}"  :wrapperCol="{span: 16}" :required="true">
           <div>
             <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
@@ -318,7 +324,9 @@ export default {
       subject: [], // 活动主题； 字符串 逗号分隔
       recommend: true, //是否推荐； 0，1
       shareText: '', //分享文字
-      remember: false
+      remember: false,
+      qrCode: '',
+      qrCodeBig: '',
     };
   },
   created() {
@@ -337,6 +345,30 @@ export default {
     }
   },
   methods: {
+    getQrCode() {
+      let data = {
+        productId: this.productId,
+        path: 'pages/login/index'
+      };
+      this.$axios({
+        url: "/endpoint/qr/getByProductId.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          // res.data = '27fmRat9vha7';
+          this.qrCode = "https://upic.juniuo.com/file/picture/" + res.data + "/resize_85_85/mode_filt/format_jpg/quality_0";
+          this.qrCodeBig = "https://upic.juniuo.com/file/picture/" + res.data + "/resize_200_200/mode_filt/format_jpg/quality_0"
+          console.log(this.qrCode);
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
     handleChange (value, key, column) {
       const newData = [...this.guigeDataSource]
       const target = newData.filter(item => key === item.key)[0];
@@ -400,6 +432,7 @@ export default {
         sessionStorage.getItem("PROCIDERID") || this.$route.query.providerId;
       this.productId = this.$route.query.productId;
       this.merchantListFun(this.providerId);
+      this.getQrCode();
     },
     checkStord() {
       this.visible = true;
@@ -967,6 +1000,34 @@ export default {
       if (!isLt2M) {
         this.$message.error("上传图片大小必须小于10MB!");
       }
+    },
+
+    uploadImg() {
+      console.log(111);
+      const image = new Image();
+      // 解决跨域 canvas 污染问题
+      image.setAttribute("crossOrigin", "anonymous");
+      image.onload = function() {
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const context = canvas.getContext("2d");
+        context.drawImage(image, 0, 0, image.width, image.height);
+        //得到图片的base64编码数据
+        const url = canvas.toDataURL("image/png");
+        // 生成一个 a 标签
+        const a = document.createElement("a");
+        // 创建一个点击事件
+        const event = new MouseEvent("click");
+        // 将 a 的 download 属性设置为我们想要下载的图片的名称，若 name 不存在则使用'图片'作为默认名称
+        a.download = name || "图片";
+        // 将生成的 URL 设置为 a.href 属性
+        a.href = url;
+        // 触发 a 的点击事件
+        a.dispatchEvent(event);
+        // return a;
+      };
+      image.src = this.qrCodeBig;
     }
   }
 };
@@ -984,6 +1045,12 @@ export default {
 .w40 {
   width: 40px;
   margin-left: 10px;
+}
+.qrCode {
+  width: 85px;
+  height: 85px;
+  background-color: #eee;
+  margin-right: 20px;
 }
 </style>
 
