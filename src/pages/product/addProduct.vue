@@ -357,10 +357,8 @@ export default {
         params: data
       }).then(res => {
         if (res.success) {
-          // res.data = '27fmRat9vha7';
           this.qrCode = "https://upic.juniuo.com/file/picture/" + res.data + "/resize_85_85/mode_filt/format_jpg/quality_0";
           this.qrCodeBig = "https://upic.juniuo.com/file/picture/" + res.data + "/resize_200_200/mode_filt/format_jpg/quality_0"
-          console.log(this.qrCode);
         } else {
           this.$error({
             title: "温馨提示",
