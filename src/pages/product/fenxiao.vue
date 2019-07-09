@@ -426,7 +426,7 @@ export default {
           // manageRateStr: item.manageRate,
           // saleRateStr: item.salesRate,
           manageAmount: that.accurate_mul(item.manageAmount, 100),
-          // saleAmount: item.saleAmount,
+          saleAmount: that.accurate_mul(item.currentp - item.sharedp, 100),
           sharePrice: that.accurate_mul(item.sharedp, 100)
         }
       });
