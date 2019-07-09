@@ -54,7 +54,7 @@
           <a-card title="分佣设置" style="margin-top:20px">
 
             <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
-              <template v-for="(col, i) in ['name', 'originp', 'currentp', 'costp', 'memberp','sharedp', 'salesRate', 'manageRate', 'platform', 'provider']" :slot="col" slot-scope="text, record, index">
+              <template v-for="(col, i) in ['name', 'originp', 'currentp', 'costp', 'sharedp', 'manageAmount', 'platform', 'provider']" :slot="col" slot-scope="text, record, index">
                 <div :key="col">
                   <div class="disflex" v-if="guigeColumns[i].editable">
                     <a-input
@@ -63,9 +63,9 @@
                     @change="e => handleChange(e.target.value, record.key, col)"
                     @blur="e => handleBlur(e.target.value, record.key, col)"
                     />
-                    <span v-if="guigeColumns[i].rate"> % </span>
-                    <span class="w40" v-if="i == 6">{{record.salesp}}</span>
-                    <span class="w40" v-if="i == 7">{{record.managep}}</span>
+                    <!-- <span v-if="guigeColumns[i].rate"> % </span> -->
+                    <!-- <span class="w40" v-if="i == 6">{{record.salesp}}</span>
+                    <span class="w40" v-if="i == 7">{{record.managep}}</span> -->
                   </div>
                   <template v-else>{{text}}</template>
                 </div>
@@ -156,13 +156,13 @@ const columns2 = [
     title: "售价",
     dataIndex: "price"
   },
-  {
-    title: "购物返利(元)",
-    dataIndex: "SALESAmount"
-  },
+  // {
+  //   title: "购物返利(元)",
+  //   dataIndex: "SALESAmount"
+  // },
   {
     title: "管理佣金(元)",
-    dataIndex: "MANAGERAmount"
+    dataIndex: "manageAmount"
   },
   {
     title: "操作",
@@ -203,28 +203,25 @@ const guigeColumns = [
     title: '底价(元)',
     dataIndex: 'costp',
     scopedSlots: { customRender: 'costp' },
-  }, {
+  },  {
     title: '会员价(元)',
-    dataIndex: 'memberp',
-    scopedSlots: { customRender: 'memberp' },
-    editable: true
-  }, {
-    title: '分享价(元)',
     dataIndex: 'sharedp',
     scopedSlots: { customRender: 'sharedp' },
     editable: true
-  }, {
-    title: '销售返利(%/元)',
-    dataIndex: 'salesRate',
-    scopedSlots: { customRender: 'salesRate' },
+  },
+  // {
+  //   title: '销售返利(%/元)',
+  //   dataIndex: 'salesRate',
+  //   scopedSlots: { customRender: 'salesRate' },
+  //   editable: true,
+  //   rate: true
+  // },
+  {
+    title: '管理佣金(元)',
+    dataIndex: 'manageAmount',
+    scopedSlots: { customRender: 'manageAmount' },
     editable: true,
-    rate: true
-  }, {
-    title: '管理佣金(%/元)',
-    dataIndex: 'manageRate',
-    scopedSlots: { customRender: 'manageRate' },
-    editable: true,
-    rate: true
+    // rate: true
   }
   // , {
   //   title: '平台抽佣',
@@ -426,8 +423,10 @@ export default {
       this.guigeDataSource.forEach(function(item, index) {
         itemSkus[index] = {
           itemSkuId: item.skuId,
-          manageRateStr: item.manageRate,
-          saleRateStr: item.salesRate,
+          // manageRateStr: item.manageRate,
+          // saleRateStr: item.salesRate,
+          manageAmount: that.accurate_mul(item.manageAmount, 100),
+          // saleAmount: item.saleAmount,
           sharePrice: that.accurate_mul(item.sharedp, 100)
         }
       });
@@ -536,32 +535,34 @@ export default {
 
           let guigeDataSource = [];
           this.detail.skuList.forEach(function(item1, index1) {
-            item1.estimateSettlements.forEach(function(item2, index2) {
-              if (item2.settlementType === "DISTRIBUTOR_SALES_REBATE"){
-                item1.salesRateStr = item2.rate;
-                item1.name = "销售返利";
-                item1.boolean = true;
-                item1.salesRateStrAmount = item2.estimateAmount/100;
-              }
-              if (item2.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
-                item1.boolean = true;
-                item1.name = "管理佣金";
-                item1.manageRateStr = item2.rate;
-                item1.manageRateStrAmount = item2.estimateAmount/100;
-              }
-              // if (item2.settlementType === "JUJI_PLATFORM") item1.name = "平台抽佣"; //平台抽佣
-              // if (item2.settlementType === "PROVIDER") item1.name = "代理商分佣比例"; //代理商分佣比例
-            })
+            if(item1.estimateSettlements) {
+              item1.estimateSettlements.forEach(function(item2, index2) {
+                if (item2.settlementType === "DISTRIBUTOR_SALES_REBATE"){
+                  item1.salesRateStr = item2.rate;
+                  item1.name = "销售返利";
+                  item1.boolean = true;
+                  item1.salesRateStrAmount = item2.estimateAmount/100;
+                }
+                if (item2.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
+                  item1.boolean = true;
+                  item1.name = "管理佣金";
+                  item1.manageRateStr = item2.rate;
+                  item1.manageRateStrAmount = item2.estimateAmount/100;
+                }
+                // if (item2.settlementType === "JUJI_PLATFORM") item1.name = "平台抽佣"; //平台抽佣
+                // if (item2.settlementType === "PROVIDER") item1.name = "代理商分佣比例"; //代理商分佣比例
+              })
+            }
             guigeDataSource[index1] = {
               key: index1,
               name: item1.skuName,
               originp: item1.originalPrice/100,
               currentp: item1.salePrice/100,
               costp: item1.costPrice/100,
-              memberp: 0,
               sharedp: item1.sharePrice ? item1.sharePrice/100 : 0,
               salesRate: item1.salesRateStr ? item1.salesRateStr : 0,
               manageRate: item1.manageRateStr ? item1.manageRateStr : 0,
+              manageAmount: item1.manageAmount ? item1.manageAmount/100 : 0,
               platform: '0',
               provider: '0',
               salesp: item1.salesRateStrAmount ? item1.salesRateStrAmount : 0,
@@ -570,24 +571,6 @@ export default {
             };
           })
           this.guigeDataSource = guigeDataSource;
-
-          // this.detail.estimateSettlements.forEach(function(i) {
-          //   if (i.settlementType === "MERCHANT") i.boolean = true;
-          //   if (i.settlementType === "DISTRIBUTOR_SALES_REBATE"){
-          //         that.salesRateStr = i.rate;
-          //         i.name = "销售返利";
-          //         i.boolean = true;
-          //       that.salesRateStrAmount = i.estimateAmount;
-          //     }
-          //     if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
-          //       i.boolean = true;
-          //       i.name = "管理佣金";
-          //       that.manageRateStr = i.rate;
-          //       that.manageRateStrAmount = i.estimateAmount;
-          //     }
-          //   if (i.settlementType === "JUJI_PLATFORM") i.name = "平台抽佣"; //平台抽佣
-          //   if (i.settlementType === "PROVIDER") i.name = "代理商分佣比例"; //代理商分佣比例
-          // });
 
           this.descriptions = res.data.descriptions;
           let fileList2 = res.data.picIds;
@@ -644,14 +627,17 @@ export default {
                 i.providerName = n.providerName;
             });
             if(that.effective === '1') {
+              i.manageAmount = i.skuList[0].manageAmount ? that.accurate_div(i.skuList[0].manageAmount, 100) : 0;
               let SALESAmountArr = [], MANAGERAmountArr = [];
               i.skuList.forEach(function(s) {
-                s.estimateSettlements.forEach(function(m) {
-                  if (m.settlementType === "DISTRIBUTOR_MANAGER_REBATE")
-                    MANAGERAmountArr.push(that.accurate_div(m.estimateAmount, 100))
-                  if (m.settlementType === "DISTRIBUTOR_SALES_REBATE")
-                    SALESAmountArr.push(that.accurate_div(m.estimateAmount, 100))
-                })
+                // if(s.estimateSettlements) {
+                //   s.estimateSettlements.forEach(function(m) {
+                //   if (m.settlementType === "DISTRIBUTOR_MANAGER_REBATE")
+                //     MANAGERAmountArr.push(that.accurate_div(m.estimateAmount, 100))
+                //   if (m.settlementType === "DISTRIBUTOR_SALES_REBATE")
+                //     SALESAmountArr.push(that.accurate_div(m.estimateAmount, 100))
+                // })
+                // }
               });
               let SALESAmountL= SALESAmountArr[0], SALESAmountS = SALESAmountArr[0], MANAGERAmountL = MANAGERAmountArr[0], MANAGERAmountS = MANAGERAmountArr[0];
               SALESAmountArr.forEach(function(item) {

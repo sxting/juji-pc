@@ -645,6 +645,7 @@ export default {
               recommend: this.recommend ? 1 : 0,
               shareText: values.repository.shareText,
               shareImg: this.fileList4[0] ? this.fileList4[0].response : '',
+              isMember: this.remember ? 1 : 0
             };
             console.log(data);
             if (this.productId) {
@@ -873,6 +874,7 @@ export default {
           });
           this.subject = res.data.subject ? res.data.subject.split(',') : [];
           this.recommend = res.data.recommend ? true : false;
+          this.remember = res.data.isMember ? true : false;
           let storeIdArr = [];
           res.data.productStores.forEach(function(i) {
             storeIdArr.push(i.storeId);
