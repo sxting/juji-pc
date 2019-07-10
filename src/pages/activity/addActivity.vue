@@ -46,9 +46,9 @@
                     @change="e => handleChange1(e.target.value, record.key, col)"
                     @blur="e => handleBlur1(e.target.value, record.key, col)"
                   />
-                  <span v-if="guigeColumns[i].rate"> % </span>
-                  <span class="w40" v-if="i == 6">{{record.salesp}}</span>
-                  <span class="w40" v-if="i == 7">{{record.managep}}</span>
+                  <!-- <span v-if="guigeColumns[i].rate"> % </span> -->
+                  <!-- <span class="w40" v-if="i == 6">{{record.salesp}}</span> -->
+                  <!-- <span class="w40" v-if="i == 7">{{record.managep}}</span> -->
                 </div>
                 <template v-else>{{text}}</template>
               </div>
@@ -153,15 +153,15 @@ const guigeColumns1 = [
     scopedSlots: { customRender: 'pintuanp' },
     editable: true
   }, {
-    title: '销售返利(%/元)',
-    dataIndex: 'salesRate',
-    scopedSlots: { customRender: 'salesRate' },
+    title: '销售返利(元)',
+    dataIndex: 'salePrice',
+    scopedSlots: { customRender: 'salePrice' },
     editable: true,
     rate: true
   }, {
-    title: '管理佣金(%/元)',
-    dataIndex: 'manageRate',
-    scopedSlots: { customRender: 'manageRate' },
+    title: '管理佣金(元)',
+    dataIndex: 'managePrice',
+    scopedSlots: { customRender: 'managePrice' },
     editable: true,
     rate: true
   }
@@ -189,7 +189,9 @@ const guigeDataSource1 = [
     platform: '0',
     provider: '0',
     salesp: '0',
-    managep: '0'
+    managep: '0',
+    salePrice: 0,
+    managePrice: 0
   }
 ]
 
@@ -220,15 +222,15 @@ const guigeColumns2 = [
     scopedSlots: { customRender: 'kanjiap' },
   }
   , {
-    title: '销售返利(%/元)',
-    dataIndex: 'salesRate',
-    scopedSlots: { customRender: 'salesRate' },
+    title: '销售返利(元)',
+    dataIndex: 'salePrice',
+    scopedSlots: { customRender: 'salePrice' },
     editable: true,
     rate: true
   }, {
-    title: '管理佣金(%/元)',
-    dataIndex: 'manageRate',
-    scopedSlots: { customRender: 'manageRate' },
+    title: '管理佣金(元)',
+    dataIndex: 'managePrice',
+    scopedSlots: { customRender: 'managePrice' },
     editable: true,
     rate: true
   }
@@ -253,7 +255,9 @@ const guigeDataSource2 = [
     salesRate: '0',
     manageRate: '0',
     salesp: '0',
-    managep: '0'
+    managep: '0',
+    salePrice: 0,
+    managePrice: 0,
   }
 ]
 
@@ -285,14 +289,14 @@ const guigeColumns3 = [
     editable: true
   }, {
     title: '销售返利(%/元)',
-    dataIndex: 'salesRate',
-    scopedSlots: { customRender: 'salesRate' },
+    dataIndex: 'salePrice',
+    scopedSlots: { customRender: 'salePrice' },
     editable: true,
     rate: true
   }, {
     title: '管理佣金(%/元)',
-    dataIndex: 'manageRate',
-    scopedSlots: { customRender: 'manageRate' },
+    dataIndex: 'managePrice',
+    scopedSlots: { customRender: 'managePrice' },
     editable: true,
     rate: true
   },{
@@ -325,12 +329,14 @@ const guigeDataSource3 = [
     stock2: '0',
     salesp: '',
     managep: '',
+    salePrice: 0,
+    managePrice: 0,
   }
 ]
 
-const colArr1 = ['name', 'originp', 'currentp', 'point', 'costp', 'pintuanp', 'salesRate', 'manageRate', 'platform', 'provider']
-const colArr2 = ['name', 'originp', 'currentp', 'point', 'costp', 'kanjiap', 'salesRate', 'manageRate']
-const colArr3 = ['name', 'originp', 'currentp', 'point', 'costp', 'miaoshap', 'salesRate', 'manageRate', 'stock1', 'stock2']
+const colArr1 = ['name', 'originp', 'currentp', 'point', 'costp', 'pintuanp', 'salePrice', 'managePrice', 'platform', 'provider']
+const colArr2 = ['name', 'originp', 'currentp', 'point', 'costp', 'kanjiap', 'salePrice', 'managePrice']
+const colArr3 = ['name', 'originp', 'currentp', 'point', 'costp', 'miaoshap', 'salePrice', 'managePrice', 'stock1', 'stock2']
 
 export default {
   name: "addActivity",
@@ -606,8 +612,10 @@ export default {
               initiatorBargainCount: 1,
               participantBargainCount: 1,
               skuId: item1.skuId,
-              manageRateStr: item1.manageRate,
-              saleRateStr: item1.salesRate
+              // manageRateStr: item1.manageRate,
+              // saleRateStr: item1.salesRate,
+              managePrice: that.accurate_mul(item1.managePrice, 100),
+              salePrice: that.accurate_mul(item1.salePrice, 100),
             })
           })
         })
@@ -618,8 +626,10 @@ export default {
             splicedPeopleCount: 2, //拼团人数
             splicedPrice: parseFloat(item.pintuanp) * 100 + "",  //拼团金额
             skuId: item.skuId,
-            manageRateStr: item.manageRate,
-            saleRateStr: item.salesRate
+            managePrice: that.accurate_mul(item.managePrice, 100),
+            salePrice: that.accurate_mul(item.salePrice, 100),
+            // manageRateStr: item.manageRate,
+            // saleRateStr: item.salesRate
           }
         })
       }else if(this.activityType === "SEC_KILL"){
@@ -630,16 +640,20 @@ export default {
               activityPoint: parseFloat(item.miaoshap.juzi) + "",
               activityStock: item.stock2,
               skuId: item.skuId,
-              manageRateStr: item.manageRate,
-              saleRateStr: item.salesRate
+              managePrice: that.accurate_mul(item.managePrice, 100),
+              salePrice: that.accurate_mul(item.salePrice, 100),
+              // manageRateStr: item.manageRate,
+              // saleRateStr: item.salesRate
             }
           } else {
             rules[index] = {
               activityPrice: parseFloat(item.miaoshap.price) * 100 + "",
               activityStock: item.stock2,
               skuId: item.skuId,
-              manageRateStr: item.manageRate,
-              saleRateStr: item.salesRate
+              managePrice: that.accurate_mul(item.managePrice, 100),
+              salePrice: that.accurate_mul(item.salePrice, 100),
+              // manageRateStr: item.manageRate,
+              // saleRateStr: item.salesRate
             }
           }
         })
@@ -875,11 +889,13 @@ export default {
                 costp: item.costPrice/100,
                 point: item.pointPrice,
                 kanjiap: [],
-                salesRate: item.rules[0].saleRateStr,
-                manageRate: item.rules[0].manageRateStr,
+                // salesRate: item.rules[0].saleRateStr,
+                // manageRate: item.rules[0].manageRateStr,
                 salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
                 managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
-                skuId: item.skuId
+                skuId: item.skuId,
+                managePrice: item.managePrice ? item.managePrice/100 : 0,
+                salePrice: item.salePrice ? item.salePrice/100 : 0,
               }
               item.rules.forEach(function(item2, index2){
                 guigeDataSource[index].kanjiap[index2] = {
@@ -901,13 +917,15 @@ export default {
                 point: item.pointPrice,
                 costp: item.costPrice/100,
                 pintuanp: item.rules[0].splicedPrice/100,
-                salesRate: item.rules[0].saleRateStr,
-                manageRate: item.rules[0].manageRateStr,
+                // salesRate: item.rules[0].saleRateStr,
+                // manageRate: item.rules[0].manageRateStr,
                 platform: '0',
                 provider: '0',
                 salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
                 managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
-                skuId: item.skuId
+                skuId: item.skuId,
+                managePrice: item.managePrice ? item.managePrice/100 : 0,
+                salePrice: item.salePrice ? item.salePrice/100 : 0,
               }
             })
           }else if(this.activityType === 'SEC_KILL'){
@@ -925,11 +943,13 @@ export default {
                 },
                 stock1: item.stock,
                 stock2: item.rules[0].activityStock,
-                salesRate: item.rules[0].saleRateStr,
-                manageRate: item.rules[0].manageRateStr,
+                // salesRate: item.rules[0].saleRateStr,
+                // manageRate: item.rules[0].manageRateStr,
                 salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
                 managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
                 skuId: item.skuId,
+                managePrice: item.managePrice ? item.managePrice/100 : 0,
+                salePrice: item.salePrice ? item.salePrice/100 : 0,
               }
             });
           }
