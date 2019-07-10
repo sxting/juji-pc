@@ -894,8 +894,8 @@ export default {
                 salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
                 managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
                 skuId: item.skuId,
-                managePrice: item.managePrice ? item.managePrice/100 : 0,
-                salePrice: item.salePrice ? item.salePrice/100 : 0,
+                managePrice: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
+                salePrice: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
               }
               item.rules.forEach(function(item2, index2){
                 guigeDataSource[index].kanjiap[index2] = {
@@ -924,8 +924,8 @@ export default {
                 salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
                 managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
                 skuId: item.skuId,
-                managePrice: item.managePrice ? item.managePrice/100 : 0,
-                salePrice: item.salePrice ? item.salePrice/100 : 0,
+                managePrice: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
+                salePrice: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
               }
             })
           }else if(this.activityType === 'SEC_KILL'){
@@ -948,8 +948,8 @@ export default {
                 salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
                 managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
                 skuId: item.skuId,
-                managePrice: item.managePrice ? item.managePrice/100 : 0,
-                salePrice: item.salePrice ? item.salePrice/100 : 0,
+                managePrice: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
+                salePrice: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
               }
             });
           }
