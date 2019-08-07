@@ -288,13 +288,13 @@ const guigeColumns3 = [
     scopedSlots: { customRender: 'miaoshap' },
     editable: true
   }, {
-    title: '销售返利(%/元)',
+    title: '销售返利(元)',
     dataIndex: 'salePrice',
     scopedSlots: { customRender: 'salePrice' },
     editable: true,
     rate: true
   }, {
-    title: '管理佣金(%/元)',
+    title: '管理佣金(元)',
     dataIndex: 'managePrice',
     scopedSlots: { customRender: 'managePrice' },
     editable: true,
@@ -614,8 +614,8 @@ export default {
               skuId: item1.skuId,
               // manageRateStr: item1.manageRate,
               // saleRateStr: item1.salesRate,
-              managePrice: that.accurate_mul(item1.managePrice, 100),
-              salePrice: that.accurate_mul(item1.salePrice, 100),
+              managePrice: item.managePrice ? that.accurate_mul(item.managePrice, 100) : 0,
+              salePrice: item.salePrice ? that.accurate_mul(item.salePrice, 100) : 0,
             })
           })
         })
@@ -626,8 +626,8 @@ export default {
             splicedPeopleCount: 2, //拼团人数
             splicedPrice: parseFloat(item.pintuanp) * 100 + "",  //拼团金额
             skuId: item.skuId,
-            managePrice: that.accurate_mul(item.managePrice, 100),
-            salePrice: that.accurate_mul(item.salePrice, 100),
+            managePrice: item.managePrice ? that.accurate_mul(item.managePrice, 100) : 0,
+            salePrice: item.salePrice ? that.accurate_mul(item.salePrice, 100) : 0,
             // manageRateStr: item.manageRate,
             // saleRateStr: item.salesRate
           }
@@ -640,8 +640,8 @@ export default {
               activityPoint: parseFloat(item.miaoshap.juzi) + "",
               activityStock: item.stock2,
               skuId: item.skuId,
-              managePrice: that.accurate_mul(item.managePrice, 100),
-              salePrice: that.accurate_mul(item.salePrice, 100),
+              managePrice: item.managePrice ? that.accurate_mul(item.managePrice, 100) : 0,
+              salePrice: item.salePrice ? that.accurate_mul(item.salePrice, 100) : 0,
               // manageRateStr: item.manageRate,
               // saleRateStr: item.salesRate
             }
@@ -650,8 +650,8 @@ export default {
               activityPrice: parseFloat(item.miaoshap.price) * 100 + "",
               activityStock: item.stock2,
               skuId: item.skuId,
-              managePrice: that.accurate_mul(item.managePrice, 100),
-              salePrice: that.accurate_mul(item.salePrice, 100),
+              managePrice: item.managePrice ? that.accurate_mul(item.managePrice, 100) : 0,
+              salePrice: item.salePrice ? that.accurate_mul(item.salePrice, 100) : 0,
               // manageRateStr: item.manageRate,
               // saleRateStr: item.salesRate
             }
