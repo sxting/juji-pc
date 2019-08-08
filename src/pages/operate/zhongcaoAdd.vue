@@ -1,9 +1,23 @@
 <template>
   <div>
-    <div class="editor">
+    <!-- <div class="editor">
         <div id="editor"></div>
         <button type="" @click="gettext">点击</button>
-    </div>
+    </div> -->
+
+    <a-card :body-style="{padding: '24px 32px'}" :bordered="false">
+        <a-form :autoFormCreate="(form) => {this.form = form;}">
+            <a-form-item label="文章标题" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" fieldDecoratorId="title" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入文章标题，限1-40字', whitespace: true}]}" :required="true">
+                <a-input placeholder="请输入文章标题，限1-40字" />
+            </a-form-item>
+            <a-form-item label="种草内容详情" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" fieldDecoratorId="editors" :fieldDecoratorOptions="{rules: [{ required: true, message: '', whitespace: true}]}">
+                <div class="editor">
+                    <div id="editor"></div>
+                    <button type="" @click="gettext">点击</button>
+                </div>
+            </a-form-item>
+        </a-form>
+    </a-card>
 
   </div>
 </template>
@@ -16,7 +30,8 @@ export default {
   data() {
     return {
       editor: null,
-
+      title: '',
+      editors: ''
     };
   },
   mounted() {
