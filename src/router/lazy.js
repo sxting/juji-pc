@@ -120,6 +120,21 @@ let routesObj = {
               component: () => import('@/pages/operate/juziOperate'),
               icon: 'none',
               invisible: true
+            },
+            {
+              path: '/operate/zhongcaoManage',
+              name: '种草内容管理',
+              menuId: '40200000',
+              component: () => import('@/pages/operate/zhongcaoManage'),
+              icon: 'none',
+              invisible: true
+            },
+            {
+              path: '/operate/zhongcaoAdd',
+              name: '种草内容编辑',
+              component: () => import('@/pages/operate/zhongcaoAdd'),
+              icon: 'none',
+              invisible: true
             }
           ]
         },

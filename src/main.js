@@ -12,6 +12,12 @@ import store from './store'
 import PouchDB from 'pouchdb'
 import G2 from '@antv/g2'
 import moment from 'moment'
+
+import '../static/ueditor/ueditor.config.js';
+import '../static/ueditor/ueditor.all.min.js';
+import '../static/ueditor/ueditor.parse.min.js';
+import '../static/ueditor/lang/zh-cn/zh-cn.js'
+
 Vue.prototype.$axios = axios
 Vue.prototype.moment = moment
 Vue.config.productionTip = false
