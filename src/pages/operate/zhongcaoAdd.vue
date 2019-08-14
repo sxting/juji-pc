@@ -158,7 +158,6 @@ export default {
 <style>
 .edui-default{line-height: 20px}
 .edui-arrow{width: 12px!important;}
-.ant-form-item-children input[type="text"]{width: 800px;}
 .edui-button-body.edui-default{line-height: 20px}
 .edui-combox-body.edui-default{line-height: 20px}
 </style>
