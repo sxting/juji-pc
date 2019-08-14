@@ -47,9 +47,11 @@
               <a-form-item label="商品标签" fieldDecoratorId="repository.biaoqian" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
                 <a-select placeholder="请选择">
                   <a-select-option value="">全部标签</a-select-option>
-                  <a-select-option value="美食饮品">美食饮品</a-select-option>
-                  <a-select-option value="丽人美发">丽人美发</a-select-option>
-                  <a-select-option value="休闲娱乐">休闲娱乐</a-select-option>
+                  <a-select-option value="要吃">要吃</a-select-option>
+                  <a-select-option value="要玩">要玩</a-select-option>
+                  <a-select-option value="要美">要美</a-select-option>
+                  <a-select-option value="亲子">亲子</a-select-option>
+                  <a-select-option value="度假">度假</a-select-option>
                   <a-select-option value="其他">其他</a-select-option>
                 </a-select>
               </a-form-item>
@@ -94,11 +96,12 @@
           <a-form-item label="展示顺序" :labelCol="{span: 7}" help="第几位" :wrapperCol="{span: 10}" :required="false">
             <a-input-number :min="0" :step="1" :max="99999" v-model="showIdx" />
           </a-form-item>
-          <a-form-item label="活动主题" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
+          <a-form-item label="活动主题" :labelCol="{span: 7}" :wrapperCol="{span: 16}" :required="false">
             <a-checkbox-group v-model="subject" @change="onSubjectChange" :style="{ paddingTop: '8px' }">
               <a-row>
-                <a-col :span="12"><a-checkbox value="新品抢鲜" defaultChecked>新品抢鲜</a-checkbox></a-col>
-                <a-col :span="12"><a-checkbox value="好店礼券">好店礼券</a-checkbox></a-col>
+                <a-col :span="8"><a-checkbox value="特惠品鉴" defaultChecked>特惠品鉴</a-checkbox></a-col>
+                <a-col :span="8"><a-checkbox value="优选好券">优选好券</a-checkbox></a-col>
+                <a-col :span="8"><a-checkbox value="打卡潮店">打卡潮店</a-checkbox></a-col>
               </a-row>
             </a-checkbox-group>
           </a-form-item>

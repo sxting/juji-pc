@@ -20,11 +20,11 @@
                     <div id="editor"></div>
                 </div>
             </a-form-item>
-            <a-form-item label="展示顺序" :labelCol="{span: 5}" :wrapperCol="{span: 10}" fieldDecoratorId="idx" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入展示顺序', whitespace: true}]}">
-                <a-input placeholder="请输入展示顺序" v-model="idx" />
+            <a-form-item label="展示顺序" :labelCol="{span: 5}" help="第几位" :wrapperCol="{span: 10}" fieldDecoratorId="repository.idx" :required="false">
+              <a-input-number :min="0" :step="1" :max="99999" v-model="idx" />
             </a-form-item>
         </a-form>
-        <div style="text-align: center;margin-bottom: 30px;">
+        <div style="text-align: center;margin: 30px 0;">
           <div class="btn btn_cancel">取消</div>
           <div class="btn btn_save" @click="submit()">保存</div>
         </div>
