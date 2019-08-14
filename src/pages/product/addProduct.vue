@@ -84,6 +84,7 @@
             </a-upload>
           </div>
         </a-form-item>
+        
         <a-form-item label="图文详情" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div v-for="(list, j) in picXQ" :key="j" style="margin-top:20px;">
             <div class="clearfix">
