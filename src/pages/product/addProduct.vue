@@ -10,7 +10,7 @@
           </a-radio-group>
         </a-form-item>
         -->
-        <a-form-item label="商品标签" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+        <a-form-item label="商品标签1" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="biaoqian">
             <a-radio :value="'要吃'">要吃</a-radio>
             <a-radio :value="'要美'">要美</a-radio>
