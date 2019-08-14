@@ -172,8 +172,8 @@
         <a-form-item label="活动主题" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <a-checkbox-group v-model="subject" @change="onSubjectChange" :style="{ paddingTop: '8px' }">
             <a-row>
-              <a-col :span="8"><a-checkbox value="特惠品鉴" defaultChecked>特惠品鉴</a-checkbox></a-col>
-              <a-col :span="8"><a-checkbox value="优选好券">优选好券</a-checkbox></a-col>
+              <a-col :span="8"><a-checkbox value="新品尝鲜" defaultChecked>特惠品鉴</a-checkbox></a-col>
+              <a-col :span="8"><a-checkbox value="好店礼券">优选好券</a-checkbox></a-col>
               <a-col :span="8"><a-checkbox value="打卡潮店">打卡潮店</a-checkbox></a-col>
             </a-row>
           </a-checkbox-group>
