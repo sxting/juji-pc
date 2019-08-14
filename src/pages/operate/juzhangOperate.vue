@@ -28,7 +28,6 @@
               </a-col>
             </a-row>
           </div>
-
         </a-form>
       </div>
       <div>

@@ -12,9 +12,11 @@
         -->
         <a-form-item label="商品标签" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="biaoqian">
-            <a-radio :value="'美食饮品'">美食饮品</a-radio>
-            <a-radio :value="'丽人美发'">丽人美发</a-radio>
-            <a-radio :value="'休闲娱乐'">休闲娱乐</a-radio>
+            <a-radio :value="'要吃'">要吃</a-radio>
+            <a-radio :value="'要美'">要美</a-radio>
+            <a-radio :value="'要玩'">要玩</a-radio>
+            <a-radio :value="'度假'">度假</a-radio>
+            <a-radio :value="'亲子'">亲子</a-radio>
             <a-radio :value="'其他'">其他</a-radio>
           </a-radio-group>
         </a-form-item>
@@ -28,7 +30,6 @@
 
         <a-form-item v-if="productId" label="商品小程序码" :labelCol="{span: 7}"  :wrapperCol="{span: 10}">
            <img class="qrCode" :src="qrCode" alt="">
-           <!-- <a :href="qrCodeBig" download="qrCode.png" target="_blank">点击下载</a> -->
            <a-button type="primary" @click="uploadImg">点击下载</a-button>
         </a-form-item>
 
