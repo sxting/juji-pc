@@ -33,7 +33,7 @@
            <a-button type="primary" @click="uploadImg">点击下载</a-button>
         </a-form-item>
 
-        <a-form-item label="商品规格" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" :required="true"> 
+        <a-form-item label="商品规格" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" :required="true">
           <div>
             <a-table :dataSource="guigeDataSource" :columns="guigeColumns" :pagination="false">
               <template v-for="(col, i) in ['name', 'originp', 'currentp', 'jifen', 'costp', 'stock']" :slot="col" slot-scope="text, record, index">
