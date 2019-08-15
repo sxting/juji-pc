@@ -5,6 +5,12 @@
         <a-col :md="16" :sm="24">
           <a-button @click="addNew" type="primary">发布新内容</a-button>
         </a-col>
+        <a-col :md="8" :sm="24">
+          <a-tabs @change="tabFun">
+            <a-tab-pane tab="展示中" key="1"></a-tab-pane>
+            <a-tab-pane tab="已下架" key="0"></a-tab-pane>
+          </a-tabs>
+        </a-col>
       </a-row>
     </div>
     <div :class="advanced ? 'search' : null">
@@ -33,8 +39,8 @@
           <img :src="'https://upic.juniuo.com/file/picture/'+record.cover+'/resize_0_0/mode_filt/format_jpg/quality_0'" alt="" width="150" height="50" />
         </span>
         <span slot="action" slot-scope="text, record">
-          <!-- <a @click="bianji(record)">编辑</a>
-          <a-divider v-if="putAway === '1'" type="vertical" /> -->
+          <a @click="bianji(record)">编辑</a>
+          <a-divider v-if="putAway === '1'" type="vertical" />
           <a v-if="putAway === '1'" @click="xiajia(record)" class="ant-dropdown-link">下架</a>
         </span>
       </a-table>
@@ -121,7 +127,7 @@ export default {
       });
     });
     sessionStorage.setItem("menuBoolean",true);
-    this.productList();
+    this.productList(1);
   },
   mounted() {},
   methods: {
@@ -133,6 +139,11 @@ export default {
     },
     providerListFun(e) {
       this.providerId = e;
+    },
+    tabFun(e) {
+      console.log(e)
+      this.putAway = e;
+      this.productList(e);
     },
     showContro(e) {
       this.visible1 = true;
@@ -226,8 +237,9 @@ export default {
         );
       });
     },
-    productList() {
+    productList(show) {
       let data = {
+        show:show,
         pageNo: this.pageNo || 1,
         pageSize: 10,
         providerId: this.providerId
