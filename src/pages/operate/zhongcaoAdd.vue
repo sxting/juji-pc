@@ -109,7 +109,7 @@ export default {
             content: "请输入文章标题"
           });return;
       }
-      if(this.cover==""){
+      if(this.fileList2.length==0){
           this.$error({
             title: "温馨提示",
             content: "请上传列表图片"
