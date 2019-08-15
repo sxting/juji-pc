@@ -52,7 +52,7 @@ export default {
   },
   mounted() {
     this.providerList = JSON.parse(sessionStorage.getItem("LoginDate")).providerList;
-    this.providerId = this.providerList[0].providerId;
+    this.providerId = this.providerId;
     this.editor = UE.getEditor('editor', {
       initialFrameHeight:600,
       toolbars: [['fontsize', 'fontfamily', 'bold', 'italic','underline','justifyleft', 'justifyright','justifycenter', 'justifyjustify','strikethrough','lineheight','forecolor', 'backcolor','selectall', 'cleardoc', 'link','simpleupload','insertimage','preview']],
@@ -61,11 +61,30 @@ export default {
       imageUrlPrefix: "https://upic.juniuo.com/file/picture/",
       autoHeightEnabled: true
     });
+    if(this.tweetsId){
+      this.getData();
+    }
+  },
+  beforeDestroy(){
+    this.editor.destroy();
   },
   methods: {
     gettext() {
     　console.log(this.editor.getContent())
 　　 },
+    getData(){
+      this.$axios.get("/tweets/detail.json?tweetsId="+this.tweetsId).then(res => {
+        if (res.errorCode === "200") {
+          this.title = res.data.title;
+          this.cover = res.data.cover;
+          this.idx = res.data.idx;
+          var ue = this.editor;
+          ue.ready(()=>{
+            ue.setContent(res.data.html);
+          })
+        }
+      })
+    },
     submit(){
       this.$axios({
         url: "/endpoint/tweets/add.json",
