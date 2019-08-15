@@ -10,15 +10,42 @@
           </a-radio-group>
         </a-form-item>
         -->
+
+
+
+
+
+
+
         <a-form-item label="商品标签" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-          <a-radio-group v-model="biaoqian">
+
+
+
+
+          <a-checkbox-group v-model="biaoqian" @change="onBianqianChange" :style="{ paddingTop: '8px' }">
+            <a-row>
+              <a-col :span="4"><a-checkbox value="要吃" defaultChecked>要吃</a-checkbox></a-col>
+              <a-col :span="4"><a-checkbox value="要美">要美</a-checkbox></a-col>
+              <a-col :span="4"><a-checkbox value="要玩">要玩</a-checkbox></a-col>
+              <a-col :span="4"><a-checkbox value="度假">度假</a-checkbox></a-col>
+              <a-col :span="4"><a-checkbox value="亲子">亲子</a-checkbox></a-col>
+              <a-col :span="4"><a-checkbox value="其它">其它</a-checkbox></a-col>
+            </a-row>
+          </a-checkbox-group>
+
+
+
+
+
+
+         <!--  <a-radio-group v-model="biaoqian">
             <a-radio :value="'要吃'">要吃</a-radio>
             <a-radio :value="'要美'">要美</a-radio>
             <a-radio :value="'要玩'">要玩</a-radio>
             <a-radio :value="'度假'">度假</a-radio>
             <a-radio :value="'亲子'">亲子</a-radio>
             <a-radio :value="'其他'">其他</a-radio>
-          </a-radio-group>
+          </a-radio-group> -->
         </a-form-item>
         <a-form-item label="商品名称" :labelCol="{span: 7}"  :wrapperCol="{span: 10}" fieldDecoratorId="repository.productName" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入商品名称', whitespace: true}]}" :required="true">
           <a-input placeholder="请输入商品名称，限1-40字" />
@@ -239,7 +266,7 @@ export default {
       editor: null,
       desc:
         "表单页用于向用户收集或验证信息，基础表单常见于数据项较少的表单场景。",
-      biaoqian: "其他",
+      biaoqian: [],
       previewVisible: false,
       previewShareImgVisible: false,
       productType: "PRODUCT",
@@ -468,6 +495,9 @@ export default {
     onSubjectChange(event) {
       this.subject = event;
     },
+    onBianqianChange(event){
+      this.biaoqian = event;
+    },
     onChange(event) {
       console.log(event);
       this.checkAll = event.length === this.cityStoreList.length;
@@ -648,7 +678,7 @@ export default {
               providerId: this.providerId,
               providerName: values.repository.providerName,
               putAway: 1,
-              tag: this.biaoqian,
+              tag: this.biaoqian.join(','),
               type: productType,
               productId: this.productId,
               subject: this.subject.join(','),
@@ -842,7 +872,11 @@ export default {
         if (res.success) {
           this.unAuditCount = res.data.unAuditCount;
           this.productType = res.data.type;
-          this.biaoqian = res.data.tag;
+          // this.biaoqian = res.data.tag;
+
+
+          this.biaoqian = res.data.tag ? res.data.tag.split(',') : [];
+
           this.count = res.data.productSkus.length;
 
           let guigeDataSource = [];
