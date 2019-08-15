@@ -20,13 +20,14 @@
                     <div id="editor"></div>
                 </div>
             </a-form-item>
-            <a-form-item label="展示顺序" :labelCol="{span: 5}" help="第几位" :wrapperCol="{span: 10}" fieldDecoratorId="repository.idx" :required="false">
-              <a-input-number :min="0" :step="1" :max="99999" v-model="idx" />
+            <a-form-item label="展示顺序" :labelCol="{span: 5}" :wrapperCol="{span: 10}" :required="false">
+              <a-input-number :min="0" :step="1" :max="99999" v-model="idx"/>
             </a-form-item>
         </a-form>
         <div style="text-align: center;margin: 30px 0;">
           <div class="btn btn_cancel">取消</div>
-          <div class="btn btn_save" @click="submit()">保存</div>
+          <div v-if="tweetsId" class="btn btn_save" @click="modifyTweet()">确认修改</div>
+          <div v-else class="btn btn_save" @click="submit()">保存</div>
         </div>
     </a-card>
 
@@ -69,15 +70,31 @@ export default {
     this.editor.destroy();
   },
   methods: {
-    gettext() {
-    　console.log(this.editor.getContent())
-　　 },
+    picUrl(id) {
+      return (
+        "https://upic.juniuo.com/file/picture/" + id + "/resize_85_85/mode_fill"
+      );
+    },
     getData(){
-      this.$axios.get("/tweets/detail.json?tweetsId="+this.tweetsId).then(res => {
+      var show = this.$route.query.show;
+      if(show==1){
+        var url = '/tweets/detail.json?tweetsId='
+      }else{
+        var url = '/endpoint/tweets/detail.json?tweetsId='
+      }
+      this.$axios.get(url+this.tweetsId).then(res => {
         if (res.errorCode === "200") {
           this.title = res.data.title;
           this.cover = res.data.cover;
-          this.idx = res.data.idx;
+
+          this.fileList2 = [{
+              uid: "-1",
+              response: res.data.cover,
+              status: "done",
+              url: this.picUrl(res.data.cover)
+            }];
+
+          this.idx = Number(res.data.idx);
           var ue = this.editor;
           ue.ready(()=>{
             ue.setContent(res.data.html);
@@ -86,6 +103,30 @@ export default {
       })
     },
     submit(){
+      if(this.title==""){
+          this.$error({
+            title: "温馨提示",
+            content: "请输入文章标题"
+          });return;
+      }
+      if(this.cover==""){
+          this.$error({
+            title: "温馨提示",
+            content: "请上传列表图片"
+          });return;
+      }
+      if(this.editor.getContent()==""){
+          this.$error({
+            title: "温馨提示",
+            content: "请输入种草内容"
+          });return;
+      }
+      if(this.idx==""){
+          this.$error({
+            title: "温馨提示",
+            content: "请输入展示顺序"
+          });return;
+      }
       this.$axios({
         url: "/endpoint/tweets/add.json",
         method: "post",
@@ -111,6 +152,28 @@ export default {
       if (!isLt2M) {
         this.$message.error("上传图片大小必须小于10MB!");
       }
+    },
+    modifyTweet(){
+      this.$axios({
+        url: "/endpoint/tweets/modify.json",
+        method: "post",
+        data: {
+          cover:this.fileList2[0].response,
+          html:this.editor.getContent(),
+          providerId:this.providerId,
+          show:Number(this.$route.query.show),
+          title:this.title,
+          idx:Number(this.idx),
+          tweetsId:this.tweetsId
+        },
+      }).then(res => {
+        if (res.errorCode === "200") {
+          this.$success({content: "修改成功！"});
+          this.$router.go(-1);
+        } else {
+
+        }
+      })
     },
     handleChange2({ fileList }) {
       this.fileList2 = fileList;
@@ -138,7 +201,6 @@ export default {
       });
     },
     uploadImg() {
-      console.log(111);
       const image = new Image();
       // 解决跨域 canvas 污染问题
       image.setAttribute("crossOrigin", "anonymous");
