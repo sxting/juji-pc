@@ -55,8 +55,8 @@ export default {
     this.providerList = JSON.parse(sessionStorage.getItem("LoginDate")).providerList;
     this.providerId = this.providerId;
     this.editor = UE.getEditor('editor', {
-      initialFrameHeight:600,
-      toolbars: [['fontsize', 'fontfamily', 'bold', 'italic','underline','justifyleft', 'justifyright','justifycenter', 'justifyjustify','strikethrough','lineheight','forecolor', 'backcolor','selectall', 'cleardoc', 'link','simpleupload','insertimage','preview']],
+      initialFrameHeight:800,
+      toolbars: [['fontsize', 'fontfamily', 'bold', 'italic','underline','justifyleft', 'justifyright','justifycenter', 'justifyjustify','strikethrough','lineheight','forecolor', 'backcolor','selectall', 'cleardoc', 'link','insertimage','preview']],
       serverUrl:'https://api.juniuo.com/ueditor/utf8-php/php/controller.php',
       imagePathFormat: "/ueditor/php/upload/image/{yyyy}{mm}{dd}/{time}{rand:6}",
       imageUrlPrefix: "https://upic.juniuo.com/file/picture/",
