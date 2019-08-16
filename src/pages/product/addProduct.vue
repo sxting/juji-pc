@@ -2,6 +2,7 @@
   <div>
     <a-card :body-style="{padding: '24px 32px'}" :bordered="false">
       <a-form :autoFormCreate="(form) => {this.form = form;}">
+
         <!--
         <a-form-item label="商品类型" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-radio-group v-model="productType" :style="{ marginBottom: '8px' }">
@@ -11,16 +12,7 @@
         </a-form-item>
         -->
 
-
-
-
-
-
-
         <a-form-item label="商品标签" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
-
-
-
 
           <a-checkbox-group v-model="biaoqian" @change="onBianqianChange" :style="{ paddingTop: '8px' }">
             <a-row>
@@ -32,11 +24,6 @@
               <a-col :span="4"><a-checkbox value="其它">其它</a-checkbox></a-col>
             </a-row>
           </a-checkbox-group>
-
-
-
-
-
 
          <!--  <a-radio-group v-model="biaoqian">
             <a-radio :value="'要吃'">要吃</a-radio>
@@ -211,6 +198,9 @@
         <a-form-item label="会员专区" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-switch checkedChildren="开" unCheckedChildren="关" v-model="remember" @change="onRememberChange" />
         </a-form-item>
+        <a-form-item label="购买送会员" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+          <a-switch checkedChildren="开" unCheckedChildren="关" v-model="buyMember" @change="onBuyMemberChange" />
+        </a-form-item>
         <a-form-item label="旅游专属" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
           <a-switch checkedChildren="开" unCheckedChildren="关" v-model="lvyou" @change="onLvyouChange" />
         </a-form-item>
@@ -359,6 +349,7 @@ export default {
       shareText: '', //分享文字
       remember: false,
       lvyou: false,
+      buyMember:false,
       qrCode: '',
       qrCodeBig: '',
     };
@@ -468,6 +459,9 @@ export default {
     },
     checkStord() {
       this.visible = true;
+    },
+    onBuyMemberChange(event){
+      this.buyMember = event;
     },
     onRecommendChange(event) {
       this.recommend = event;
@@ -683,6 +677,7 @@ export default {
               productId: this.productId,
               subject: this.subject.join(','),
               recommend: this.recommend ? 1 : 0,
+              openMember:this.buyMember?1:0,
               voucherGenerateType: this.lvyou ? 'TSTC' : '',
               shareText: values.repository.shareText,
               shareImg: this.fileList4[0] ? this.fileList4[0].response : '',
@@ -872,8 +867,6 @@ export default {
         if (res.success) {
           this.unAuditCount = res.data.unAuditCount;
           this.productType = res.data.type;
-          // this.biaoqian = res.data.tag;
-
 
           this.biaoqian = res.data.tag ? res.data.tag.split(',') : [];
 
@@ -920,6 +913,7 @@ export default {
           this.subject = res.data.subject ? res.data.subject.split(',') : [];
           this.recommend = res.data.recommend ? true : false;
           this.remember = res.data.isMember ? true : false;
+          this.buyMember = res.data.openMember ? true : false;
           this.lvyou = res.data.voucherGenerateType == 'TSTC' ? true : false;
 
           let storeIdArr = [];
