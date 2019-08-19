@@ -98,7 +98,7 @@
             </a-upload>
           </div>
         </a-form-item>
-        
+
         <a-form-item label="图文详情" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div v-for="(list, j) in picXQ" :key="j" style="margin-top:20px;">
             <div class="clearfix">
@@ -580,7 +580,8 @@ export default {
     submit(e) {
       // console.dir(this.guigeDataSource);
       e.preventDefault();
-      let data,
+      let that = this,
+        data,
         picXQArr = [],
         note = [],
         storeIdArr = [];
@@ -640,10 +641,10 @@ export default {
                 productType = 'POINT'
               }
               productSkus[index] = {
-                costPrice: parseFloat(item.costp) * 100,
-                originalPrice: parseFloat(item.originp) * 100,
+                costPrice: that.accurate_mul(item.costp, 100),
+                originalPrice: that.accurate_mul(item.originp, 100),
                 point: parseFloat(item.jifen),
-                price: parseFloat(item.currentp) * 100,
+                price: that.accurate_mul(item.currentp, 100),
                 productName: values.repository.productName,
                 skuName: item.name,
                 status: 'NORMAL',
@@ -877,10 +878,10 @@ export default {
             guigeDataSource[index] = {
               key: index,
               name: item.skuName,
-              originp: item.originalPrice/100,
-              currentp: item.price/100,
+              originp: that.accurate_div(item.originalPrice, 100),
+              currentp: that.accurate_div(item.price, 100),
               jifen: item.point,
-              costp: item.costPrice/100,
+              costp: that.accurate_div(item.costPrice, 100),
               stock: item.stock,
               skuId: item.skuId,
               id: item.id,
@@ -996,8 +997,8 @@ export default {
     fenyongFun(item) {
       let data = {
         providerId: this.providerId,
-        price: parseFloat(item.currentp) * 100,
-        costPrice: parseFloat(item.costp) * 100,
+        price: this.accurate_mul(item.currentp, 100),
+        costPrice: this.accurate_mul(item.costp, 100),
         manageRateStr: item.manageRate,
         salesRateStr: item.saleRate
       };
@@ -1016,12 +1017,12 @@ export default {
                 if (i.settlementType === "DISTRIBUTOR_SALES_REBATE"){
                   i.name = "销售返利";
                   i.boolean = true;
-                  item2.salesp = i.estimateAmount/100;
+                  item2.salesp = that.accurate_div(i.estimateAmount, 100);
                 }
                 if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
                   i.name = "管理佣金";
                   i.boolean = true;
-                  item2.managep = i.estimateAmount/100;
+                  item2.managep = that.accurate_div(i.estimateAmount, 100);
                 }
               }
             })

@@ -399,6 +399,7 @@ export default {
         name: name || "",
         putAway: this.putAway
       };
+      let that = this;
       this.$axios({
         url: "/endpoint/product/page.json",
         method: "get",
@@ -416,7 +417,7 @@ export default {
             if (i.auditStatusMap && i.auditStatusMap.auditStatus === "REJECT")
               i.auditStatusMap.auditStatusName = "拒绝";
 
-            i.price = i.price / 100;
+            i.price = that.accurate_div(i.price , 100);
             i.typeName = i.type === "PRODUCT" ? "普通商品" : "积分商品";
           });
         } else {

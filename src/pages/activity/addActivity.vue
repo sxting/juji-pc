@@ -624,7 +624,7 @@ export default {
           rules[index] = {
             enableMock: 0, //模拟成团
             splicedPeopleCount: 2, //拼团人数
-            splicedPrice: parseFloat(item.pintuanp) * 100 + "",  //拼团金额
+            splicedPrice: that.accurate_mul(item.pintuanp, 100) + "",  //拼团金额
             skuId: item.skuId,
             managePrice: item.managePrice ? that.accurate_mul(item.managePrice, 100) : 0,
             salePrice: item.salePrice ? that.accurate_mul(item.salePrice, 100) : 0,
@@ -636,7 +636,7 @@ export default {
         this.guigeDataSource.forEach(function(item, index) {
           if(parseFloat(item.miaoshap.juzi)) {
             rules[index] = {
-              activityPrice: parseFloat(item.miaoshap.price) * 100 + "",
+              activityPrice: that.accurate_mul(item.miaoshap.price, 100) + "",
               activityPoint: parseFloat(item.miaoshap.juzi) + "",
               activityStock: item.stock2,
               skuId: item.skuId,
@@ -647,7 +647,7 @@ export default {
             }
           } else {
             rules[index] = {
-              activityPrice: parseFloat(item.miaoshap.price) * 100 + "",
+              activityPrice: that.accurate_mul(item.miaoshap.price, 100) + "",
               activityStock: item.stock2,
               skuId: item.skuId,
               managePrice: item.managePrice ? that.accurate_mul(item.managePrice, 100) : 0,
@@ -884,22 +884,22 @@ export default {
               guigeDataSource[index] = {
                 key: index,
                 name: item.skuName,
-                originp: item.originalPrice/100,
-                currentp: item.price/100,
-                costp: item.costPrice/100,
+                originp: that.accurate_div(item.originalPrice, 100),
+                currentp: that.accurate_div(item.price, 100),
+                costp: that.accurate_div(item.costPrice, 100),
                 point: item.pointPrice,
                 kanjiap: [],
                 // salesRate: item.rules[0].saleRateStr,
                 // manageRate: item.rules[0].manageRateStr,
-                salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
-                managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
+                salesp: item.rules[0].salePrice ? that.accurate_div(item.rules[0].salePrice, 100) : 0,
+                managep: item.rules[0].managePrice ? that.accurate_div(item.rules[0].managePrice, 100) : 0,
                 skuId: item.skuId,
-                managePrice: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
-                salePrice: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
+                managePrice: item.rules[0].managePrice ? that.accurate_div(item.rules[0].managePrice, 100) : 0,
+                salePrice: item.rules[0].salePrice ? that.accurate_div(item.rules[0].salePrice, 100) : 0,
               }
               item.rules.forEach(function(item2, index2){
                 guigeDataSource[index].kanjiap[index2] = {
-                  bargainAmount: item2.bargainAmount/100, //砍价金额
+                  bargainAmount: that.accurate_div(item2.bargainAmount, 100), //砍价金额
                   bargainCount: item2.bargainCount, //砍价次数
                   bargainStage: item2.bargainStage, //砍价规则顺序
                   initiatorBargainCount: 1, //发起者砍价次数
@@ -912,20 +912,20 @@ export default {
               guigeDataSource[index] = {
                 key: index,
                 name: item.skuName,
-                originp: item.originalPrice/100,
-                currentp: item.price/100,
+                originp: that.accurate_div(item.originalPrice, 100),
+                currentp: that.accurate_div(item.price, 100),
                 point: item.pointPrice,
-                costp: item.costPrice/100,
-                pintuanp: item.rules[0].splicedPrice/100,
+                costp: that.accurate_div(item.costPrice, 100),
+                pintuanp: that.accurate_div(item.rules[0].splicedPrice, 100),
                 // salesRate: item.rules[0].saleRateStr,
                 // manageRate: item.rules[0].manageRateStr,
                 platform: '0',
                 provider: '0',
-                salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
-                managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
+                salesp: item.rules[0].salePrice ? that.accurate_div(item.rules[0].salePrice, 100) : 0,
+                managep: item.rules[0].managePrice ? that.accurate_div(item.rules[0].managePrice, 100) : 0,
                 skuId: item.skuId,
-                managePrice: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
-                salePrice: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
+                managePrice: item.rules[0].managePrice ? that.accurate_div(item.rules[0].managePrice, 100) : 0,
+                salePrice: item.rules[0].salePrice ? that.accurate_div(item.rules[0].salePrice, 100) : 0,
               }
             })
           }else if(this.activityType === 'SEC_KILL'){
@@ -933,23 +933,23 @@ export default {
               guigeDataSource[index] = {
                 key: index,
                 name: item.skuName,
-                originp: item.originalPrice/100,
-                currentp: item.price/100,
+                originp: that.accurate_div(item.originalPrice, 100),
+                currentp: that.accurate_div(item.price, 100),
                 point: item.pointPrice,
-                costp: item.costPrice/100,
+                costp: that.accurate_div(item.costPrice, 100),
                 miaoshap: {
-                  price: item.rules[0].activityPrice/100,
+                  price: that.accurate_div(item.rules[0].activityPrice, 100),
                   juzi: item.rules[0].activityPoint ? item.rules[0].activityPoint : 0
                 },
                 stock1: item.stock,
                 stock2: item.rules[0].activityStock,
                 // salesRate: item.rules[0].saleRateStr,
                 // manageRate: item.rules[0].manageRateStr,
-                salesp: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
-                managep: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
+                salesp: item.rules[0].salePrice ? that.accurate_div(item.rules[0].salePrice, 100) : 0,
+                managep: item.rules[0].managePrice ? that.accurate_div(item.rules[0].managePrice, 100) : 0,
                 skuId: item.skuId,
-                managePrice: item.rules[0].managePrice ? item.rules[0].managePrice/100 : 0,
-                salePrice: item.rules[0].salePrice ? item.rules[0].salePrice/100 : 0,
+                managePrice: item.rules[0].managePrice ? that.accurate_div(item.rules[0].managePrice, 100) : 0,
+                salePrice: item.rules[0].salePrice ? that.accurate_div(item.rules[0].salePrice, 100) : 0,
               }
             });
           }
@@ -980,8 +980,8 @@ export default {
       console.log(item);
       if(this.activityType === 'SPLICED'){
         var data = {
-          price:item.pintuanp*100,
-          costPrice: item.costp*100,
+          price: this.accurate_mul(item.pintuanp, 100),
+          costPrice: this.accurate_mul(item.costp, 100),
           manageRateStr: item.manageRate,
           salesRateStr: item.salesRate,
           skuId: item.skuId
@@ -989,8 +989,8 @@ export default {
       }
       if(this.activityType === 'BARGAIN'){
         var data = {
-          price:(item.originp*100 - item.kanjiap[0].bargainAmount*100).toFixed(0),
-          costPrice: item.costp*100,
+          price:(this.accurate_mul(item.originp, 100) - this.accurate_mul(item.kanjiap[0].bargainAmount, 100)).toFixed(0),
+          costPrice: this.accurate_mul(item.costp, 100),
           manageRateStr: item.manageRate,
           salesRateStr: item.salesRate,
           skuId: item.skuId
@@ -998,8 +998,8 @@ export default {
       }
       if(this.activityType === 'SEC_KILL'){
         var data = {
-          price:item.miaoshap.price*100,
-          costPrice: item.costp*100,
+          price: this.accurate_mul(item.miaoshap.price, 100),
+          costPrice: this.accurate_mul(item.costp, 100),
           manageRateStr: item.manageRate,
           salesRateStr: item.salesRate,
           skuId: item.skuId
@@ -1020,12 +1020,12 @@ export default {
                 if (i.settlementType === "DISTRIBUTOR_SALES_REBATE"){
                   i.name = "销售返利";
                   i.boolean = true;
-                  item2.salesp = i.estimateAmount/100;
+                  item2.salesp = that.accurate_div(i.estimateAmount, 100);
                 }
                 if (i.settlementType === "DISTRIBUTOR_MANAGER_REBATE"){
                   i.name = "管理佣金";
                   i.boolean = true;
-                  item2.managep = i.estimateAmount/100;
+                  item2.managep = that.accurate_div(i.estimateAmount, 100);
                 }
               }
             })

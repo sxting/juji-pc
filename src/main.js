@@ -16,7 +16,9 @@ import moment from 'moment'
 import '../static/ueditor/ueditor.config.js';
 import '../static/ueditor/ueditor.all.min.js';
 import '../static/ueditor/ueditor.parse.min.js';
-import '../static/ueditor/lang/zh-cn/zh-cn.js'
+import '../static/ueditor/lang/zh-cn/zh-cn.js';
+
+// import formatNum from './utils/formatNum';
 
 Vue.prototype.$axios = axios
 Vue.prototype.moment = moment
