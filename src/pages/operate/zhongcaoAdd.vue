@@ -175,7 +175,10 @@ export default {
           this.$success({content: "发布新内容成功！"});
           this.$router.go(-1);
         } else {
-
+          this.$error({
+            title: "温馨提示",
+            content: res.data.errorInfo
+          });
         }
       })
     },
@@ -206,7 +209,10 @@ export default {
           this.$success({content: "修改成功！"});
           this.$router.go(-1);
         } else {
-
+          this.$error({
+            title: "温馨提示",
+            content: res.data.errorInfo
+          });
         }
       })
     },
