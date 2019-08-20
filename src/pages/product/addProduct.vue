@@ -338,8 +338,8 @@ export default {
       providerId: "",
       picIds: "",
       jifen: "桔子兑换",
-      point: "",
-      price: "",
+      point: 0,
+      price: 0,
       checkedList: [],
       selectedItems:[],
       productId: sessionStorage.getItem("PROCIDERID") || "",
@@ -640,7 +640,7 @@ export default {
                 productType = 'POINT'
               }
               productSkus[index] = {
-                costPrice: parseFloat(item.costp) * 100,
+                costPrice: Nmber((parseFloat(item.costp) * 100).toFixed(2)),
                 originalPrice: parseFloat(item.originp) * 100,
                 point: parseFloat(item.jifen),
                 price: parseFloat(item.currentp) * 100,

@@ -15,12 +15,27 @@
                 </a-upload>
               </div>
             </a-form-item>
-            <a-form-item label="种草内容" :labelCol="{span: 5}" :wrapperCol="{span: 10}" fieldDecoratorId="editors" :fieldDecoratorOptions="{rules: [{ required: true, message: '', whitespace: true}]}">
+            <a-form-item label="种草类型" :labelCol="{span: 5}" :wrapperCol="{span: 10}" :required="true">
+              <a-radio-group v-model="type">
+                <a-radio :value="'STRATEGY'">攻略</a-radio>
+                <a-radio :value="'STORE'">识店</a-radio>
+              </a-radio-group>
+            </a-form-item>
+            <a-form-item label="内容来源" :labelCol="{span: 5}" :wrapperCol="{span: 10}" :required="true">
+              <a-radio-group v-model="source" @change="onSourceChange">
+                <a-radio :value="'MP'">外链</a-radio>
+                <a-radio :value="'RICH_TEXT'">编辑器</a-radio>
+              </a-radio-group>
+            </a-form-item>
+            <a-form-item v-show="source=='RICH_TEXT'" label="种草内容" :labelCol="{span: 5}" :wrapperCol="{span: 10}" fieldDecoratorId="editors" :fieldDecoratorOptions="{rules: [{ required: true, message: '', whitespace: true}]}">
                 <div class="editor">
                     <div id="editor"></div>
                 </div>
             </a-form-item>
-            <a-form-item label="展示顺序" :labelCol="{span: 5}" :wrapperCol="{span: 10}" :required="false">
+            <a-form-item v-show="source=='MP'" label="内容链接" :labelCol="{span: 5}" :wrapperCol="{span: 10}" :required="true">
+              <a-input placeholder="请输入内容链接" v-model="url" />
+            </a-form-item>
+            <a-form-item label="展示顺序" :labelCol="{span: 5}" :wrapperCol="{span: 10}" :required="true">
               <a-input-number :min="0" :step="1" :max="99999" v-model="idx"/>
             </a-form-item>
         </a-form>
@@ -45,7 +60,10 @@ export default {
       providerId:this.$route.query.providerId,
       tweetsId:this.$route.query.tweetsId,
       fileList2:[],
+      source:'MP',
+      type:'STRATEGY',
       title: '',
+      url:"",
       cover:'',
       editors: '',
       idx:0
@@ -70,6 +88,9 @@ export default {
     this.editor.destroy();
   },
   methods: {
+    onSourceChange(e){
+      console.log(e.target.value);
+    },
     picUrl(id) {
       return (
         "https://upic.juniuo.com/file/picture/" + id + "/resize_85_85/mode_fill"
@@ -86,7 +107,9 @@ export default {
         if (res.errorCode === "200") {
           this.title = res.data.title;
           this.cover = res.data.cover;
-
+          this.type = res.data.type;
+          this.source = res.data.source;
+          this.url = res.data.url;
           this.fileList2 = [{
               uid: "-1",
               response: res.data.cover,
@@ -115,10 +138,16 @@ export default {
             content: "请上传列表图片"
           });return;
       }
-      if(this.editor.getContent()==""){
+      if(this.editor.getContent()==""&&this.source=="RICH_TEXT"){
           this.$error({
             title: "温馨提示",
             content: "请输入种草内容"
+          });return;
+      }
+      if(this.url==""&&this.source=="MP"){
+          this.$error({
+            title: "温馨提示",
+            content: "请输入内容链接"
           });return;
       }
       if(this.idx==""){
@@ -136,7 +165,10 @@ export default {
           providerId:this.providerId,
           show:1,
           title:this.title,
-          idx:Number(this.idx)
+          idx:Number(this.idx),
+          source:this.source,
+          type:this.type,
+          url:this.url
         },
       }).then(res => {
         if (res.errorCode === "200") {
@@ -164,7 +196,10 @@ export default {
           show:Number(this.$route.query.show),
           title:this.title,
           idx:Number(this.idx),
-          tweetsId:this.tweetsId
+          tweetsId:this.tweetsId,
+          source:this.source,
+          type:this.type,
+          url:this.url
         },
       }).then(res => {
         if (res.errorCode === "200") {

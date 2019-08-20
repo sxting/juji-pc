@@ -187,7 +187,7 @@ export default {
         providerId: this.providerId
       };
       this.$axios({
-        url: "/tweets/list.json",
+        url: "endpoint/tweets/list.json",
         method: "get",
         processData: false,
         params: data
