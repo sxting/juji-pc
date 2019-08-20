@@ -40,7 +40,7 @@
             </a-form-item>
         </a-form>
         <div style="text-align: center;margin: 30px 0;">
-          <div class="btn btn_cancel">取消</div>
+          <div class="btn btn_cancel" @click="$router.go(-1)">取消</div>
           <div v-if="tweetsId" class="btn btn_save" @click="modifyTweet()">确认修改</div>
           <div v-else class="btn btn_save" @click="submit()">保存</div>
         </div>
