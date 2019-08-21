@@ -66,7 +66,8 @@ export default {
       url:"",
       cover:'',
       editors: '',
-      idx:0
+      idx:0,
+      loading: false,
     };
   },
   mounted() {
@@ -156,6 +157,8 @@ export default {
             content: "请输入展示顺序"
           });return;
       }
+      if(this.loading) {return;}
+      this.loading = true;
       this.$axios({
         url: "/endpoint/tweets/add.json",
         method: "post",
@@ -171,6 +174,7 @@ export default {
           url:this.url
         },
       }).then(res => {
+        this.loading = false;
         if (res.errorCode === "200") {
           this.$success({content: "发布新内容成功！"});
           this.$router.go(-1);
