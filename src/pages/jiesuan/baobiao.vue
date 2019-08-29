@@ -472,9 +472,9 @@ export default {
             i.typeName = i.type === "POINT" ? "积分商品" : "普通商品";
             i.orderPaidAmount = that.accurate_div(i.orderPaidAmount * 1, 100);
             i.merchantAmount = that.accurate_div(i.merchantAmount * 1, 100);
-            i.providerAmount = that.accurate_div(i.providerAmount * 1, 100);
-            i.salerAmount = that.accurate_div(i.salerAmount * 1, 100);
-            i.managerAmount = that.accurate_div(i.managerAmount * 1, 100);
+            i.providerAmount = i.openMember ? '--' : that.accurate_div(i.providerAmount * 1, 100);
+            i.salerAmount = i.openMember ? '--' : that.accurate_div(i.salerAmount * 1, 100);
+            i.managerAmount = i.openMember ? '--' : that.accurate_div(i.managerAmount * 1, 100);
             i.openMember = i.openMember ? '是' : '否';
           });
           this.countTotal1 = res.data.countTotal;
