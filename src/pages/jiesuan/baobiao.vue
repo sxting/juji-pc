@@ -211,6 +211,10 @@ const columns = [
     dataIndex: "typeName"
   },
   {
+    title: "会员商品",
+    dataIndex: "openMember"
+  },
+  {
     title: "商品名称",
     dataIndex: "productName"
   },
@@ -471,6 +475,7 @@ export default {
             i.providerAmount = that.accurate_div(i.providerAmount * 1, 100);
             i.salerAmount = that.accurate_div(i.salerAmount * 1, 100);
             i.managerAmount = that.accurate_div(i.managerAmount * 1, 100);
+            i.openMember = i.openMember ? '是' : '否';
           });
           this.countTotal1 = res.data.countTotal;
         } else {
