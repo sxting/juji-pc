@@ -46,6 +46,7 @@
                   </a-form-item>
                 </a-col>
                 <span style="float: right; margin-top: 3px;">
+                  <a-button @click="submit2">导出Excel</a-button>
                   <a-button  type="primary" @click="submit">查询</a-button>
                 </span>
               </a-row>
@@ -55,7 +56,7 @@
         </div>
       </a-form>
     </div>
-    <div>
+    <div style="margin-top: 20px;">
 
       <a-table :columns="columns" :dataSource="data2" :pagination="false" :locale="{emptyText: '暂无数据'}">
         <span slot="action" slot-scope="text, record">
@@ -154,6 +155,8 @@
 
 <script>
 import StandardTable from "../../components/table/StandardTable";
+import axios from "axios";
+
 const columns = [
   {
     title: "核销时间",
@@ -278,6 +281,43 @@ export default {
         that.productName = values.repository.productName;
       });
       this.voucherRecordsListFun();
+    },
+    submit2() {
+      let that = this;
+      this.form.validateFields((err, values) => {
+        that.providerId = values.repository.providerId;
+        that.merchantId = values.repository.merchantId;
+        that.storeId = values.repository.storeId;
+        that.productName = values.repository.productName;
+        that.code = values.repository.code;
+      });
+
+      let data = {
+        providerId: this.providerId,
+        merchantId: this.merchantId,
+        dateStart: this.dateStart,
+        dateEnd: this.dateEnd,
+        pageNo: this.pageNo,
+        pageSize: 10,
+        storeId: this.storeId,
+        productId: "",
+        code: this.code,
+        productName: this.productName
+      };
+      let param = "";
+      let apiUrl = axios.defaults.baseURL + "/endpoint/settle/voucherRecords.download";
+      if (data.pageNo) param += "&pageNo=" + this.pageNo;
+      if (data.providerId) param += "&providerId=" + this.providerId;
+      if (data.merchantId) param += "&merchantId=" + this.merchantId;
+      if (data.dateStart) param += "&dateStart=" + this.dateStart;
+      if (data.dateEnd) param += "&dateEnd=" + this.dateEnd;
+
+      if (data.storeId) param += "&storeId=" + this.storeId;
+      if (data.productId) param += "&productId=" + this.productId;
+      if (data.code) param += "&code=" + this.code;
+      if (data.productName) param += "&productName=" + this.productName;
+
+      window.location.href = apiUrl + "?pageSize=10" + param;
     },
     merchantListFun(providerId) {
       let data = {
