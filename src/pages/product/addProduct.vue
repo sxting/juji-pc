@@ -198,8 +198,11 @@
         <a-form-item label="会员专区" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-switch checkedChildren="开" unCheckedChildren="关" v-model="remember" @change="onRememberChange" />
         </a-form-item>
-        <a-form-item label="购买送会员" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+        <a-form-item v-if="!productId" label="购买送会员" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
           <a-switch checkedChildren="开" unCheckedChildren="关" v-model="buyMember" @change="onBuyMemberChange" />
+        </a-form-item>
+        <a-form-item v-if="productId" label="购买送会员" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+          {{buyMember ? '是' : '否'}} 
         </a-form-item>
         <a-form-item label="旅游专属" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
           <a-switch checkedChildren="开" unCheckedChildren="关" v-model="lvyou" @change="onLvyouChange" />
