@@ -48,7 +48,7 @@
       </a-form>
     </div>
     <div>
-      <a-table :columns="columns" :dataSource="data2" :pagination="false" :locale="{emptyText: '暂无数据'}">
+      <a-table :columns="columns" :dataSource="data2" :rowClassName="classNameFun" :pagination="false" :locale="{emptyText: '暂无数据'}">
         <span slot="action" slot-scope="text, record">
           <a @click="orderListfun(record)">查看详情</a>
           <a-divider v-if="record.status=='PAID'" type="vertical" />
@@ -61,7 +61,7 @@
     </div>
 
     <a-modal title="详情" :visible="visible" @ok="handleCancel" @cancel="handleCancel" width="1000px" :footer="null">
-      <div class="orderpage_detail_list">
+      <div class="orderpage_detail_list1">
         <table>
           <tr class="ui-grid-row">
             <td class="">订单号</td>
@@ -83,7 +83,7 @@
       </div>
 
       <h3 class="flex-1 text-lg borderLeft" style="margin-top:20px;">订单信息</h3>
-      <div>
+      <div class="jusuan_order">
         <table nz-table class="existingGroups-table">
           <thead>
             <tr>
@@ -107,7 +107,7 @@
           </tbody>
         </table>
       </div>
-      <div class="orderpage_detail_list">
+      <div class="orderpage_detail_list1">
         <table>
           <tr class="ui-grid-row">
             <td class="">订单金额</td>
@@ -124,7 +124,7 @@
         </table>
       </div>
       <h3 class="flex-1 text-lg borderLeft">顾客信息</h3>
-      <div class="orderpage_detail_list">
+      <div class="orderpage_detail_list1">
         <table>
           <tr class="ui-grid-row">
             <td class="">微信昵称</td>
@@ -135,7 +135,7 @@
         </table>
       </div>
       <!-- <h3 class="flex-1 text-lg borderLeft">分销信息</h3> -->
-      <!-- <div class="orderpage_detail_list">
+      <!-- <div class="orderpage_detail_list1">
         <table>
           <tr class="ui-grid-row">
             <td class="">分销桔长</td>
@@ -323,12 +323,16 @@ export default {
           this.data2 = res.data.list;
           this.data2.forEach(function(i) {
             // i.typeName = i.type === "POINT" ? "积分商品" : "普通商品";
-            if (i.status === "CREATED") i.orderTypeName = "待付款";
-            if (i.status === "PAID") i.orderTypeName = "待使用";
-            if (i.status === "CONSUME") i.orderTypeName = "待评价";
-            if (i.status === "FINISH") i.orderTypeName = "已完成";
-            if (i.status === "CLOSE") i.orderTypeName = "已关闭";
-            if (i.status === "REFUND") i.orderTypeName = "已退款";
+            if(i.orderType === 'ORDER') {
+              if (i.status === "CREATED") i.orderTypeName = "待付款";
+              if (i.status === "PAID") i.orderTypeName = "待使用";
+              if (i.status === "CONSUME") i.orderTypeName = "待评价";
+              if (i.status === "FINISH") i.orderTypeName = "已完成";
+              if (i.status === "CLOSE") i.orderTypeName = "已关闭";
+              if (i.status === "REFUND") i.orderTypeName = "已退款";
+            } else { //i.orderType === 'REFUND'
+              i.orderTypeName = "--";
+            }
             i.paidAmount = that.accurate_div(i.paidAmount, 100);
             i.amount = that.accurate_div(i.amount, 100);
           });
@@ -408,6 +412,11 @@ export default {
     orderListfun(e) {
       this.orderFun(e.orderId);
     },
+    classNameFun(e, index) {
+      if(e.orderType === 'REFUND') {
+        return 'red-color'
+      }
+    },
     orderFun(orderId) {
       let data = {
         orderId: orderId
@@ -420,6 +429,9 @@ export default {
       }).then(res => {
         if (res.success) {
           this.orderInfoOrder = res.data.order;
+          if(this.orderInfoOrder.orderType === 'REFUND') {
+            this.orderInfoOrder.statusName = '--';
+          }
           if (this.orderInfoOrder.orderType === "CREATED")
             this.orderInfoOrder.orderTypeName = "待付款";
           if (this.orderInfoOrder.orderType === "PAID")
@@ -454,30 +466,16 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
-.search {
-  margin-bottom: 54px;
-}
-.fold {
-  width: calc(100% - 216px);
-  display: inline-block;
-}
-.operator {
-  margin-bottom: 18px;
-}
-@media screen and (max-width: 900px) {
-  .fold {
-    width: 100%;
-  }
-}
-.orderpage_detail_list table {
+<style lang="less">
+
+.orderpage_detail_list1 table {
   border-spacing: 0;
   border: solid #d9d9d9;
   border-width: 1px 0px 0px 1px;
   padding: 0;
 }
 
-.orderpage_detail_list tr td {
+.orderpage_detail_list1 tr td {
   line-height: 38px;
   height: 38px;
   border: solid #d9d9d9;
@@ -486,20 +484,23 @@ export default {
   padding: 0;
 }
 
-.orderpage_detail_list tr td:nth-child(2n-1) {
+.orderpage_detail_list1 tr td:nth-child(2n-1) {
   color: #999999;
   background-color: #f4f4f4;
   width: 150px;
 }
-.existingGroups-table {
+.jusuan_order .existingGroups-table {
   width: 100%;
   text-align: center;
 }
-.existingGroups-table tr {
+.jusuan_order .existingGroups-table tr {
   height: 40px;
   line-height: 40px;
 }
-.existingGroups-table thead tr {
+.jusuan_order .existingGroups-table thead tr {
   background: #f2f2f2;
+}
+.red-color {
+  color: red;
 }
 </style>
