@@ -33,7 +33,16 @@
     </div>
 
     <div>
-      <a-table :columns="columns" :dataSource="dataSource" :pagination="false"></a-table>
+      <a-table :columns="columns" :dataSource="dataSource" :pagination="false">
+        <div slot="action" slot-scope="text, record">
+          <span v-if="''"><a @click="band(record)">绑定微信号</a></span>
+          <span v-else>
+            <a @click="qrCode(record)">下载二维码</a>
+            <a-divider type="vertical" />
+            <a @click="unBand(record)">解绑</a>
+          </span>
+        </div>
+      </a-table>
     </div>
   </a-card>
 </template>
@@ -43,6 +52,19 @@ const columns = [
   {
     title: '门店名称',
     dataIndex: 'storeName'
+  },
+  {
+    title: '绑定微信号',
+    dataIndex: 'bandWechat'
+  },
+  {
+    title: '赠送商品',
+    dataIndex: 'products'
+  },
+  {
+    title: '操作',
+    dataIndex: 'action',
+    scopedSlots: { customRender: "action" }
   }
 ]
   export default {
@@ -55,7 +77,11 @@ const columns = [
         cityStoreList: [],
         wechat: '',
         store: '',
-        dataSource: [],
+        dataSource: [{
+          storeName: 'storeName',
+          bandWechat: 'bandWechat',
+          products: '5'
+        }],
         columns: columns
       }
     },
@@ -70,6 +96,18 @@ const columns = [
       },
 
       search() {
+
+      },
+
+      band(e) {
+
+      },
+
+      qrCode(e) {
+
+      },
+
+      unBand(e) {
 
       },
 
