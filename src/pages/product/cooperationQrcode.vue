@@ -104,7 +104,7 @@ const columns = [
       },
 
       qrCode(e) {
-
+        console.log(e);
       },
 
       unBand(e) {
