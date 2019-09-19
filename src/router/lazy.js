@@ -55,12 +55,41 @@ let routesObj = {
               invisible: true
             },
             {
+              path: '/product/CooperationList',
+              name: '异业合作',
+              menuId: '20400000',
+              component: () => import('@/pages/product/CooperationList'),
+              icon: 'none',
+              invisible: true
+            },
+            {
               path: '/product/addProduct',
               name: '商品',
               component: () => import('@/pages/product/addProduct'),
               icon: 'none',
               invisible: true
-            }
+            },
+            {
+              path: '/product/CooperationEdit',
+              name: '赠送商品管理',
+              component: () => import('@/pages/product/CooperationEdit'),
+              icon: 'none',
+              invisible: true
+            },
+            {
+              path: '/product/CooperationQrcode',
+              name: '下载二维码',
+              component: () => import('@/pages/product/CooperationQrcode'),
+              icon: 'none',
+              invisible: true
+            },
+            {
+              path: '/product/CooperationAdd',
+              name: '新增异业合作商家',
+              component: () => import('@/pages/product/CooperationAdd'),
+              icon: 'none',
+              invisible: true
+            },
           ]
         },
         {
