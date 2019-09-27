@@ -202,10 +202,13 @@
           <a-switch checkedChildren="开" unCheckedChildren="关" v-model="buyMember" @change="onBuyMemberChange" />
         </a-form-item>
         <a-form-item v-if="productId" label="购买送会员" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
-          {{buyMember ? '是' : '否'}} 
+          {{buyMember ? '是' : '否'}}
         </a-form-item>
         <a-form-item label="旅游专属" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
           <a-switch checkedChildren="开" unCheckedChildren="关" v-model="lvyou" @change="onLvyouChange" />
+        </a-form-item>
+        <a-form-item label="异业合作礼品商品" :labelCol="{span: 7}" :wrapperCol="{span: 10}">
+          <a-switch checkedChildren="开" unCheckedChildren="关" v-model="innerVip" @change="onInnerVipChange" />
         </a-form-item>
         <a-form-item label="分享文字" :labelCol="{span: 7}" :wrapperCol="{span: 10}" fieldDecoratorId="repository.shareText" :required="false">
           <a-textarea type="text" class="desc_textarea" placeholder="请输入分享文案，不填写则为系统默认文案"></a-textarea>
@@ -352,6 +355,7 @@ export default {
       shareText: '', //分享文字
       remember: false,
       lvyou: false,
+      innerVip: false,
       buyMember:false,
       qrCode: '',
       qrCodeBig: '',
@@ -488,6 +492,9 @@ export default {
     },
     onLvyouChange(event) {
       this.lvyou = event;
+    },
+    onInnerVipChange(event) {
+      this.innerVip = event;
     },
     onSubjectChange(event) {
       this.subject = event;
@@ -683,6 +690,7 @@ export default {
               recommend: this.recommend ? 1 : 0,
               openMember:this.buyMember?1:0,
               voucherGenerateType: this.lvyou ? 'TSTC' : '',
+              innerVip: this.innerVip ? 1 : 0,
               shareText: values.repository.shareText,
               shareImg: this.fileList4[0] ? this.fileList4[0].response : '',
               isMember: this.remember ? 1 : 0
@@ -919,6 +927,7 @@ export default {
           this.remember = res.data.isMember ? true : false;
           this.buyMember = res.data.openMember ? true : false;
           this.lvyou = res.data.voucherGenerateType == 'TSTC' ? true : false;
+          this.innerVip = res.data.innerVip ? true : false;
 
           let storeIdArr = [];
           res.data.productStores.forEach(function(i) {

@@ -57,7 +57,7 @@ let routesObj = {
             {
               path: '/product/CooperationList',
               name: '异业合作',
-              menuId: '20400000',
+              menuId: '20300000',
               component: () => import('@/pages/product/cooperationList'),
               icon: 'none',
               invisible: true
@@ -78,8 +78,22 @@ let routesObj = {
             },
             {
               path: '/product/CooperationQrcode',
-              name: '下载二维码',
+              name: '分账微信号管理',
               component: () => import('@/pages/product/cooperationQrcode'),
+              icon: 'none',
+              invisible: true
+            },
+            {
+              path: '/product/CooperationEditBatch',
+              name: '批量修改',
+              component: () => import('@/pages/product/cooperationEditBatch'),
+              icon: 'none',
+              invisible: true
+            },
+            {
+              path: '/product/CooperationEditRule',
+              name: '编辑规则',
+              component: () => import('@/pages/product/cooperationEditRule'),
               icon: 'none',
               invisible: true
             },

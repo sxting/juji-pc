@@ -40,7 +40,7 @@
         <span slot="action" slot-scope="text, record">
           <a @click="bianji(record)">编辑</a>
           <a-divider type="vertical" />
-          <a @click="qrCode(record)">下载二维码</a>
+          <a @click="wechatManage(record)">分账账号管理</a>
         </span>
       </a-table>
 
@@ -56,7 +56,7 @@ import StandardTable from "../../components/table/StandardTable";
 const columns = [
   {
     title: "上次修改时间",
-    dataIndex: "typeName"
+    dataIndex: "lastUpdated"
   },
   {
     title: "所属运营商",
@@ -67,8 +67,8 @@ const columns = [
     dataIndex: "merchantName"
   },
   {
-    title: "可选赠送商品",
-    dataIndex: "price"
+    title: "异业合作类型",
+    dataIndex: "typeName"
   },
   {
     title: "操作",
@@ -94,9 +94,7 @@ export default {
     };
   },
   created() {
-    this.providerList = JSON.parse(
-      sessionStorage.getItem("LoginDate")
-    ).providerList;
+    this.providerList = JSON.parse(sessionStorage.getItem("LoginDate")).providerList;
     this.providerId = this.providerList[0].providerId;
     this.merchantListFun(this.providerId);
     this.$nextTick(() => {
@@ -107,8 +105,7 @@ export default {
         }
       });
     });
-    sessionStorage.setItem("menuBoolean",true);
-    this.productList();
+    this.crossList();
   },
   mounted() {},
   methods: {
@@ -119,25 +116,21 @@ export default {
     submit() {
       this.pageNo = 1;
       this.form.validateFields((err, values) => {
-        console.log(values);
-        this.productList(
+        this.crossList(
           values.repository.merchantId,
-          values.repository.productType,
-          values.repository.productName,
-          values.repository.biaoqian
         );
       });
     },
     bianji(e) {
       this.$router.push({
         path: "/product/CooperationEdit",
-        query: { providerId: this.providerId, merchantId: e.merchantId }
+        query: { providerId: this.providerId, merchantId: e.merchantId, crossId: e.crossId, type: e.type }
       });
     },
-    qrCode(e) {
+    wechatManage(e) {
       this.$router.push({
         path: "/product/CooperationQrcode",
-        query: { providerId: this.providerId, merchantId: e.merchantId }
+        query: { providerId: this.providerId, merchantId: e.merchantId, crossId: e.crossId }
       });
     },
     addNew() {
@@ -150,14 +143,12 @@ export default {
     onChange(e) {
       this.pageNo = e;
       this.form.validateFields((err, values) => {
-        this.productList(
+        this.crossList(
           values.repository.merchantId,
-          values.repository.productType,
-          values.repository.productName,
-          values.repository.biaoqian
         );
       });
     },
+
     merchantListFun(providerId) {
       let data = {
         providerId: providerId
@@ -178,20 +169,16 @@ export default {
         }
       });
     },
-
-    productList(merchantId, type, name, tag) {
+    crossList(merchantId) {
       let data = {
-        pageNo: this.pageNo || 1,
+        pageIndex: this.pageNo || 1,
         pageSize: 10,
         providerId: this.providerId,
         merchantId: merchantId || "",
-        type: type || "",
-        tag: tag || "",
-        name: name || "",
       };
       let that = this;
       this.$axios({
-        url: "/endpoint/product/page.json",
+        url: "/endpoint/cross/list.json",
         method: "get",
         processData: false,
         params: data
@@ -200,7 +187,11 @@ export default {
           this.data2 = res.data.list;
           this.countTotal = res.data.countTotal;
           this.data2.forEach(function(i) {
-
+            if(i.type === 'MEMBER') {
+              i.typeName = '会员版';
+            } else if(i.type === 'GIFT') {
+              i.typeName = '礼品版';
+            }
           });
         } else {
           this.$error({

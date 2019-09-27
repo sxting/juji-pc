@@ -2,15 +2,15 @@
   <a-card>
     <div>
       <a-form layout="horizontal">
-        <a-row>
+        <!-- <a-row>
           <a-col :md="12" :sm="24">
             <a-form-item label="商家名称" :labelCol="{span: 6}" :wrapperCol="{span: 18}">商家名称</a-form-item>
           </a-col>
-        </a-row>
+        </a-row> -->
         <a-row>
           <a-col :md="12" :sm="24">
             <a-form-item label="门店名称" :labelCol="{span: 6}" :wrapperCol="{span: 18}">
-              <a-select placeholder="请选择">
+              <a-select v-model="storeId" placeholder="请选择" @change="getCrossStores">
                 <a-select-option value="">全部门店</a-select-option>
                 <a-select-option v-for="(item) in cityStoreList" :key="item.id">{{item.name}}</a-select-option>
               </a-select>
@@ -27,55 +27,13 @@
     <div>
       <a-table :columns="columns" :dataSource="dataSource" :pagination="false" :locale="{emptyText: '暂无数据'}">
         <span slot="action" slot-scope="text, record">
-          <a @click="bianji(record)">编辑</a>
+          <a @click="bianji(record)">编辑规则</a>
         </span>
       </a-table>
       <div style="margin-top:20px;">
         <a-pagination style="float:right" @change="onChange" :current="pageNo" :pageSize="10" :total="countTotal" />
       </div>
     </div>
-
-    <a-modal title="批量修改赠送商品" :width="660" v-model="showModal1" @ok="handleOk1">
-      <a-transfer
-      :dataSource="mockData1"
-      showSearch
-      :targetKeys="targetKeys1"
-      @change="handleChange1"
-      :render="item=>item.title"
-      :titles="titlesArr1"
-      :listStyle="{
-        width: 'auto',
-        minWidth: '220px'
-      }">
-      </a-transfer>
-      <a-transfer class="mt20"
-      :dataSource="mockData2"
-      showSearch
-      :targetKeys="targetKeys2"
-      @change="handleChange2"
-      :render="item=>item.title"
-      :titles="titlesArr2"
-      :listStyle="{
-        width: 'auto',
-        minWidth: '220px'
-      }">
-      </a-transfer>
-    </a-modal>
-
-    <a-modal title="编辑赠送商品" :width="660" v-model="showModal2" @ok="handleOk2">
-      <a-transfer
-      :dataSource="mockData"
-      showSearch
-      :targetKeys="targetKeys"
-      @change="handleChange"
-      :render="item=>item.title"
-      :titles="titlesArr2"
-      :listStyle="{
-        width: 'auto',
-        minWidth: '250px'
-      }">
-      </a-transfer>
-    </a-modal>
   </a-card>
 </template>
 
@@ -86,8 +44,12 @@ const columns = [
     dataIndex: "storeName"
   },
   {
-    title: "赠送商品",
-    dataIndex: "products"
+    title: "赠送礼品商品",
+    dataIndex: "GIFT"
+  },
+  {
+    title: "赠送会员商品",
+    dataIndex: "MEMBER"
   },
   {
     title: "操作",
@@ -102,77 +64,81 @@ export default {
     return {
       providerId: '',
       merchantId: '',
+      crossId: '',
+      type: '',
       cityStoreList: [],
+      storeId: '',
       columns: columns,
-      dataSource: [
-        {
-          storeName: '门店名称',
-          products: '8'
-        }
-      ],
+      dataSource: [],
       pageNo: 1,
       countTotal: 0,
       pageSize: 10,
-      showModal1: false,
-      showModal2: false,
-      mockData: [],
-      targetKeys: [],
-      mockData1: [],
-      targetKeys1: [],
-      titlesArr1: ['全部可选门店', '已选门店'],
-      titlesArr2: ['全部购买送会员商品', '赠送商品'],
-      mockData2: [],
-      targetKeys2: [],
     }
   },
   created() {
     this.merchantId = this.$route.query.merchantId;
     this.providerId = this.$route.query.providerId;
+    this.crossId = this.$route.query.crossId;
+    this.type = this.$route.query.type;
     this.getStoreList();
+    this.getCrossStores();
   },
   methods: {
     search() {
-
+      this.getCrossStores();
     },
+
     fix() {
-      let mockData1 = [];
-      this.cityStoreList.forEach(function(item, i) {
-        let data = {
-          key: item.id,
-          title: item.name
-        };
-        mockData1.push(data);
+      this.$router.push({
+        path: "/product/CooperationEditBatch",
+        query: { providerId: this.providerId, merchantId: this.merchantId, crossId: this.crossId, type: this.type }
       });
-      this.mockData1 = mockData1;
-      this.targetKeys1 = [];
-      this.targetKeys2 = [];
-      this.showModal1 = true;
     },
+
     bianji(e) {
-      this.showModal2 = true;
+      this.$router.push({
+        path: "/product/CooperationEditRule",
+        query: { providerId: this.providerId, merchantId: this.merchantId, storeId: e.storeId, crossId: this.crossId, type: this.type }
+      });
     },
-    onChange(){
 
-    },
-    handleOk1() {
-
-    },
-    handleOk2() {
-
-    },
-    handleChange(targetKeys, direction, moveKeys) {
-      this.targetKeys = targetKeys
-    },
-    handleChange1(targetKeys, direction, moveKeys) {
-      console.log(targetKeys, direction, moveKeys);
-      this.targetKeys1 = targetKeys
-    },
-    handleChange2(targetKeys, direction, moveKeys) {
-      console.log(targetKeys, direction, moveKeys);
-      this.targetKeys2 = targetKeys
+    onChange(e){
+      this.pageNo = e;
+      this.getCrossStores();
     },
 
     /* ===service data=== */
+
+    getCrossStores() {
+      let data = {
+        storeId: this.storeId,
+        crossId: this.crossId,
+        pageIndex: this.pageNo,
+        pageSize: this.pageSize
+      };
+      this.$axios({
+        url: "/endpoint/cross/stores.json",
+        method: "get",
+        processData: false,
+        params: data
+      }).then(res => {
+        if (res.success) {
+          this.countTotal = res.data.countTotal;
+          this.dataSource = res.data.list;
+          this.dataSource.forEach(function(item) {
+            if(!item.MEMBER) {
+              item.MEMBER = '--';
+            }
+          })
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
+    },
+
     getStoreList() {
       let data = {
         merchantId: this.merchantId
@@ -206,5 +172,16 @@ export default {
 }
 .mt20 {
   margin-top: 20px;
+}
+.form-item {
+  display: flex;
+  line-height: 32px;
+  margin-top: 20px;
+}
+.mr10 {
+  margin-right: 10px;
+}
+.w200 {
+  width: 200px;
 }
 </style>
