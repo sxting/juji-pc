@@ -192,6 +192,10 @@
             </a-row>
           </a-checkbox-group>
         </a-form-item>
+        <!-- 首页展示 -->
+        <a-form-item label="首页展示" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+          <a-switch checkedChildren="开" unCheckedChildren="关" v-model="homeDisplay" @change="onHomeDisplayChange" />
+        </a-form-item>
         <a-form-item label="精选推荐" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
           <a-switch checkedChildren="开" unCheckedChildren="关" v-model="recommend" @change="onRecommendChange" />
         </a-form-item>
@@ -351,6 +355,7 @@ export default {
       productId: sessionStorage.getItem("PROCIDERID") || "",
       unAuditCount: 0,
       subject: [], // 活动主题； 字符串 逗号分隔
+      homeDisplay: true,
       recommend: true, //是否推荐； 0，1
       shareText: '', //分享文字
       remember: false,
@@ -469,6 +474,9 @@ export default {
     },
     onBuyMemberChange(event){
       this.buyMember = event;
+    },
+    onHomeDisplayChange(event) {
+      this.homeDisplay = event;
     },
     onRecommendChange(event) {
       this.recommend = event;
@@ -691,6 +699,7 @@ export default {
               type: productType,
               productId: this.productId,
               subject: this.subject.join(','),
+              homeDisplay: this.homeDisplay ? 1 : 0,
               recommend: this.recommend ? 1 : 0,
               openMember:this.buyMember?1:0,
               voucherGenerateType: this.lvyou ? 'TSTC' : '',
@@ -927,6 +936,7 @@ export default {
             });
           });
           this.subject = res.data.subject ? res.data.subject.split(',') : [];
+          this.homeDisplay = res.data.homeDisplay ? true : false;
           this.recommend = res.data.recommend ? true : false;
           this.remember = res.data.isMember ? true : false;
           this.buyMember = res.data.openMember ? true : false;
