@@ -154,7 +154,7 @@
         </a-form-item>
         -->
         <a-form-item label="使用有效期" :labelCol="{span: 7}" help="自购买之日起开始计算时间" :wrapperCol="{span: 10}" fieldDecoratorId="repository.cutOffDays" :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入使用有效期'}]}" :required="true">
-          <a-input-number :min="1" :step="1" :max="30" />
+          <a-input-number :min="1" :step="1" :max="180" />
         </a-form-item>
         <a-form-item label="购买限制" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
           <div>
@@ -529,17 +529,21 @@ export default {
       }
     },
     addGroupBuynote() {
-      if (this.buyerNotes.length >= 5) {
-        this.$error({
-          title: "温馨提示",
-          content: "最多添加五组!!"
-        });
-      } else {
-        this.buyerNotes.push({
+      this.buyerNotes.push({
           title: "",
           details: [{ item: "" }]
-        });
-      }
+      });
+      // if (this.buyerNotes.length >= 5) {
+      //   this.$error({
+      //     title: "温馨提示",
+      //     content: "最多添加五组!!"
+      //   });
+      // } else {
+      //   this.buyerNotes.push({
+      //     title: "",
+      //     details: [{ item: "" }]
+      //   });
+      // }
     },
     pluseGroupbuyNote(index) {
       if (this.buyerNotes.length <= 1) {
