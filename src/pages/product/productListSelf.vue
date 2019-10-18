@@ -88,6 +88,7 @@
 
 <script>
 import StandardTable from "../../components/table/StandardTable";
+
 const columns = [
   {
     title: "商品类型",
@@ -179,30 +180,31 @@ export default {
       console.log(e);
       let data = {
         productId: e.productId,
-        baseSoldNum: e.baseSoldNum
+        num: e.baseSoldNum
       };
-      // this.$axios({
-      //   url: "/endpoint/juji/provider/merchant/list.json",
-      //   method: "get",
-      //   processData: false,
-      //   params: data
-      // }).then(res => {
-      //   if (res.success) {
-      //     this.form.validateFields((err, values) => {
-      //       this.productList(
-      //         values.repository.merchantId,
-      //         values.repository.productType,
-      //         values.repository.productName,
-      //         values.repository.biaoqian
-      //       );
-      //     });
-      //   } else {
-      //     this.$error({
-      //       title: "温馨提示",
-      //       content: res.errorInfo
-      //     });
-      //   }
-      // });
+
+      this.$axios({
+        url: "https://api.juniuo.com/juji/hotnum.php",
+        method: "post",
+        processData: false,
+        data: data
+      }).then(res => {
+        if (res.success) {
+          this.form.validateFields((err, values) => {
+            this.productList(
+              values.repository.merchantId,
+              values.repository.productType,
+              values.repository.productName,
+              values.repository.biaoqian
+            );
+          });
+        } else {
+          this.$error({
+            title: "温馨提示",
+            content: res.errorInfo
+          });
+        }
+      });
     },
 
     toggleAdvanced() {
