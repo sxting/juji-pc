@@ -39,6 +39,13 @@ let routesObj = {
               invisible: true
             },
             {
+              path: '/product/productList/self',
+              name: '商品列表',
+              component: () => import('@/pages/product/productListSelf'),
+              icon: 'none',
+              invisible: true
+            },
+            {
               path: '/product/fenxiao',
               name: '分销商品',
               menuId: '20300000',
