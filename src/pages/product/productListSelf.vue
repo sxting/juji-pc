@@ -192,26 +192,19 @@ export default {
         data: data
       }).then(res => {
         console.log(res);
-        if (res.message === 'SUCCESS') {
-          if(res.data == 1) {
-            this.form.validateFields((err, values) => {
-              this.productList(
-                values.repository.merchantId,
-                values.repository.productType,
-                values.repository.productName,
-                values.repository.biaoqian
-              );
-            });
-          } else  {
-            this.$error({
-              title: "温馨提示",
-              content: '修改失败'
-            });
-          }
+        if (res.error == '0') {
+          this.form.validateFields((err, values) => {
+            this.productList(
+              values.repository.merchantId,
+              values.repository.productType,
+              values.repository.productName,
+              values.repository.biaoqian
+            );
+          });
         } else {
           this.$error({
             title: "温馨提示",
-            content: res.errorInfo
+            content: '修改失败'
           });
         }
       });
