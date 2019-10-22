@@ -177,27 +177,37 @@ export default {
     },
 
     ediltBaseSoldNum(e) {
-      console.log(e);
+      // console.log(e);
       let data = {
         productId: e.productId,
-        num: e.baseSoldNum
+        num: Number(e.baseSoldNum)
       };
 
+      let url = JSON.parse(JSON.stringify(window.location.host.indexOf('oauth2.jujipay.com') > -1 ? 'https://api.juniuo.com/juji/hotnum.php' : 'https://api.juniuo.com/juji/hotnum.php?env=dev'))
+
       this.$axios({
-        url: "https://api.juniuo.com/juji/hotnum.php",
+        url: url,
         method: "post",
         processData: false,
         data: data
       }).then(res => {
-        if (res.success) {
-          this.form.validateFields((err, values) => {
-            this.productList(
-              values.repository.merchantId,
-              values.repository.productType,
-              values.repository.productName,
-              values.repository.biaoqian
-            );
-          });
+        console.log(res);
+        if (res.message === 'SUCCESS') {
+          if(res.data == 1) {
+            this.form.validateFields((err, values) => {
+              this.productList(
+                values.repository.merchantId,
+                values.repository.productType,
+                values.repository.productName,
+                values.repository.biaoqian
+              );
+            });
+          } else  {
+            this.$error({
+              title: "温馨提示",
+              content: '修改失败'
+            });
+          }
         } else {
           this.$error({
             title: "温馨提示",
